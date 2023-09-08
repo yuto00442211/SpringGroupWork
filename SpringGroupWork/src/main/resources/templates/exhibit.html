@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>キャルション - 出品</title>
+<style>
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	background-color: #f0f0f0;
+}
+
+.sell-container {
+	max-width: 600px;
+	margin: 100px auto;
+	background-color: white;
+	border-radius: 5px;
+	box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+	padding: 20px;
+}
+
+.sell-title {
+	font-size: 24px;
+	font-weight: bold;
+	margin-bottom: 20px;
+	text-align: center;
+}
+
+.sell-form {
+	text-align: center;
+}
+
+.sell-input {
+	width: 100%;
+	padding: 10px;
+	margin-bottom: 10px;
+	border: 1px solid #ddd;
+	border-radius: 3px;
+}
+
+.sell-textarea {
+	width: 100%;
+	padding: 10px;
+	margin-bottom: 10px;
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	resize: vertical;
+}
+
+.sell-select {
+	padding: 5px;
+}
+
+.sell-button {
+	background-color: #3498db;
+	color: white;
+	padding: 10px 20px;
+	border: none;
+	border-radius: 3px;
+	cursor: pointer;
+}
+
+.sell-button:hover {
+	background-color: #2980b9;
+}
+</style>
+</head>
+<body>
+	<div class="sell-container">
+		<div class="sell-title">商品を出品する</div>
+		<div class="sell-form">
+			<form method="POST" th:action="@{/afterLogin/create}"
+				th:object="${goodsForm}" enctype="multipart/form-data">
+				<div th:if="${validationError}" th:each="error : ${validationError}">
+					<label class="text-danger" th:text="${error}"></label>
+				</div>
+				<input class="sell-input" type="text" th:field="*{name}"
+					placeholder="商品名"> <input class="sell-input" type="number"
+					th:field="*{initial_price}" placeholder="開始価格"> <label>終了時間：</label>
+				<input class="sell-input" type="datetime-local"
+					th:field="*{endtime}" id="endTime"> <label for="genre">ジャンル：</label>
+				<select class="sell-select" id="genre" name="genre"
+					th:field="*{genre_id}">
+					<option th:each="product : ${genreList}"
+						th:value="${product.genre_id}" th:text="${product.genreName}"></option>
+				</select>
+
+				<textarea class="sell-textarea" th:field="*{comment}"
+					placeholder="商品説明"></textarea>
+				<input class="sell-input" type="file" name="file" accept="image/*">
+				<button class="sell-button" type="submit">出品する</button>
+			</form>
+
+
+
+
+
+		</div>
+	</div>
+</body>
+</html>

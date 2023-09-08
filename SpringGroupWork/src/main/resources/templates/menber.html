@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>キャルション - 新規登録</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        .registration-container {
+            max-width: 600px;
+            margin: 100px auto;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+        }
+        .registration-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .registration-form {
+            text-align: center;
+        }
+        .registration-label {
+            display: block;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .registration-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .registration-button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .registration-button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="registration-container">
+        <div class="registration-title">新規登録</div>
+        <div class="registration-form">
+          
+           <form method="POST" th:action="@{/sell/sub}"  th:object="${accountForm}" onsubmit="return validateForm()">
+    <label class="registration-label" for="name">名前</label>
+    <input class="registration-input" type="text" th:field="*{name}" required>
+
+    <label class="registration-label" for="address">住所</label>
+    <input class="registration-input" type="text"  th:field="*{address}" required>
+
+    <label class="registration-label" for="tel">電話番号</label>
+    <input class="registration-input" type="tel"  th:field="*{tel}"required>
+
+    <label class="registration-label" for="email">メールアドレス</label>
+    <input class="registration-input" type="email"   th:field="*{mail}"required>
+
+    <label class="registration-label" for="password">パスワード</label>
+    <input class="registration-input" type="password"  th:field="*{password}" required>
+
+    <button class="registration-button" type="submit">登録</button>
+</form>
+
+        </div>
+    </div>
+
+    <script>
+        function validateForm() {
+            var name = document.getElementById('name').value.trim();
+            var address = document.getElementById('address').value.trim();
+            var tel = document.getElementById('tel').value.trim();
+            var email = document.getElementById('email').value.trim();
+            var password = document.getElementById('password').value.trim();
+
+            if (name === '' || address === '' || tel === '' || email === '' || password === '') {
+                alert('全てのフィールドを入力してください。');
+                return false;
+            }
+
+            // ここで他のバリデーションを追加
+
+            return true;
+        }
+    </script>
+</body>
+</html>

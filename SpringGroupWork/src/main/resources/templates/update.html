@@ -1,0 +1,63 @@
+
+
+<!-- update.html -->
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>問題更新</title>
+</head>
+<body>
+    <h2>問題更新</h2>
+    <!-- 問題更新用フォーム -->
+    <form th:action="@{/afterLogin/updateGood}" th:object="${updateGoods}" th:method="post" enctype="multipart/form-data">
+
+
+        <!-- 隠しフィールド: 問題のID -->
+        <input type="hidden" th:field="*{goods_id}" /> 
+        <p>
+            <label>商品名：</label>
+            <!-- 問題テキストの入力エリア -->
+            <textarea th:field="*{name}" rows="3" cols="50"></textarea>
+        </p>
+        <p>
+            <label>ジャンルID：</label>
+            <!-- 選択肢1の入力フィールド -->
+            <input th:field="*{genre_id}" />
+        </p>
+        <p>
+            <label>開始価格：</label>
+            <!-- 選択肢2の入力フィールド -->
+            <input th:field="*{initial_price}" />
+        </p>
+        <p>
+            <label>終了時間：</label>
+            <!-- 選択肢3の入力フィールド -->
+            <input th:field="*{end_time}" />
+        </p>
+        <p>
+            <label>ファイル名：</label>
+            <!-- 選択肢4の入力フィールド -->
+            <span th:text="*{image_number}"></span>
+        </p>
+        <p>
+            <label>詳細：</label>
+            <!-- 正解の選択肢を選ぶ入力フィールド -->
+            <input th:field="*{comment}" />
+        </p>
+         <p>
+            <label>画像の更新及び追加：</label>
+            <!-- 画像のテキストの入力エリア -->
+            <input type="file" class="form-control-file" id="image" name="image">
+        </p>
+               
+       	<p>
+            <!-- 更新ボタン -->
+            <button type="submit">更新</button>
+        </p>
+    </form>
+    
+     <!-- ボタン -->
+        <a th:href="@{itemList}" class="btn btn-secondary">戻る</a>
+</body>
+</html>

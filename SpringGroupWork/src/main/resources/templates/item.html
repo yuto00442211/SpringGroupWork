@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>キャルション - 商品詳細</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        .product-details-container {
+            max-width: 600px;
+            margin: 100px auto;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .product-details-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .product-details-content {
+            text-align: center;
+        }
+
+        .product-image {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .product-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .product-price {
+            color: #e74c3c;
+            margin-bottom: 10px;
+        }
+
+        .bid-count {
+            margin-bottom: 10px;
+        }
+
+        .remaining-time {
+            margin-bottom: 10px;
+        }
+
+        .product-description {
+            margin-bottom: 20px;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-button, .bid-button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .back-button:hover, .bid-button:hover {
+            background-color: #2980b9;
+        }
+
+        .bid-table {
+            text-align: center; /* テキストを中央に配置 */
+            margin: 0 auto; /* 左右の余白を自動で均等に調整してセンター配置 */
+        }
+    </style>
+</head>
+<body>
+<div class="product-details-container">
+    <div class="product-details-title">商品詳細</div>
+    <div class="product-details-content">
+        <div class="product-name" th:text="${product.name}">商品名：</div>
+        <div class="product-price" th:text="${'$' + current_price}">現在価格：</div>
+        <div class="remaining-time" th:text="${remainingTime}">終了時間：</div>
+        <div class="product-description" th:text="${product.comment}">商品説明：</div>
+        <form th:action="@{/afterLogin/auction}" method="get" th:unless="${remainingTime == 'オークション終了'}">
+    <input type="hidden" name="productId" th:value="${product.goods_id}" />
+        <button class="bid-button">入札する</button>
+</form>
+    </div>
+</div>
+
+<form th:action="@{/afterLogin/sell}" method="get">
+    <button class="back-button">Topページに戻る</button>
+</form>
+
+</body>
+</html>
