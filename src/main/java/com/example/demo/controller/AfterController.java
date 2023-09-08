@@ -277,7 +277,8 @@ public class AfterController {
 
 	        if (bidAmount <= a) {
 	            model.addAttribute("error", true); // エラーがある場合、エラー変数を設定
-	            return "item"; // エラーがある場合、入札ページに戻る
+	            
+	            return "redirect:/afterLogin/auction?productId="+productId;// エラーがある場合、入札ページに戻る
 	        }
 	    }
 	    model.addAttribute("BitForm", new BitForm());
