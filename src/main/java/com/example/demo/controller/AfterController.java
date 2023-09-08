@@ -415,7 +415,7 @@ public class AfterController {
 				return "redirect:/afterLogin/itemList"; // 問題一覧ページへリダイレクト
 			}
 
-			@GetMapping("/mypage")
+			@GetMapping("/showMypage")
 			public String showMypage() {
 				return "mypage";
 			}
