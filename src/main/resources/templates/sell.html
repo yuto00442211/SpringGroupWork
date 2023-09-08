@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-	
-<link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css"
+	rel="stylesheet">
 
 <head>
 <meta charset="UTF-8">
@@ -108,29 +109,28 @@ header {
 }
 
 .user-info {
-    padding-left: 10px; /* 左側のパディング */
-    padding-right: 10px; /* 右側のパディング */
+	padding-left: 10px; /* 左側のパディング */
+	padding-right: 10px; /* 右側のパディング */
 }
+
 .product-container {
-    display: flex;
-    flex-wrap: wrap; /* 要素が行をまたいで折り返す */
-    justify-content: space-between; /* 要素を横に均等に配置 */
+	display: flex;
+	flex-wrap: wrap; /* 要素が行をまたいで折り返す */
+	justify-content: space-between; /* 要素を横に均等に配置 */
 }
 
 .product-card {
-    flex: 1;
-    padding: 20px;
-    border: 1px solid #ddd;
-    background-color: #fff;
-    border-radius: 5px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    min-width: calc(25% - 10px);
-    /* 高さを幅の0.75倍に設定（4:3の縦横比） */
-    height: calc((25% - 10px) * 0.75);
+	flex: 1;
+	padding: 20px;
+	border: 1px solid #ddd;
+	background-color: #fff;
+	border-radius: 5px;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	min-width: calc(25% - 10px);
+	/* 高さを幅の0.75倍に設定（4:3の縦横比） */
+	height: calc(( 25% - 10px)* 0.75);
 }
-
-
 </style>
 
 <script>
@@ -166,104 +166,121 @@ document.addEventListener("DOMContentLoaded", function () {
 </head>
 <body>
 	<header>
-		<div class="site-name"><h1 style="font-size: 32px;">キャルション！</h1></div>
-		
-        <div sec:authorize="!isAuthenticated()" class="auth-buttons">
-            <form th:action="@{/sell/login}" method="get">
-                  <button class="action-button">ログイン</button>
-            </form>
-        </div>
+		<div class="site-name">
+			<h1 style="font-size: 32px;">キャルション！</h1>
+		</div>
 
-        <!-- sec:authorizeを使って"isAuthenticated()"で認証済みかどうかを判定 -->
-        <!-- trueならば<div>内を表示 -->
-        <div sec:authorize="isAuthenticated()" class="user-info">
-            こんにちは：<span sec:authentication="name"></span>さん
-            <form th:action="@{/logout}" method="post">
-            </form>
-           
-                <div class="button-container">
-     <form th:action="@{itemList}" method="get">
-        <button style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
-    </form>
-    
-    <form th:action="@{showMypage}" method="get">
-        <button style="background: url('/image/mypageicon.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
-    </form>
-    <form th:action="@{create}" method="get">
-        <button style="background: url('/image/upload.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
-    </form>
-    <form th:action="@{/logout}" method="post">
-        <button style="background: url('/image/logoutbutton.png') no-repeat center center; width: 145px; height: 65px; border: none;" type="submit"></button>
-    </form>
-    </div>
-    
-</div>
+		<div sec:authorize="!isAuthenticated()" class="auth-buttons">
+			<form th:action="@{/sell/login}" method="get">
+				<button class="action-button">ログイン</button>
+			</form>
+		</div>
+
+		<!-- sec:authorizeを使って"isAuthenticated()"で認証済みかどうかを判定 -->
+		<!-- trueならば<div>内を表示 -->
+		<div sec:authorize="isAuthenticated()" class="user-info">
+			こんにちは：<span sec:authentication="name"></span>さん
+			<form th:action="@{/logout}" method="post"></form>
+
+			<div class="button-container">
+				<form th:action="@{itemList}" method="get">
+					<button
+						style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;"
+						type="submit"></button>
+				</form>
+
+				<form th:action="@{showMypage}" method="get">
+					<button
+						style="background: url('/image/mypageicon.png') no-repeat center center; width: 60px; height: 65px; border: none;"
+						type="submit"></button>
+				</form>
+				<form th:action="@{create}" method="get">
+					<button
+						style="background: url('/image/upload.png') no-repeat center center; width: 60px; height: 65px; border: none;"
+						type="submit"></button>
+				</form>
+				<form th:action="@{/logout}" method="post">
+					<button
+						style="background: url('/image/logoutbutton.png') no-repeat center center; width: 145px; height: 65px; border: none;"
+						type="submit"></button>
+				</form>
+			</div>
+
+		</div>
 	</header>
 	<div class="container">
 		<div class="search-form">
-			<label class="search-label" for="genre">ジャンル：</label> <select
-				class="search-select" id="genre">
-				<option value="all">全てのジャンル</option>
-				<option value="electronics">電化製品</option>
-				<option value="clothing">服</option>
-				<!-- 他のジャンルのオプションも追加 -->
-			</select>
+			<form th:action="@{genreItemList}" method="post">
+				<label class="search-label" for="genre">ジャンル：</label> <select
+					class="search-select" id="genre" name="genre_id">
+					<option value="0">全てのジャンル</option>
+					<option th:each="product : ${genreList}"
+						th:value="${product.genre_id}" th:text="${product.genreName}"></option>
+
+
+				</select><input type="submit" value="選択">
+			</form>
 		</div>
-</div>
+	</div>
 
 
-		
-		
-		<!-- 既存のHTMLコード -->
 
-<div class="product-container">
-    <div th:each="product : ${productList}" class="product-card">
-        <!-- 画像表示は削除されました -->
-        <form th:action="@{product}" method="get">
-           <button class="action-button product-card-name" type="submit" name="productId" th:value="${product.goodsId}">
-                <span th:text="${product.name}"></span>
-            </button>
-        </form>
-        <div class="product-card-price" th:text="${  product.initialPrice+'円'}"></div>
-    </div>
-</div>
 
-<!-- 既存のHTMLコードの後続部分 -->
+	<!-- 既存のHTMLコード -->
 
-	
+	<div class="product-container">
+		<div th:each="product : ${productList}" class="product-card">
+			<!-- 画像表示は削除されました -->
+			<form th:action="@{product}" method="get">
+				<button class="action-button product-card-name" type="submit"
+					name="productId" th:value="${product.goods_id}">
+					<span th:text="${product.name}"></span>
+				</button>
+			</form>
+			<div class="product-card-price"
+				th:text="${  product.initial_price+'円'}"></div>
+		</div>
+	</div>
+
+	<!-- 既存のHTMLコードの後続部分 -->
+
+
 </body>
 
 <style>
 h1 {
-  font-family: "Nico Moji";
+	font-family: "Nico Moji";
 }
-.site-name {
-background:#FFDA45; /*背景色の指定*/
-color:#000000; /*テキストの色の指定*/
-padding:px;
-text-align: center;
-width: 200px;
 
+.site-name {
+	background: #FFDA45; /*背景色の指定*/
+	color: #000000; /*テキストの色の指定*/
+	padding: px;
+	text-align: center;
+	width: 200px;
 }
 .site-name p {
-margin:0;
-padding:10px;
+	margin: 0;
+	padding: 10px;
+}
 
-}
 .search-form {
-    text-align: left;
+	text-align: left;
 }
+
 .button-container {
-    display: flex;
-    align-items: center;
+	display: flex;
+	align-items: center;
 }
 
 .action-button {
-    /* ボタンのスタイル */
+	/* ボタンのスタイル */
+	
 }
 
 .action-button:hover {
-    /* ボタンのホバースタイル */
+	/* ボタンのホバースタイル */
+	
 }
 </style>
 
