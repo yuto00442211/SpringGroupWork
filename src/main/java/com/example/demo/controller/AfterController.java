@@ -76,6 +76,8 @@ public class AfterController {
 	
 //	highPrice(int goodsId)
 	
+	
+	
 	/**
 	 * トップページに遷移します.
 	 * （引数はログインしたユーザーを取得するための記述）
