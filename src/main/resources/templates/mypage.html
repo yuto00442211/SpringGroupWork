@@ -1,180 +1,190 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-        rel="stylesheet">
-    <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css"
-        rel="stylesheet">
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css"
+	rel="stylesheet">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>キャルション - MyPage</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 0;
-                background-color: #f0f0f0;
-            }
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>キャルション - MyPage</title>
+<style>
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	background-color: #f0f0f0;
+}
 
-            header {
-                background-color: #f0f0f0;
-                color: rgb(0, 0, 0);
-                padding: 10px 0;
-                text-align: left; /* テキストを左寄せに配置 */
-                display: flex;
-                justify-content: space-between; /* 要素を左右に配置 */
-                align-items: center;
-                padding-left: 20px; /* ヘッダー全体のパディング */
-                padding-right: 20px; /* ヘッダー全体のパディング */
-            }
-            .button-container {
+header {
+	background-color: #f0f0f0;
+	color: rgb(0, 0, 0);
+	padding: 10px 0;
+	text-align: left; /* テキストを左寄せに配置 */
+	display: flex;
+	justify-content: space-between; /* 要素を左右に配置 */
+	align-items: center;
+	padding-left: 20px; /* ヘッダー全体のパディング */
+	padding-right: 20px; /* ヘッダー全体のパディング */
+}
+
+.button-container {
 	display: flex;
 	align-items: center;
 	margin-left: auto;
 }
 
-            .site-name {
-                background: #FFDA45; /* 背景色の指定 */
-                color: #000000; /* テキストの色の指定 */
-                padding: 15px;
-                text-align: center;
-                width: 200px;
-            }
+.site-name {
+	background: #FFDA45; /* 背景色の指定 */
+	color: #000000; /* テキストの色の指定 */
+	padding: 15px;
+	text-align: center;
+	width: 200px;
+}
 
-            .user-info {
-                display: flex;
-                align-items: center;
-            }
+.user-info {
+	display: flex;
+	align-items: center;
+}
 
-            .user-info img {
-                width: 50px; /* 画像の幅を調整 */
-                height: 50px; /* 画像の高さを調整 */
-                margin-right: 10px; /* 画像とテキストの間のマージン */
-            }
+.user-info img {
+	width: 50px; /* 画像の幅を調整 */
+	height: 50px; /* 画像の高さを調整 */
+	margin-right: 10px; /* 画像とテキストの間のマージン */
+}
 
-            .user-info span {
-                font-weight: bold;
-            }
+.user-info span {
+	font-weight: bold;
+}
 
-            .cp_menu {
-                max-width: 360px;
-                margin: 0;
-                padding: 0;
-            }
+.cp_menu {
+	max-width: 360px;
+	margin: 0;
+	padding: 0;
+}
 
-            .cp_menu a {
-                display: block;
-                padding: 10px;
-                text-decoration: none;
-                color: #000000;
-                line-height: 1;
-            }
+.cp_menu a {
+	display: block;
+	padding: 10px;
+	text-decoration: none;
+	color: #000000;
+	line-height: 1;
+}
 
-            .cp_menu label {
-                display: block;
-                position: relative;
-                margin: 0 0 2px 0;
-                padding: 12px;
-                line-height: 1;
-                color: #ffffff;
-                background: #1b2538;
-                cursor: pointer;
-            }
+.cp_menu label {
+	display: block;
+	position: relative;
+	margin: 0 0 2px 0;
+	padding: 12px;
+	line-height: 1;
+	color: #ffffff;
+	background: #1b2538;
+	cursor: pointer;
+}
 
-            .cp_menu label::before {
-                position: absolute;
-                content: '▼';
-                color: #ffffff;
-                right: 0.5em;
-                top: 25%;
-            }
+.cp_menu label::before {
+	position: absolute;
+	content: '▼';
+	color: #ffffff;
+	right: 0.5em;
+	top: 25%;
+}
 
-            .cp_menu input {
-                display: none;
-            }
+.cp_menu input {
+	display: none;
+}
 
-            .cp_menu ul {
-                margin: 0;
-                padding: 0;
-                background: #f4f4f4;
-                list-style: none;
-            }
+.cp_menu ul {
+	margin: 0;
+	padding: 0;
+	background: #f4f4f4;
+	list-style: none;
+}
 
-            .cp_menu li {
-                overflow-y: hidden;
-                max-height: 0;
-                transition: all 0.5s;
-            }
+.cp_menu li {
+	overflow-y: hidden;
+	max-height: 0;
+	transition: all 0.5s;
+}
 
-            /* リストが増えたらULごとに追加してください */
-            #cp_menu_bar1:checked ~ #link1 li,
-            #cp_menu_bar2:checked ~ #link2 li {
-                max-height: 46px;
-                opacity: 1;
-            }
+/* リストが増えたらULごとに追加してください */
+#cp_menu_bar1:checked ~ #link1 li, #cp_menu_bar2:checked ~ #link2 li {
+	max-height: 46px;
+	opacity: 1;
+}
 
-            h1 {
-                font-family: "Nico Moji";
-            }
+h1 {
+	font-family: "Nico Moji";
+}
 
-            .product-icon {
-                width: 150px; /* 画像の幅を50pxに調整 */
-                height: 150px; /* 画像の高さを50pxに調整 */
-            }
+.product-icon {
+	width: 150px; /* 画像の幅を50pxに調整 */
+	height: 150px; /* 画像の高さを50pxに調整 */
+}
 
-            .site-name p {
-                margin: 10;
-                padding: 10px;
-            }
+.site-name p {
+	margin: 10;
+	padding: 10px;
+}
 
-            .search-form {
-                text-align: left;
-            }
-        </style>
-    </head>
+.search-form {
+	text-align: left;
+}
+</style>
+</head>
 
-    <body>
-        <header>
-            <div class="site-name">
-                <h1 style="font-size: 32px; cursor: pointer;"
-                    onclick="redirectToSellPage()">キャルション！</h1>
-                <script>
+<body>
+	<header>
+		<div class="site-name">
+			<h1 style="font-size: 32px; cursor: pointer;"
+				onclick="redirectToSellPage()">キャルション！</h1>
+			<script>
                     function redirectToSellPage() {
                         window.location.href = '/afterLogin/sell';
                     }
                 </script>
-            </div>
+		</div>
 
-            <div sec:authorize="isAuthenticated()" class="user-info">
-                <img src="/image/icon.png" alt="アイコン" width="50" height="50">
-                <span sec:authentication="name"></span>さんのマイページ
-                <form th:action="@{/logout}" method="post"></form>
-            </div>
-        </header>
-<div class="cp_menu">
-            <label for="cp_menu_bar1">アカウントメニュー</label>
-            <input type="radio" name="radio" id="cp_menu_bar1" class="accordion" />
-            <ul id="link1">
-                <li>
-                       <div class="button-container">
-				<form th:action="@{itemList}" method="get">
-					<button class="action-button">出品商品</button> <!-- 今は商品一覧ページに繋がっています(仮) -->
-				</form>
-        </div>
+		<div sec:authorize="isAuthenticated()" class="user-info">
+			<img src="/image/icon.png" alt="アイコン" width="50" height="50"> <span
+				sec:authentication="name"></span>さんのマイページ
+			<form th:action="@{/logout}" method="post"></form>
+		</div>
+	</header>
+	<div class="cp_menu">
+		<label for="cp_menu_bar1">アカウントメニュー</label> <input type="radio"
+			name="radio" id="cp_menu_bar1" class="accordion" />
+		<ul id="link1">
+			<li>
+				<div class="button-container">
+					<form th:action="@{itemList}" method="get">
+						<button class="action-button">出品商品</button>
+						<!-- 今は商品一覧ページに繋がっています(仮) -->
+					</form>
+				</div>
 
-                </li>
-                <li><a href="">出品中の商品</a></li>
-                <li><a href="">入札中の商品</a></li>
-                <li><a href="">評価</a></li>
-                <li><a href="">ログアウト</a></li>
-            </ul>
-             
-  
+			</li>
+			<li><a href="">出品中の商品</a></li>
+			<li><a href="">入札中の商品</a></li>
+			<li><a href="">評価</a></li>
+			<li><a href="">ログアウト</a></li>
+		</ul>
 
-        <!-- ここにページのコンテンツを追加 -->
+		<form action="addGenre" method="get">
+			<input type="text" name="text" placeholder="ジャンル名を入力">
+			<button type="submit">送信</button>
+		</form>
+		<div th:if="${successMessage}" class="success-message">
+			<p th:text="${successMessage}"></p>
+		</div>
+		<div th:if="${errorMessage}" class="error-message">
+			<p th:text="${errorMessage}"></p>
+		</div>
 
-    </body>
+
+		<!-- ここにページのコンテンツを追加 -->
+</body>
 </html>

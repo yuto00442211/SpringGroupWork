@@ -504,18 +504,18 @@ public class AfterController {
 	}
 
 	@GetMapping("addGenre")
-	public String addGenre(Model model ,@RequestParam("text") String text) {
-		if(genreService.chkName(text)) {
+	public String addGenre(Model model, @RequestParam("text") String text) {
+		if (genreService.chkName(text)) {
 			Genre genre = new Genre();
 			genre.setGenreName(text);
 			genreRepository.save(genre);
-		}else {
-			//エラーメッセージの表示
+			model.addAttribute("successMessage", "ジャンルが正常に追加されました。");
+		} else {
+			model.addAttribute("errorMessage", "ジャンルが既に存在します。別の名前を試してください。");
 		}
-		return "redirect:/afterLogin/sell";
-		//↑ホントはマイページにリダイレクトしたい。
+		return "mypage";
 	}
-
+	
 }
 
 
