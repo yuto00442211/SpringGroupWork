@@ -113,6 +113,8 @@ public class AfterController {
 
 
 		model.addAttribute("productList", dataList);
+		boolean issellMapping =false;
+		model.addAttribute("issellMapping",issellMapping);
 		////////////////////////////////////////////
 		return "sell";
 	}

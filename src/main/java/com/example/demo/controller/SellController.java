@@ -18,8 +18,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.Form.AccountForm;
 import com.example.demo.entity.Account;
+import com.example.demo.entity.Genre;
 import com.example.demo.entity.Goods;
+import com.example.demo.entity.GoodsList;
 import com.example.demo.repositry.AccountRepositry;
+import com.example.demo.service.BitinfoService;
+import com.example.demo.service.GenreService;
+import com.example.demo.service.GoodsListService;
 import com.example.demo.service.GoodsService;
 
 import jakarta.validation.Valid;
@@ -38,22 +43,51 @@ public class SellController {
 	@Autowired
 	//	private @Bean // このメソッドの返り値をSpringのBeanとして登録します
 	public PasswordEncoder passwordEncoder;// パスワードエンコーダー（パスワードのハッシュ化）を提供するメソッド
+	@Autowired
+	private BitinfoService bitinfoService ;
+	@Autowired
+	private GoodsListService goodsListService ;
+	@Autowired
+	private GenreService genreService;
 
 	@GetMapping
 	public String showSellPage(Model model) {
 
 
-		List<Goods> productList = goodsservice.getAllGoods(); // 商品情報を取得するメソッドを実装してください
-		model.addAttribute("productList", productList);
+		List<Goods> dataList = goodsservice.getAllGoods(); // データベースからListに代入
+		//		List<Goods> productList = new ArrayList<>();//最新の金額に変更したGoodsを入れるリスト
+
+		for(Goods g :dataList) {
+			int goodsId=g.getGoods_id();
+			if(bitinfoService.highPrice(goodsId)!=0) {
+				g.setInitial_price(bitinfoService.highPrice(goodsId));
+			}
+			//			productList.add(g);
+		}
+
+		List<Genre> genreList = genreService.getAllGenre();
+		model.addAttribute("genreList", genreList);
+
+
+		model.addAttribute("productList", dataList);
+		
+		boolean issellMapping =true;
+		model.addAttribute("issellMapping",issellMapping);
 		return "sell"; // 出品ページのテンプレート名
 	}
 
 	@GetMapping("/product")
 	public String getProductDetail(@RequestParam int productId, Model model) {
 		Goods product = goodsservice.getGoodsById(productId);
+		
+		
 
 		if (product != null) { // 商品が存在する場合のみ処理を行う
 			String remainingTime = calculateRemainingTime(product.getEnd_time());
+			
+			int current_price = bitinfoService.highPrice(productId);
+			model.addAttribute("current_price", current_price);
+		
 
 			model.addAttribute("product", product);
 			model.addAttribute("remainingTime", remainingTime);
@@ -135,6 +169,39 @@ public class SellController {
 	@GetMapping("/login")
 	public String loginForm() {
 		return "login";
+	}
+	@GetMapping("itemList")
+	public String showItemList(Model model) {
+		System.out.println(123465);
+		// 商品データをデータベースから取得
+		List<GoodsList> productList = goodsListService.goodsList();
+		System.out.println(productList.get(0));
+
+		boolean RoleAdmin = false;
+		boolean RoleYes = false;
+		String genre = "全商品";
+
+		model.addAttribute("genre",genre);
+		model.addAttribute("RoleAdmin",RoleAdmin);
+		model.addAttribute("RoleYes",RoleYes);
+		model.addAttribute("productList",productList);
+
+		return "itemList";
+	}
+	@PostMapping("genreItemList")
+	public String showGenreItemList(Model model,@RequestParam int genre_id) {
+		List<GoodsList> productList = goodsListService.goodsList2(genre_id);
+
+
+		boolean RoleAdmin = false;
+		boolean RoleYes = false;
+
+		String genre = goodsListService.genreList(genre_id);
+		model.addAttribute("genre",genre);
+		model.addAttribute("RoleAdmin",RoleAdmin);
+		model.addAttribute("RoleYes",RoleYes);
+		model.addAttribute("productList",productList);
+		return "itemList";
 	}
 
 

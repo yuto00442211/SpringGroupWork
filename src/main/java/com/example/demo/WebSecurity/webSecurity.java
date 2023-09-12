@@ -2,7 +2,6 @@ package com.example.demo.WebSecurity;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,6 +14,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @EnableWebSecurity
 public class webSecurity {
+	
 
 	@Bean//パスワード暗号化用のクラス
 	PasswordEncoder passwordEncoder() {
@@ -29,9 +29,13 @@ public class webSecurity {
 				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
 		.authorizeHttpRequests(authorizeRequests ->
 		authorizeRequests
-		.requestMatchers("/sell","/sell/login","/sell/sub","/sell/sell","/sell/item").permitAll()
-		.requestMatchers(HttpMethod. POST,"/afterLogin/*").permitAll()
-		.requestMatchers(HttpMethod. GET,"/afterLogin/*","/sell/product").permitAll()
+		
+		.requestMatchers("/sell","/sell/login","/sell/sub","/sell/product","/sell/genreItemList","/sell/itemList","/sell/success").permitAll()
+		
+		
+		
+//		.requestMatchers(HttpMethod. POST,"/sell/product/**").permitAll()
+//		.requestMatchers(HttpMethod. GET,"/sell/product/**").permitAll()
 		.anyRequest().authenticated()
 				)
 		.formLogin(formLogin ->
@@ -45,11 +49,12 @@ public class webSecurity {
 		.logout(logout ->
 		logout
 		.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-		.logoutSuccessUrl("/sell/sell")
+		.logoutSuccessUrl("/sell")
 		.deleteCookies("JSESSIONID")
 		.invalidateHttpSession(true)
 				);
-
+		 // 特定のURLを許可
+ 
 		return http.build();
 	}
 
