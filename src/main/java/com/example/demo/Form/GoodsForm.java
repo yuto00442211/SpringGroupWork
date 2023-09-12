@@ -24,6 +24,8 @@ public class GoodsForm {
 
 	    @NotBlank(message = "眠眠打破を入力してください")
 	    private String comment;
+	    
+	    private Integer account_id;
 
 	}
 

@@ -30,4 +30,6 @@ public class Goods {
     
     private String comment;
     
+    private Integer account_id;
+    
 }

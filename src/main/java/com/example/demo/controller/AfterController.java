@@ -41,6 +41,7 @@ import com.example.demo.entity.Goods;
 import com.example.demo.entity.GoodsList;
 import com.example.demo.repositry.AccountRepositry;
 import com.example.demo.repositry.BitRepositry;
+import com.example.demo.repositry.GenreRepository;
 import com.example.demo.repositry.GoodsRepositry;
 import com.example.demo.service.AccountService;
 import com.example.demo.service.BitinfoService;
@@ -79,10 +80,12 @@ public class AfterController {
 	private GenreService genreService;
 	@Autowired
 	private CommentService commentService;
+	@Autowired
+	private GenreRepository genreRepository;
 
-	
-//	highPrice(int goodsId)
-	
+
+	//	highPrice(int goodsId)
+
 	/**
 	 * トップページに遷移します.
 	 * （引数はログインしたユーザーを取得するための記述）
@@ -90,27 +93,27 @@ public class AfterController {
 	 */
 	@GetMapping("/sell")
 	public String showTop(Model model,@AuthenticationPrincipal UserPrincipal userPrincipal) {
-////////////////////////////////////////////
+		////////////////////////////////////////////
 		int count=0;
 		// ログインしたユーザー情報を画面に表示するために記述。
 		model.addAttribute("loginUsername", userPrincipal.getUsername());
 		List<Goods> dataList = goodsservice.getAllGoods(); // データベースからListに代入
-//		List<Goods> productList = new ArrayList<>();//最新の金額に変更したGoodsを入れるリスト
-		
+		//		List<Goods> productList = new ArrayList<>();//最新の金額に変更したGoodsを入れるリスト
+
 		for(Goods g :dataList) {
 			int goodsId=g.getGoods_id();
 			if(bitinfoService.highPrice(goodsId)!=0) {
-			g.setInitial_price(bitinfoService.highPrice(goodsId));
+				g.setInitial_price(bitinfoService.highPrice(goodsId));
 			}
-//			productList.add(g);
+			//			productList.add(g);
 		}
-		
+
 		List<Genre> genreList = genreService.getAllGenre();
 		model.addAttribute("genreList", genreList);
 
-		
+
 		model.addAttribute("productList", dataList);
-////////////////////////////////////////////
+		////////////////////////////////////////////
 		return "sell";
 	}
 	@GetMapping("/product")
@@ -119,7 +122,7 @@ public class AfterController {
 
 		if (product != null) { // 商品が存在する場合のみ処理を行う
 			String remainingTime = calculateRemainingTime(product.getEnd_time());
-			
+
 			int current_price = bitinfoService.highPrice(productId);
 			model.addAttribute("current_price", current_price);
 
@@ -153,10 +156,10 @@ public class AfterController {
 
 	@GetMapping("create")
 	public String bbb(Model model) {
-		
+
 		List<Genre> genreList = genreService.getAllGenre();
 		model.addAttribute("genreList", genreList);
-		
+
 		model.addAttribute("goodsForm",new GoodsForm());
 		System.out.println("x");
 		return "exhibit";
@@ -185,8 +188,18 @@ public class AfterController {
 		goods.setImage_number(filePath);
 		System.out.println(filePath);
 		//////
-//		System.out.println(goodsForm.getImagenumber());
+		//		System.out.println(goodsForm.getImagenumber());
 		goods.setComment(goodsForm.getComment());
+
+		// 認証情報を取得
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		// ユーザー名を取得
+		String username = authentication.getName();
+
+		int account_id = accountService.findAccountIdByName(username);
+		goods.setAccount_id(account_id);
+
 		goodsRepositry.save(goods);
 		List<String> errorList = new ArrayList<String>();
 		for (ObjectError error : bindingResult.getAllErrors()) {
@@ -242,11 +255,11 @@ public class AfterController {
 	public String showAuction(@RequestParam int productId,Model model) {
 		Goods product = goodsservice.getGoodsById(productId);
 		List<Bitinfo>bidInfo = bitinfoService.findByGoods(productId);
-		 model.addAttribute("BitForm", new BitForm());
+		model.addAttribute("BitForm", new BitForm());
 		if (product != null&&bidInfo != null) { // 商品が存在する場合のみ処理を行う
 			String remainingTime = calculateRemainingTime(product.getEnd_time());
-			 // 入札情報を金額の大きい順にソート
-	        bidInfo.sort(Comparator.comparing(Bitinfo::getCurrent_price).reversed());
+			// 入札情報を金額の大きい順にソート
+			bidInfo.sort(Comparator.comparing(Bitinfo::getCurrent_price).reversed());
 
 
 			model.addAttribute("product", product);
@@ -264,41 +277,41 @@ public class AfterController {
 
 	@PostMapping("/auction")
 	public String placeBid(@RequestParam int productId, @Valid @ModelAttribute BitForm BitForm,
-	        BindingResult bindingResult, RedirectAttributes redirectAttributes, @RequestParam String username, Model model) {
-	    if (bindingResult.hasErrors()) {
-	        model.addAttribute("BitForm", new BitForm());
-	        return "auction";
-	    }
-	   
+			BindingResult bindingResult, RedirectAttributes redirectAttributes, @RequestParam String username, Model model) {
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("BitForm", new BitForm());
+			return "auction";
+		}
 
-	    int x = accountService.findAccountIdByName(username);
-	    Goods product = goodsservice.getGoodsById(productId);
-	    model.addAttribute("product", product);
-	   
-	    model.addAttribute("BitForm", new BitForm());
-	    if (product != null) {
-	        int a = bitinfoService.highPrice(productId);
 
-	        int bidAmount = BitForm.getBidAmount();
-	        model.addAttribute("bidAmount", bidAmount); // bidAmountをコンテキストに追加
+		int x = accountService.findAccountIdByName(username);
+		Goods product = goodsservice.getGoodsById(productId);
+		model.addAttribute("product", product);
 
-	        if (bidAmount <= a) {
-	            model.addAttribute("error", true); // エラーがある場合、エラー変数を設定
-	            
-	            return "redirect:/afterLogin/auction?productId="+productId;// エラーがある場合、入札ページに戻る
-	        }
-	    }
-	    model.addAttribute("BitForm", new BitForm());
-		
+		model.addAttribute("BitForm", new BitForm());
+		if (product != null) {
+			int a = bitinfoService.highPrice(productId);
+
+			int bidAmount = BitForm.getBidAmount();
+			model.addAttribute("bidAmount", bidAmount); // bidAmountをコンテキストに追加
+
+			if (bidAmount <= a) {
+				model.addAttribute("error", true); // エラーがある場合、エラー変数を設定
+
+				return "redirect:/afterLogin/auction?productId="+productId;// エラーがある場合、入札ページに戻る
+			}
+		}
+		model.addAttribute("BitForm", new BitForm());
+
 		System.out.println(LocalDateTime.now());
 		System.out.println(BitForm.getBidAmount());
-		
+
 		int goodsId = productId;
 		int accountId=x;
 		LocalDateTime bidTime = LocalDateTime.now();
 		int currentPrice = BitForm.getBidAmount();
 		// 入札情報を作成
-		
+
 		// 新しい入札情報を保存
 		int o =bitinfoService.insertbid(goodsId, accountId, bidTime, currentPrice);
 		System.out.println(o);
@@ -312,190 +325,203 @@ public class AfterController {
 
 		return "redirect:/afterLogin/sell"; // 入札完了後、トップページにリダイレクト
 	}
-	
-	
+
+
 	//-------------------------------------------------------------
-		@GetMapping("itemList")
-		public String showItemList(Model model) {
-			System.out.println(123465);
-			// 商品データをデータベースから取得
-			List<GoodsList> productList = goodsListService.goodsList();
-			System.out.println(productList.get(0));
+	@GetMapping("itemList")
+	public String showItemList(Model model) {
+		System.out.println(123465);
+		// 商品データをデータベースから取得
+		List<GoodsList> productList = goodsListService.goodsList();
+		System.out.println(productList.get(0));
 
-			boolean RoleAdmin = true;
-			boolean RoleYes = true;
-			String genre = "全商品";
+		boolean RoleAdmin = true;
+		boolean RoleYes = true;
+		String genre = "全商品";
 
-			model.addAttribute("genre",genre);
-			model.addAttribute("RoleAdmin",RoleAdmin);
-			model.addAttribute("RoleYes",RoleYes);
-			model.addAttribute("productList",productList);
+		model.addAttribute("genre",genre);
+		model.addAttribute("RoleAdmin",RoleAdmin);
+		model.addAttribute("RoleYes",RoleYes);
+		model.addAttribute("productList",productList);
 
-			return "itemList";
-		}
+		return "itemList";
+	}
 
-		@PostMapping("genreItemList")
-		public String showGenreItemList(Model model,@RequestParam int genre_id) {
-			List<GoodsList> productList = goodsListService.goodsList2(genre_id);
-
-
-			boolean RoleAdmin = true;
-			boolean RoleYes = true;
-
-			String genre = goodsListService.genreList(genre_id);
-			model.addAttribute("genre",genre);
-			model.addAttribute("RoleAdmin",RoleAdmin);
-			model.addAttribute("RoleYes",RoleYes);
-			model.addAttribute("productList",productList);
-			return "itemList";
-		}
-
-		//アップデート
-		@GetMapping("/update")
-		public String showUpdate(@RequestParam int goods_id, Model model) {
-			Goods updateGoods = goodsservice.getGoodsById(goods_id);
-
-			model.addAttribute("updateGoods",updateGoods);
-			return "update";
-		}
-
-		@PostMapping("/updateGood")
-		public String updateGood(
-		@ModelAttribute("updateGoods") Goods updatedgoods,
-		@RequestParam(name = "image", required = false) MultipartFile imageFile) {
+	@PostMapping("genreItemList")
+	public String showGenreItemList(Model model,@RequestParam int genre_id) {
+		List<GoodsList> productList = goodsListService.goodsList2(genre_id);
 
 
-			// 更新前の画像ファイル名を取得
-			String oldImageName = goodsservice.getImageName(updatedgoods.getGoods_id());
+		boolean RoleAdmin = true;
+		boolean RoleYes = true;
 
+		String genre = goodsListService.genreList(genre_id);
+		model.addAttribute("genre",genre);
+		model.addAttribute("RoleAdmin",RoleAdmin);
+		model.addAttribute("RoleYes",RoleYes);
+		model.addAttribute("productList",productList);
+		return "itemList";
+	}
+
+	//アップデート
+	@GetMapping("/update")
+	public String showUpdate(@RequestParam int goods_id, Model model) {
+		Goods updateGoods = goodsservice.getGoodsById(goods_id);
+
+		model.addAttribute("updateGoods",updateGoods);
+		return "update";
+	}
+
+	@PostMapping("/updateGood")
+	public String updateGood(
+			@ModelAttribute("updateGoods") Goods updatedgoods,
+			@RequestParam(name = "image", required = false) MultipartFile imageFile) {
+
+
+		// 更新前の画像ファイル名を取得
+		String oldImageName = goodsservice.getImageName(updatedgoods.getGoods_id());
+
+		// 画像ファイル名をIDと連結した名前に設定
+		String newImageName;// = updatedQuestion.getId() + "_" + (imageFile != null ? imageFile.getOriginalFilename() : oldImageName);
+
+		if (imageFile == null) {
+			newImageName = goodsservice.getImageName(updatedgoods.getGoods_id()); // ファイルが選択されていない場合の処理
+			System.out.println(newImageName);
+		} else {
 			// 画像ファイル名をIDと連結した名前に設定
-			String newImageName;// = updatedQuestion.getId() + "_" + (imageFile != null ? imageFile.getOriginalFilename() : oldImageName);
-
-			if (imageFile == null) {
-				newImageName = goodsservice.getImageName(updatedgoods.getGoods_id()); // ファイルが選択されていない場合の処理
-				System.out.println(newImageName);
-			} else {
-				// 画像ファイル名をIDと連結した名前に設定
-				newImageName = updatedgoods.getGoods_id() + "_" + imageFile.getOriginalFilename();
-			}
+			newImageName = updatedgoods.getGoods_id() + "_" + imageFile.getOriginalFilename();
+		}
 
 
-			updatedgoods.setImage_number(newImageName);
-			goodsRepositry.save(updatedgoods);
+		updatedgoods.setImage_number(newImageName);
+		goodsRepositry.save(updatedgoods);
 
-			// 画像を保存するディレクトリパスを指定
-			String uploadDir = "src/main/resources/static/image"; // 画像保存先ディレクトリのパス
+		// 画像を保存するディレクトリパスを指定
+		String uploadDir = "src/main/resources/static/image"; // 画像保存先ディレクトリのパス
 
-			// 画像を保存する処理
-			if (imageFile != null && !imageFile.isEmpty()) {
-				try {
-					// 旧画像ファイルを削除
-					if (oldImageName != null) {
-						Path oldImagePath = Paths.get(uploadDir, oldImageName);
-						Files.deleteIfExists(oldImagePath);
-					}
-					byte[] bytes = imageFile.getBytes();
-					Path imagePath = Paths.get(uploadDir, newImageName);
-					Files.write(imagePath, bytes);
-
-				} catch (IOException e) {
-					// エラーハンドリング
-					e.printStackTrace();
+		// 画像を保存する処理
+		if (imageFile != null && !imageFile.isEmpty()) {
+			try {
+				// 旧画像ファイルを削除
+				if (oldImageName != null) {
+					Path oldImagePath = Paths.get(uploadDir, oldImageName);
+					Files.deleteIfExists(oldImagePath);
 				}
+				byte[] bytes = imageFile.getBytes();
+				Path imagePath = Paths.get(uploadDir, newImageName);
+				Files.write(imagePath, bytes);
+
+			} catch (IOException e) {
+				// エラーハンドリング
+				e.printStackTrace();
 			}
-			return "redirect:/afterLogin/itemList"; // 問題一覧ページへリダイレクト
-			
 		}
+		return "redirect:/afterLogin/itemList"; // 問題一覧ページへリダイレクト
 
-			//デリート
-			@GetMapping("/delete")
-			public String showDelete(@RequestParam int goods_id, Model model) {
-				Goods goods = goodsservice.getGoodsById(goods_id);
+	}
 
-				model.addAttribute("goods",goods);
-				return "delete";
-			}
+	//デリート
+	@GetMapping("/delete")
+	public String showDelete(@RequestParam int goods_id, Model model) {
+		Goods goods = goodsservice.getGoodsById(goods_id);
 
-			// 問題削除処理（POSTメソッド）
-			@PostMapping("/deleteGoods/{id}")
-			public String deleteQuestion(@PathVariable Integer id) {
-				goodsRepositry.deleteById(id); // 問題を削除するサービスの呼び出し
-				return "redirect:/afterLogin/itemList"; // 問題一覧ページへリダイレクト
-			}
+		model.addAttribute("goods",goods);
+		return "delete";
+	}
 
-			//マイページ表示
-			@GetMapping("/showMypage")
-			public String showMypage(Model model) {
-				 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-				 
-				int accountId = accountService.findAccountIdByName(authentication.getName());
-				System.out.println(authentication.getName());
-				System.out.println(accountId);
-				//入札情報
-				List<Bitinfo> mypageList = bitinfoService.bidListmypage(accountId);
-				boolean RoleAdmin = true;
-				boolean RoleYes = true;
-				model.addAttribute("mypageList",mypageList);
-				model.addAttribute("RoleAdmin",RoleAdmin);
-				model.addAttribute("RoleYes",RoleYes);
-				
-				return "mypage";
-			}
-			
-			//入札者側mychat表示
-			@GetMapping("/mychat")
-			public String showMychat(@RequestParam(name = "goods_id")  int goodsId, Model model) {
-				//入札者
-				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-				int accountId = accountService.findAccountIdByName(authentication.getName());
-				
-				//出品者
-				int accountID = goodsservice.findAccountIdByGoodsId(goodsId);
-				
-				
-				List<Integer> accountIds = Arrays.asList(accountId, accountID); // 取得したい account_id のリスト
-				
-				List<Comment> comments = commentService.findByGoodsIdAndAccountIdInOrderByCommentTimeAsc(goodsId, accountIds);
+	// 問題削除処理（POSTメソッド）
+	@PostMapping("/deleteGoods/{id}")
+	public String deleteQuestion(@PathVariable Integer id) {
+		goodsRepositry.deleteById(id); // 問題を削除するサービスの呼び出し
+		return "redirect:/afterLogin/itemList"; // 問題一覧ページへリダイレクト
+	}
 
-				Comment commentForm = new Comment();
-				
-				model.addAttribute("goodsId",goodsId);
-				model.addAttribute("commentForm",commentForm);
-				model.addAttribute("accountId",accountId);
-				model.addAttribute("isBidder",false);
-		        model.addAttribute("comments", comments);
-				return "mychat";
-			}
-			
-			//出品者側mychat表示
-			@GetMapping("/mychat2")
-			public String showMychat2(@RequestParam(name = "goods_id")  int goodsId, Model model) {
-				List<Comment> comments = commentService.getCommentsByGoodsId(goodsId);
-				model.addAttribute("isBidder",false);
-		        model.addAttribute("comments", comments);
-				return "mychat";
-			}
-			
-			@PostMapping("/sendMessage")
-			public String sendMessage(@ModelAttribute Comment comment, RedirectAttributes redirectAttributes) {
-			    // CommentFormから情報を取得し、データベースに保存する処理を記述します。
-			    // エントリが保存されたら、適切なページにリダイレクトする。
+	//マイページ表示
+	@GetMapping("/showMypage")
+	public String showMypage(Model model) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-				int goodsId=comment.getGoods_id();
-				int accountId=comment.getAccount_id();
-				String comments=comment.getComment_content();
-			    LocalDateTime time =LocalDateTime.now();
-			    
-			    commentService.insertComment(goodsId, accountId, time, comments);
-			    
-			 // 保存成功メッセージやその他の情報を次のページに表示するためのオプション。
-			    redirectAttributes.addAttribute("goods_id", comment.getGoods_id());
-			    
+		int accountId = accountService.findAccountIdByName(authentication.getName());
+		System.out.println(authentication.getName());
+		System.out.println(accountId);
+		//入札情報
+		List<Bitinfo> mypageList = bitinfoService.bidListmypage(accountId);
+		boolean RoleAdmin = true;
+		boolean RoleYes = true;
+		model.addAttribute("mypageList",mypageList);
+		model.addAttribute("RoleAdmin",RoleAdmin);
+		model.addAttribute("RoleYes",RoleYes);
 
-			    return "redirect:/afterLogin/mychat";  // リダイレクト先を適切なページに置き換えます。
-			}
+		return "mypage";
+	}
 
+	//入札者側mychat表示
+	@GetMapping("/mychat")
+	public String showMychat(@RequestParam(name = "goods_id")  int goodsId, Model model) {
+		//入札者
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		int accountId = accountService.findAccountIdByName(authentication.getName());
+
+		//出品者
+		int accountID = goodsservice.findAccountIdByGoodsId(goodsId);
+
+
+		List<Integer> accountIds = Arrays.asList(accountId, accountID); // 取得したい account_id のリスト
+
+		List<Comment> comments = commentService.findByGoodsIdAndAccountIdInOrderByCommentTimeAsc(goodsId, accountIds);
+
+		Comment commentForm = new Comment();
+
+		model.addAttribute("goodsId",goodsId);
+		model.addAttribute("commentForm",commentForm);
+		model.addAttribute("accountId",accountId);
+		model.addAttribute("isBidder",false);
+		model.addAttribute("comments", comments);
+		return "mychat";
+	}
+
+	//出品者側mychat表示
+	@GetMapping("/mychat2")
+	public String showMychat2(@RequestParam(name = "goods_id")  int goodsId, Model model) {
+		List<Comment> comments = commentService.getCommentsByGoodsId(goodsId);
+		model.addAttribute("isBidder",false);
+		model.addAttribute("comments", comments);
+		return "mychat";
+	}
+
+	@PostMapping("/sendMessage")
+	public String sendMessage(@ModelAttribute Comment comment, RedirectAttributes redirectAttributes) {
+		// CommentFormから情報を取得し、データベースに保存する処理を記述します。
+		// エントリが保存されたら、適切なページにリダイレクトする。
+
+		int goodsId=comment.getGoods_id();
+		int accountId=comment.getAccount_id();
+		String comments=comment.getComment_content();
+		LocalDateTime time =LocalDateTime.now();
+
+		commentService.insertComment(goodsId, accountId, time, comments);
+
+		// 保存成功メッセージやその他の情報を次のページに表示するためのオプション。
+		redirectAttributes.addAttribute("goods_id", comment.getGoods_id());
+
+
+		return "redirect:/afterLogin/mychat";  // リダイレクト先を適切なページに置き換えます。
+	}
+
+	@GetMapping("addGenre")
+	public String addGenre(Model model ,@RequestParam("text") String text) {
+		if(genreService.chkName(text)) {
+			Genre genre = new Genre();
+			genre.setGenreName(text);
+			genreRepository.save(genre);
+		}else {
+			//エラーメッセージの表示
 		}
+		return "redirect:/afterLogin/sell";
+		//↑ホントはマイページにリダイレクトしたい。
+	}
+
+}
 
 
 

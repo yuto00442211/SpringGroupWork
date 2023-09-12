@@ -152,37 +152,45 @@ header {
 		さんのマイページ
 
 	</div>
-		
-		<table class="table table-striped">
-			<thead>
-				<tr>
-					<th>商品ID</th>
-					<th>あなたの入札価格</th>
-					<th>入札時間</th>
-					<th>チャットページへ</th>
-					<th>商品ページへ</th>
-					<th th:if="${RoleAdmin}">入金</th>
-					
+
+	<form action="addGenre" method="get">
+		<input type="text" name="text" placeholder="ジャンル名を入力">
+		<button type="submit">送信</button>
+	</form>
 
 
-				</tr>
-			</thead>
-			<tbody>
-				<!-- データを繰り返し処理 -->
-				<tr th:each="itemList : ${mypageList}">
-					<!-- 各セルにデータを表示 -->
-					<td th:text="${itemList.goods_id}"></td>
-					<td th:text="${itemList.current_price}"></td>
-					<td th:text="${itemList.bid_time}"></td>
-					<td><a th:href="@{/afterLogin/mychat(goods_id=${itemList.goods_id})}">チャット</a></td>
-					<td><a th:href="@{/afterLogin/auction(productId=${itemList.goods_id})}">入札</a></td>
-					<td th:if="${RoleAdmin}"><a
-						th:href="@{/afterLogin/update(goods_id=${itemList.goods_id})}">入金</a></td>		
-					
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>商品ID</th>
+				<th>あなたの入札価格</th>
+				<th>入札時間</th>
+				<th>チャットページへ</th>
+				<th>商品ページへ</th>
+				<th th:if="${RoleAdmin}">入金</th>
 
-				</tr>
-			</tbody>
-		</table>
+
+
+			</tr>
+		</thead>
+		<tbody>
+			<!-- データを繰り返し処理 -->
+			<tr th:each="itemList : ${mypageList}">
+				<!-- 各セルにデータを表示 -->
+				<td th:text="${itemList.goods_id}"></td>
+				<td th:text="${itemList.current_price}"></td>
+				<td th:text="${itemList.bid_time}"></td>
+				<td><a
+					th:href="@{/afterLogin/mychat(goods_id=${itemList.goods_id})}">チャット</a></td>
+				<td><a
+					th:href="@{/afterLogin/auction(productId=${itemList.goods_id})}">入札</a></td>
+				<td th:if="${RoleAdmin}"><a
+					th:href="@{/afterLogin/update(goods_id=${itemList.goods_id})}">入金</a></td>
+
+
+			</tr>
+		</tbody>
+	</table>
 
 
 
