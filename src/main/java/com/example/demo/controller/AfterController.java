@@ -93,29 +93,27 @@ public class AfterController {
 	 */
 	@GetMapping("/sell")
 	public String showTop(Model model,@AuthenticationPrincipal UserPrincipal userPrincipal) {
-		////////////////////////////////////////////
-		int count=0;
+
 		// ログインしたユーザー情報を画面に表示するために記述。
 		model.addAttribute("loginUsername", userPrincipal.getUsername());
-		List<Goods> dataList = goodsservice.getAllGoods(); // データベースからListに代入
-		//		List<Goods> productList = new ArrayList<>();//最新の金額に変更したGoodsを入れるリスト
+		List<Goods> productList = goodsservice.getAllGoods(); // 商品情報をデータベースからListに代入
 
-		for(Goods g :dataList) {
+		//入札情報を参照し、もし入札が一件でもあればTOPページの金額に代入するfor文
+		for(Goods g :productList) {
 			int goodsId=g.getGoods_id();
 			if(bitinfoService.highPrice(goodsId)!=0) {
 				g.setInitial_price(bitinfoService.highPrice(goodsId));
 			}
-			//			productList.add(g);
 		}
 
 		List<Genre> genreList = genreService.getAllGenre();
 		model.addAttribute("genreList", genreList);
 
 
-		model.addAttribute("productList", dataList);
+		model.addAttribute("productList", productList);//最新金額を渡す
 		boolean issellMapping =false;
 		model.addAttribute("issellMapping",issellMapping);
-		////////////////////////////////////////////
+
 		return "sell";
 	}
 	@GetMapping("/product")
@@ -167,7 +165,7 @@ public class AfterController {
 		return "exhibit";
 	}
 	@PostMapping("create")
-	public String sellItem(@RequestParam("file") MultipartFile file,@Valid @ModelAttribute GoodsForm goodsForm, BindingResult bindingResult, RedirectAttributes redirectAttributes,Model model) {
+	public String sellItem(@RequestParam("file") MultipartFile file,@Valid @ModelAttribute GoodsForm goodsForm, BindingResult bindingResult, RedirectAttributes redirectAttributes,Model model) throws IOException {
 
 		// goodsFormの内容を使ってデータベースに出品情報を登録する処理を呼び出す
 		// goodsService.registerGoods(goodsForm);
@@ -185,12 +183,7 @@ public class AfterController {
 		goods.setInitial_price(goodsForm.getInitial_price());
 		goods.setStart_time(LocalDateTime.now());
 		goods.setEnd_time(goodsForm.getEndtime());
-		//////
-		String filePath = file.getOriginalFilename();
-		goods.setImage_number(filePath);
-		System.out.println(filePath);
-		//////
-		//		System.out.println(goodsForm.getImagenumber());
+		goods.setImage_number(goodsservice.saveImage(file));//画像ファイルの保存と画像名の登録を同時に行っている
 		goods.setComment(goodsForm.getComment());
 
 		// 認証情報を取得

@@ -133,36 +133,6 @@ header {
 }
 </style>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  // .product-card 要素を取得
-  const productCards = document.querySelectorAll(".product-card");
-
-  // 表示させるカードの数
-  const numberOfCardsToShow = 6;
-
-  // .product-card 要素の数が numberOfCardsToShow より小さい場合、すべての要素を表示
-  if (productCards.length <= numberOfCardsToShow) {
-    return;
-  }
-
-  // ランダムに選択する要素のインデックスを格納する配列を作成
-  const selectedIndices = [];
-  while (selectedIndices.length < numberOfCardsToShow) {
-    const randomIndex = Math.floor(Math.random() * productCards.length);
-    if (!selectedIndices.includes(randomIndex)) {
-      selectedIndices.push(randomIndex);
-    }
-  }
-
-  // .product-card 要素の表示設定を調整
-  productCards.forEach((card, index) => {
-    if (!selectedIndices.includes(index)) {
-      card.style.display = "none";
-    }
-  });
-});
-</script>
 </head>
 <body>
 	<header>
@@ -245,13 +215,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	<div class="product-container">
 		<div th:each="product : ${productList}" class="product-card">
-			<!-- 画像表示は削除されました -->
+
 			<form th:if="${issellMapping}" th:action="@{/sell/product}" method="get">
 				<button class="action-button product-card-name" type="submit"
 					name="productId" th:value="${product.goods_id}">
 					<span th:text="${product.name}"></span>
 				</button>
 			</form>
+				<!-- 画像を表示 -->
+			<img class="product-card img"
+				th:src="@{'/images/' + ${product.image_number}}" alt="Image">
 			<form  th:unless="${issellMapping}" th:action="@{/afterLogin/product}" method="get">
 				<button class="action-button product-card-name" type="submit"
 					name="productId" th:value="${product.goods_id}">
@@ -304,5 +277,34 @@ h1 {
 	
 }
 </style>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // .product-card 要素を取得
+  const productCards = document.querySelectorAll(".product-card");
 
+  // 表示させるカードの数
+  const numberOfCardsToShow = 4;
+
+  // .product-card 要素の数が numberOfCardsToShow より小さい場合、すべての要素を表示
+  if (productCards.length <= numberOfCardsToShow) {
+    return;
+  }
+
+  // ランダムに選択する要素のインデックスを格納する配列を作成
+  const selectedIndices = [];
+  while (selectedIndices.length < numberOfCardsToShow) {
+    const randomIndex = Math.floor(Math.random() * productCards.length);
+    if (!selectedIndices.includes(randomIndex)) {
+      selectedIndices.push(randomIndex);
+    }
+  }
+
+  // .product-card 要素の表示設定を調整
+ // productCards.forEach((card, index) => {
+  //  if (!selectedIndices.includes(index)) {
+   //   card.style.display = "none";
+  //  }
+//  });
+});
+</script>
 </html>
