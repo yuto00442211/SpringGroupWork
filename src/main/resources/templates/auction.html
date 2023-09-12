@@ -5,6 +5,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css"
+	rel="stylesheet">
+
 <title>キャルション - 商品詳細</title>
 <style>
 body {
@@ -14,6 +17,16 @@ body {
 	background-color: #f0f0f0;
 }
 
+
+header {
+	background-color: #f0f0f0;
+	color: rgb(0, 0, 0);
+	padding: 10px 0;
+	text-align: center;
+	display: flex;
+	justify-content: flex-start; /* 要素を左寄せに配置 */
+	align-items: center;
+}
 .product-details-container {
 	max-width: 600px;
 	margin: 100px auto;
@@ -87,30 +100,120 @@ body {
   text-align: center; /* テキストを中央に配置 */
   margin: 0 auto; /* 左右の余白を自動で均等に調整してセンター配置 */
 }
+
+.auth-buttons {
+	display: flex;
+	align-items: center;
+}
+
+
+.button-container {
+	display: flex;
+	align-items: center;
+	margin-left: auto;
+}
+
+.action-button {
+	background-color: #3498db;
+	color: white;
+	padding: 10px 20px;
+	border: none;
+	border-radius: 3px;
+	cursor: pointer;
+	margin-right: 10px; /* ボタン間の右側のマージン */
+}
+
+.action-button:last-child {
+	margin-right: 0; /* 最後のボタンにはマージンを適用しない */
+}
+
+.action-button:hover {
+	background-color: #2980b9;
+}
+
+
+.user-info {
+	padding-left: 10px; /* 左側のパディング */
+	padding-right: 10px; /* 右側のパディング */
+}
+
 </style>
 </head>
 <body>
+<header>
+		<div class="site-name">
+			 <h1 style="font-size: 32px; cursor: pointer;" onclick="redirectToSellPage()">キャルション！</h1>
+<script>
+            function redirectToSellPage() {
+       window.location.href = '/afterLogin/sell'; 
+}
+</script>
+
+		</div>
+
+		<div sec:authorize="!isAuthenticated()" class="auth-buttons">
+			<form th:action="@{/sell/login}" method="get">
+				<button class="action-button">ログイン</button>
+			</form>
+		</div>
+
+		<!-- sec:authorizeを使って"isAuthenticated()"で認証済みかどうかを判定 -->
+		<!-- trueならば<div>内を表示 -->
+		<div sec:authorize="isAuthenticated()" class="user-info">
+			こんにちは：<span sec:authentication="name"></span>さん
+			<form th:action="@{/logout}" method="post"></form>
+
+			<div class="button-container" style="margin-top: -5px;">
+			
+				<form th:action="@{itemList}" method="get">
+					<button
+						style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;"
+						type="submit"></button>
+				</form>
+
+				<form th:action="@{showMypage}" method="get">
+					<button
+						style="background: url('/image/mypageicon.png') no-repeat center center; width: 60px; height: 65px; border: none;"
+						type="submit"></button>
+				</form>
+				<form th:action="@{create}" method="get">
+					<button
+						style="background: url('/image/upload.png') no-repeat center center; width: 60px; height: 65px; border: none;"
+						type="submit"></button>
+				</form>
+				<form th:action="@{/logout}" method="post">
+					<button
+						style="background: url('/image/logoutbutton.png') no-repeat center center; width: 145px; height: 65px; border: none;"
+						type="submit"></button>
+				</form>
+			</div>
+
+		</div>
+	</header>
 <div class="product-details-container">
   <div class="product-details-title">商品詳細</div>
   <div class="product-details-content">
     <div class="product-name" th:text="${product.name}">商品名：</div>
     <div class="product-price"> 
-      <span th:if="${bidInfo != null && bidInfo.size() > 0}" th:text="${'$' + bidInfo[0].current_price}">現在価格：</span>
-    <span th:unless="${bidInfo != null && bidInfo.size() > 0}" th:text="${'$' + product.initial_price}">現在価格：</span></div>
+      <span th:if="${bidInfo != null && bidInfo.size() > 0}" th:text="${ bidInfo[0].current_price+'円' }">現在価格：</span>
+      <span th:unless="${bidInfo != null && bidInfo.size() > 0}" th:text="${product.initial_price+'円'}">現在価格：</span>
+    </div>
     <div class="remaining-time" th:text="${remainingTime}">終了時間：</div>
     <div class="product-description" th:text="${product.comment}">商品説明：</div>
-  <form th:action="@{/afterLogin/auction}" method="post" th:unless="${remainingTime == 'オークション終了'}">
-    <input type="hidden" name="productId" th:value="${product.goods_id}" />
-    <input type="hidden" name="username" th:value="${#authentication.name}" />
-    <div class="bid-input">
+    <form th:action="@{/afterLogin/auction}" method="post" th:unless="${remainingTime == 'オークション終了'}">
+      <input type="hidden" name="productId" th:value="${product.goods_id}" />
+      <input type="hidden" name="username" th:value="${#authentication.name}" />
+      <div class="bid-input">
         <label for="bidAmount">入札額：</label>
-        <input type="number" id="bidAmount" name="bidAmount" required />
+        <input type="number" id="bidAmount" name="bidAmount" th:value="${bidInfo != null && bidInfo.size() > 0 ? bidInfo[0].current_price : ''}" required />
+        <span>円</span>
         <p th:if="${bidAmount <= a}" class="error-message">入札金額は現在価格または初期価格より高くしてください</p>
-    </div>
-    <!-- 入札金額が高い場合のみ入札ボタンを表示 -->
-    <button class="bid-button" type="submit">入札する</button>
-</form>
-
+      </div>
+      <!-- 入札金額が高い場合のみ入札ボタンを表示 -->
+      <button class="bid-button" type="submit">入札する</button>
+    </form>
+  </div>
+</div>
 
 
 
@@ -118,9 +221,7 @@ body {
   </div>
 </div>
 
-<form th:action="@{/afterLogin/sell}" method="get">
-	<button class="back-button">Topページに戻る</button>
-</form>
+
 
 <div class="bid-table">
   <div class="bid-title">入札履歴</div>
@@ -144,4 +245,42 @@ body {
   </table>
 </div>
 </body>
+
+<style>
+h1 {
+	font-family: "Nico Moji";
+}
+
+.site-name {
+	background: #FFDA45; /*背景色の指定*/
+	color: #000000; /*テキストの色の指定*/
+	padding: 15px;
+	text-align: center;
+	width: 200px;
+}
+.site-name p {
+	margin: 0;
+	padding: 10px;
+}
+
+.search-form {
+	text-align: left;
+}
+
+.button-container {
+	display: flex;
+	align-items: center;
+}
+
+.action-button {
+	/* ボタンのスタイル */
+	
+}
+
+.action-button:hover {
+	/* ボタンのホバースタイル */
+	
+}
+</style>
+
 </html>

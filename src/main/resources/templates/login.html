@@ -7,8 +7,15 @@
 </head>
 <body>
 <header>
-		<div class="site-name"><h1 style="font-size: 32px;">キャルション！</h1></div>
-		</header>
+		<div class="site-name">
+			 <h1 style="font-size: 32px; cursor: pointer;" onclick="redirectToSellPage()">キャルション！</h1>
+<script>
+            function redirectToSellPage() {
+       window.location.href = '/afterLogin/sell'; 
+}
+</script>
+
+		</div>
     <div th:if="${param.error}">
         <p>ユーザー認証に失敗しました</p>
     </div>

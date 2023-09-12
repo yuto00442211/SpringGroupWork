@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org">
+<link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css"
+	rel="stylesheet">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,9 +55,49 @@
         .registration-button:hover {
             background-color: #2980b9;
         }
+        header {
+	background-color: #f0f0f0;
+	color: rgb(0, 0, 0);
+	padding: 10px 0;
+	text-align: center;
+	display: flex;
+	justify-content: flex-start; /* 要素を左寄せに配置 */
+	align-items: center;
+
+.button-container {
+	display: flex;
+	align-items: center;
+	margin-left: auto;
+}
+
+.action-button {
+	background-color: #3498db;
+	color: white;
+	padding: 10px 20px;
+	border: none;
+	border-radius: 3px;
+	cursor: pointer;
+	margin-right: 10px; /* ボタン間の右側のマージン */
+}
+
+.action-button:last-child {
+	margin-right: 0; /* 最後のボタンにはマージンを適用しない */
+}
+
+.action-button:hover {
+	background-color: #2980b9;
+}
+.user-info {
+	padding-left: 10px; /* 左側のパディング */
+	padding-right: 10px; /* 右側のパディング */
+}
     </style>
 </head>
 <body>
+
+		<div class="site-name">
+			<h1 style="font-size: 32px;">キャルション！</h1>
+		</div>
     <div class="registration-container">
         <div class="registration-title">新規登録</div>
         <div class="registration-form">
@@ -100,4 +143,43 @@
         }
     </script>
 </body>
+<style>
+
+h1 {
+	font-family: "Nico Moji";
+}
+
+.site-name {
+	background: #FFDA45; /*背景色の指定*/
+	color: #000000; /*テキストの色の指定*/
+	padding: 10px;
+	text-align: center;
+	width: 200px;
+}
+.site-name p {
+	margin: 0;
+	padding: 10px;
+}
+
+.search-form {
+	text-align: left;
+}
+
+.button-container {
+	display: flex;
+	align-items: center;
+}
+
+.action-button {
+	/* ボタンのスタイル */
+	
+}
+
+.action-button:hover {
+	/* ボタンのホバースタイル */
+	
+}
+
+</style>
+
 </html>
