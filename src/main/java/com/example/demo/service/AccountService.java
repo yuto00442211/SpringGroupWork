@@ -16,4 +16,7 @@ public class AccountService {
     public int findAccountIdByName(String name) {
         return accountRepositry.findAccountIdByName(name);
     }
+    public boolean isNameAlreadyExists(String name) {
+        return accountRepositry.countByName(name) > 0;
+    }
 }

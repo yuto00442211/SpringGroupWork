@@ -22,6 +22,7 @@ import com.example.demo.entity.Genre;
 import com.example.demo.entity.Goods;
 import com.example.demo.entity.GoodsList;
 import com.example.demo.repositry.AccountRepositry;
+import com.example.demo.service.AccountService;
 import com.example.demo.service.BitinfoService;
 import com.example.demo.service.GenreService;
 import com.example.demo.service.GoodsListService;
@@ -49,6 +50,8 @@ public class SellController {
 	private GoodsListService goodsListService ;
 	@Autowired
 	private GenreService genreService;
+	@Autowired
+	private AccountService accountService;
 
 	@GetMapping
 	public String showSellPage(Model model) {
@@ -116,38 +119,43 @@ public class SellController {
 		}
 	
 
-	@GetMapping("/sub")
-	public String aaa(Model model) {
-		
-		model.addAttribute("accountForm",new AccountForm());
-		return "menber";
-	}
+		@GetMapping("/sub")
+		public String aaa(Model model) {
+			
+			model.addAttribute("accountForm",new AccountForm());
+			return "menber";
+		}
 
-	@PostMapping("sub")
-	public String menber(@Valid @ModelAttribute AccountForm accountForm, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+		@PostMapping("/sub")
+		public String menber(@Valid @ModelAttribute AccountForm accountForm, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
 
-		if (bindingResult.hasErrors()) {
+		    if (bindingResult.hasErrors()) {
+		        return "menber"; // 入力エラーがある場合は同じページに戻る
+		    }
 
-			System.out.println(11111);
-			return "menber"; // 入力エラーがある場合は同じページに戻る
-		}  
+		    String name = accountForm.getName();
 
-
-
-		Account account = new Account();
-
-		account.setName(accountForm.getName());
-		account.setAddress(accountForm.getAddress());
-		account.setTel(accountForm.getTel());
-		account.setMail(accountForm.getMail());
-		account.setPassword(passwordEncoder.encode(accountForm.getPassword()));
-		accountRepositry.save(account);
-		redirectAttributes.addFlashAttribute("message", "登録が完了しました");
-		return "redirect:/sell/success"; // 登録完了後にトップーページにリダイレクト
+		    if (accountService.isNameAlreadyExists(name)) {
+		        bindingResult.rejectValue("name", "error.accountForm", "この名前はすでに使用されています");
+		        return "menber";
+		    }
 
 
 
-	}
+			Account account = new Account();
+
+			account.setName(accountForm.getName());
+			account.setAddress(accountForm.getAddress());
+			account.setTel(accountForm.getTel());
+			account.setMail(accountForm.getMail());
+			account.setPassword(passwordEncoder.encode(accountForm.getPassword()));
+			accountRepositry.save(account);
+			redirectAttributes.addFlashAttribute("message", "登録が完了しました");
+			return "redirect:/sell/success"; // 登録完了後にトップーページにリダイレクト
+
+
+
+		}
 
 	//	@GetMapping("/") // ルートURL ("/") に対するGETリクエストを処理します
 	//    public String redirectToIndex() {
