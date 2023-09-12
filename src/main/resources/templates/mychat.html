@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BugFix Web Page</title>
+<meta name="description"
+	content="sample text sample text sample text sample text sample text sample text ...">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+	href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap"
+	rel="stylesheet">
+
+<link rel="stylesheet" href="./assets/css/sanitize.css">
+<link rel="stylesheet" href="./assets/css/style.css">
+
+<link rel="apple-touch-icon" sizes="180x180"
+	href="./assets/images/favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32"
+	href="./assets/images/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16"
+	href="./assets/images/favicon/favicon-16x16.png">
+<link rel="manifest" href="./assets/images/favicon/site.webmanifest">
+<link rel="mask-icon"
+	href="./assets/images/favicon/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+<style>
+/* スタイルルールはここで1回だけ定義します */
+.c-talk {
+	border: 5px solid #A0C3D2; /* ボーダーの色 */
+}
+
+.c-talk__head {
+	background-color: #EAE0DA; /* タイトル背景色 */
+	padding: 10px;
+}
+
+.c-talk__body {
+	background-color: #EAC7C7; /* 背景色 */
+	padding: 20px;
+}
+
+.c-talk__icon {
+	max-width: 50px;
+	min-width: 50px;
+}
+
+.c-talk__icon img {
+	border-radius: 50%;
+}
+
+.c-talk__fukidashi {
+	display: flex;
+}
+
+.c-talk__fukidashi+.c-talk__fukidashi {
+	margin-top: 30px;
+}
+
+.c-talk__fukidashi--left p {
+	margin-left: 25px;
+}
+
+.c-talk__fukidashi--left p::before {
+	clip-path: polygon(100% 0%, 0% 50%, 100% 100%);
+	left: -15px;
+}
+
+.c-talk__fukidashi--right {
+	flex-direction: row-reverse;
+}
+
+.c-talk__fukidashi--right p {
+	margin-right: 25px;
+}
+
+.c-talk__fukidashi--right p::before {
+	clip-path: polygon(0% 0%, 0% 100%, 100% 50%);
+	right: -15px;
+}
+
+.c-talk__text {
+	max-width: 75%;
+	filter: drop-shadow(3px 3px 5px rgba(0, 0, 0, 0.3));
+	display: flex;
+	align-items: flex-start;
+	flex-direction: column;
+}
+
+.c-talk__text p {
+	position: relative;
+	display: inline-block;
+	color: #333333; /* 吹き出しの色 */
+	background-color: #EAE0DA; /* 吹き出しの背景色 */
+	padding: 10px;
+	border-radius: 20px;
+}
+
+.c-talk__text p+p {
+	margin-top: 15px;
+}
+
+.c-talk__text p::before {
+	content: "";
+	display: block;
+	width: 20px;
+	height: 15px;
+	background-color: #EAE0DA; /* 吹き出しの背景色 */
+	position: absolute;
+	top: 10px;
+}
+
+/* reset & base */
+*, ::before, ::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	font-family: "Rounded Mplus 1c";
+}
+
+img {
+	width: auto;
+	max-width: 100%;
+	height: auto;
+}
+
+.c-talk__send {
+	display: flex;
+	align-items: center;
+	padding: 10px;
+	border-top: 1px solid #ccc;
+}
+
+.c-talk__input {
+	flex: 1;
+	padding: 10px;
+	border-radius: 20px;
+	border: 1px solid #ccc;
+	margin-right: 10px;
+}
+
+.c-talk__send-btn {
+	padding: 10px 20px;
+	background-color: #A0C3D2;
+	border: none;
+	border-radius: 20px;
+	cursor: pointer;
+	color: #ffffff;
+	transition: background-color 0.3s;
+}
+
+.c-talk__send-btn:hover {
+	background-color: #7599A6;
+}
+
+.mypage-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #A0C3D2;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    color: #ffffff;
+    text-decoration: none;
+    margin-bottom: 10px;  /* チャットとの間にスペースを追加 */
+    transition: background-color 0.3s;
+}
+
+.mypage-button:hover {
+    background-color: #7599A6;
+}
+
+</style>
+</head>
+
+<body>
+<a href="@{/afterLogin/showMypage}" class="mypage-button">mypageにもどる</a>
+	<div class="c-talk">
+		<div class="c-talk__head">LINE風チャットレイアウト</div>
+		<div class="c-talk__body">
+
+			<!-- コメントを表示 -->
+			<div th:each="comment : ${comments}"
+				class="c-talk__fukidashi c-talk__fukidashi--left"
+				th:classappend="${comment.account_id == accountId} ? 'c-talk__fukidashi--right' : ''">
+
+
+
+				<div class="c-talk__icon">
+					<img
+						th:src="${comment.account_id == accountId} ? 'https://anpanstyle.com/wp-content/uploads/2023/01/icon01.png' : 'https://anpanstyle.com/wp-content/uploads/2023/01/icon02.png'"
+						alt="kuma">
+				</div>
+
+				<div class="c-talk__text">
+					<p th:text="${comment.comment_content}"></p>
+					<p th:text="${comment.comment_time}"></p>
+				</div>
+			</div>
+
+			<form th:action="@{/afterLogin/sendMessage}" method="post"
+				th:object="${commentForm}">
+				<div class="c-talk__send">
+					<!-- Hidden fields for goods_id and account_id -->
+					<input type="hidden" name="goods_id" th:value="${goodsId}" /> <input
+						type="hidden" name="account_id" th:value="${accountId}" />
+					<textarea th:field="*{comment_content}" class="c-talk__input"
+						placeholder="メッセージを入力..."></textarea>
+					<button type="submit" class="c-talk__send-btn">送信</button>
+				</div>
+			</form>
+
+		</div>
+	</div>
+</body>
+</html>

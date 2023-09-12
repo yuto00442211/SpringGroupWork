@@ -12,4 +12,9 @@ public interface GoodsRepositry extends CrudRepository<Goods, Integer>{
 		@Query("select image_number From goods where goods_id =:goods_id")
 		String getImageName(@Param("goods_id") int goods_id);
 		
+		
+		// goods_idに対応するaccount_idを取得するクエリ
+	    @Query("SELECT g.account_id FROM Goods g WHERE g.goods_id = :goods_id")
+	    int findAccountIdByGoodsId(@Param("goods_id") int goodsId);
+		
 }

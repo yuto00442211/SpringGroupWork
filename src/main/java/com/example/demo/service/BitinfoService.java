@@ -45,5 +45,15 @@ public class BitinfoService {
 	        return 0; // もしくは適切なデフォルト値を返す
 	    }
 	}
+	
+
+	public List<Bitinfo> bidListmypage(int goodsId){
+
+		List<Bitinfo> bidList = bitRepository.findHighestCurrentPriceByAccountId(goodsId);
+
+		return bidList;
+
+	}
+	
 		
 }

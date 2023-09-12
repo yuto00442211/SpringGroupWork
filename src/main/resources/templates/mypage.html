@@ -135,6 +135,13 @@ header {
 
 	</header>
 
+	<div class="product-content">
+		<img src='./image/icon.png' alt="Product Icon" class="product-icon">
+		<span sec:authentication="name"></span>
+	</div>
+
+
+
 	<div th:each="product : ${productList}" class="product-card">
 		<div class="product-content">
 			<img src='./image/icon.png' alt="Product Icon" class="product-icon">
@@ -145,6 +152,39 @@ header {
 		さんのマイページ
 
 	</div>
+		
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>商品ID</th>
+					<th>あなたの入札価格</th>
+					<th>入札時間</th>
+					<th>チャットページへ</th>
+					<th>商品ページへ</th>
+					<th th:if="${RoleAdmin}">入金</th>
+					
+
+
+				</tr>
+			</thead>
+			<tbody>
+				<!-- データを繰り返し処理 -->
+				<tr th:each="itemList : ${mypageList}">
+					<!-- 各セルにデータを表示 -->
+					<td th:text="${itemList.goods_id}"></td>
+					<td th:text="${itemList.current_price}"></td>
+					<td th:text="${itemList.bid_time}"></td>
+					<td><a th:href="@{/afterLogin/mychat(goods_id=${itemList.goods_id})}">チャット</a></td>
+					<td><a th:href="@{/afterLogin/auction(productId=${itemList.goods_id})}">入札</a></td>
+					<td th:if="${RoleAdmin}"><a
+						th:href="@{/afterLogin/update(goods_id=${itemList.goods_id})}">入金</a></td>		
+					
+
+				</tr>
+			</tbody>
+		</table>
+
+
 
 </body>
 <style>

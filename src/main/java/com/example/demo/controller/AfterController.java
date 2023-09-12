@@ -7,11 +7,14 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,6 +35,7 @@ import com.example.demo.Form.BitForm;
 import com.example.demo.Form.GoodsForm;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.Bitinfo;
+import com.example.demo.entity.Comment;
 import com.example.demo.entity.Genre;
 import com.example.demo.entity.Goods;
 import com.example.demo.entity.GoodsList;
@@ -40,6 +44,7 @@ import com.example.demo.repositry.BitRepositry;
 import com.example.demo.repositry.GoodsRepositry;
 import com.example.demo.service.AccountService;
 import com.example.demo.service.BitinfoService;
+import com.example.demo.service.CommentService;
 import com.example.demo.service.GenreService;
 import com.example.demo.service.GoodsListService;
 import com.example.demo.service.GoodsService;
@@ -72,11 +77,11 @@ public class AfterController {
 	private AccountService accountService ;
 	@Autowired
 	private GenreService genreService;
+	@Autowired
+	private CommentService commentService;
 
 	
 //	highPrice(int goodsId)
-	
-	
 	
 	/**
 	 * トップページに遷移します.
@@ -418,11 +423,80 @@ public class AfterController {
 				return "redirect:/afterLogin/itemList"; // 問題一覧ページへリダイレクト
 			}
 
+			//マイページ表示
 			@GetMapping("/showMypage")
-			public String showMypage() {
+			public String showMypage(Model model) {
+				 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+				 
+				int accountId = accountService.findAccountIdByName(authentication.getName());
+				System.out.println(authentication.getName());
+				System.out.println(accountId);
+				//入札情報
+				List<Bitinfo> mypageList = bitinfoService.bidListmypage(accountId);
+				boolean RoleAdmin = true;
+				boolean RoleYes = true;
+				model.addAttribute("mypageList",mypageList);
+				model.addAttribute("RoleAdmin",RoleAdmin);
+				model.addAttribute("RoleYes",RoleYes);
+				
 				return "mypage";
 			}
+			
+			//入札者側mychat表示
+			@GetMapping("/mychat")
+			public String showMychat(@RequestParam(name = "goods_id")  int goodsId, Model model) {
+				//入札者
+				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+				int accountId = accountService.findAccountIdByName(authentication.getName());
+				
+				//出品者
+				int accountID = goodsservice.findAccountIdByGoodsId(goodsId);
+				
+				
+				List<Integer> accountIds = Arrays.asList(accountId, accountID); // 取得したい account_id のリスト
+				
+				List<Comment> comments = commentService.findByGoodsIdAndAccountIdInOrderByCommentTimeAsc(goodsId, accountIds);
+
+				Comment commentForm = new Comment();
+				
+				model.addAttribute("goodsId",goodsId);
+				model.addAttribute("commentForm",commentForm);
+				model.addAttribute("accountId",accountId);
+				model.addAttribute("isBidder",false);
+		        model.addAttribute("comments", comments);
+				return "mychat";
+			}
+			
+			//出品者側mychat表示
+			@GetMapping("/mychat2")
+			public String showMychat2(@RequestParam(name = "goods_id")  int goodsId, Model model) {
+				List<Comment> comments = commentService.getCommentsByGoodsId(goodsId);
+				model.addAttribute("isBidder",false);
+		        model.addAttribute("comments", comments);
+				return "mychat";
+			}
+			
+			@PostMapping("/sendMessage")
+			public String sendMessage(@ModelAttribute Comment comment, RedirectAttributes redirectAttributes) {
+			    // CommentFormから情報を取得し、データベースに保存する処理を記述します。
+			    // エントリが保存されたら、適切なページにリダイレクトする。
+
+				int goodsId=comment.getGoods_id();
+				int accountId=comment.getAccount_id();
+				String comments=comment.getComment_content();
+			    LocalDateTime time =LocalDateTime.now();
+			    
+			    commentService.insertComment(goodsId, accountId, time, comments);
+			    
+			 // 保存成功メッセージやその他の情報を次のページに表示するためのオプション。
+			    redirectAttributes.addAttribute("goods_id", comment.getGoods_id());
+			    
+
+			    return "redirect:/afterLogin/mychat";  // リダイレクト先を適切なページに置き換えます。
+			}
+
 		}
+
 
 
 
