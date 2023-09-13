@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,4 +64,30 @@ public class GoodsService {
           return originalFileName; // 元のファイル名をそのまま返す
       
   }
+	  
+      
+	  
+      public List<Goods> getRandomElements(List<Goods> list, int count) {
+          List<Goods> randomElements = new ArrayList<>();
+          
+          if (list == null || list.isEmpty() || count <= 0) {
+              return randomElements; // 空のリストを返す
+          }
+
+          int size = list.size();
+          if (size <= count) {
+              return new ArrayList<>(list); // リストのサイズが指定数以下の場合はすべての要素を返す
+          } else {
+              Random random = new Random();
+              while (randomElements.size() < count) {
+                  int randomIndex = random.nextInt(size);
+                  Goods randomElement = list.get(randomIndex);
+                  if (!randomElements.contains(randomElement)) {
+                      randomElements.add(randomElement);
+                  }
+              }
+              return randomElements; // ランダムに選択された要素が入ったリストを返す
+          }
+      }
+
 }

@@ -97,7 +97,7 @@ public class AfterController {
 		// ログインしたユーザー情報を画面に表示するために記述。
 		model.addAttribute("loginUsername", userPrincipal.getUsername());
 		List<Goods> productList = goodsservice.getAllGoods(); // 商品情報をデータベースからListに代入
-
+		productList=goodsservice.getRandomElements(productList, 3);
 		//入札情報を参照し、もし入札が一件でもあればTOPページの金額に代入するfor文
 		for(Goods g :productList) {
 			int goodsId=g.getGoods_id();
@@ -152,6 +152,7 @@ public class AfterController {
 		return String.format("残り時間: %d日 %d時間 %d分", days, hours, minutes);
 	}
 
+	
 
 
 	@GetMapping("create")

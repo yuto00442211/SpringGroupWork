@@ -27,6 +27,57 @@ header {
 	align-items: center;
 }
 
+.site-name {
+	font-size: 24px;
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
+.search-form {
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+.search-label {
+	font-size: 16px;
+	margin-right: 10px;
+}
+
+.search-select {
+	padding: 5px;
+}
+.product-details {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px; /* 各商品の下部にスペースを追加 */
+}
+
+.product-info {
+  flex: 1;
+  padding-left: 20px; /* 商品情報の左側のスペースを調整 */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.product-card img {
+  max-width: 30%;
+  height: auto;
+}
+
+.product-card-name {
+  font-weight: bold;
+  margin-top: 10px;
+  text-align: left;
+  margin-bottom: 15px; /* ボタンと金額の下部にスペースを追加 */
+}
+
+.product-card-price {
+  color: #e74c3c;
+  text-align: left;
+  font-weight: bold;
+  margin-top: 5px; /* ボタンと金額の間隔を広げる */
+}
 .auth-buttons {
 	display: flex;
 	align-items: center;
@@ -76,37 +127,6 @@ header {
 	background-color: #2980b9;
 }
 
-.product-container {
-	display: flex;
-	justify-content: space-between;
-}
-
-.product-card {
-	flex: 1;
-	padding: 20px;
-	border: 1px solid #ddd;
-	background-color: #fff;
-	border-radius: 5px;
-	margin-right: 10px;
-}
-
-.product-card img {
-	max-width: 100%;
-	height: auto;
-}
-
-.product-card-name {
-	font-weight: bold;
-	margin-top: 10px;
-	text-align: center;
-}
-
-.product-card-price {
-	color: #e74c3c;
-	text-align: center;
-	margin-top: 5px;
-	font-weight: bold;
-}
 
 .user-info {
 	padding-left: 10px; /* 左側のパディング */
@@ -120,16 +140,28 @@ header {
 }
 
 .product-card {
+
 	flex: 1;
+	text-align: center;
 	padding: 20px;
 	border: 1px solid #ddd;
 	background-color: #fff;
 	border-radius: 5px;
 	margin-right: 10px;
 	margin-bottom: 10px;
-	min-width: calc(25% - 10px);
+	min-width: calc(30% - 10px);
 	/* 高さを幅の0.75倍に設定（4:3の縦横比） */
-	height: calc(( 25% - 10px)* 0.75);
+	height: calc(( % - 10px)* 0.75);
+}
+@keyframes blink {
+  0% { opacity: 1; } /* 非表示 */
+  50% { opacity: 0; } /* 表示 */
+  100% { opacity: 1; } /* 非表示 */
+}
+.blinking-text {
+  color: #e74c3c;
+  animation: blink 1s infinite; /* アニメーションを適用 */
+  text-align: center;
 }
 </style>
 
@@ -226,23 +258,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-	<!-- 既存のHTMLコード -->
-
-	<div class="product-container">
-		<div th:each="product : ${productList}" class="product-card">
-			<!-- 画像表示は削除されました -->
-			<form th:action="@{product}" method="get">
-				<button class="action-button product-card-name" type="submit"
-					name="productId" th:value="${product.goods_id}">
-					<span th:text="${product.name}"></span>
-				</button>
-			</form>
-			<div class="product-card-price"
-				th:text="${  product.initial_price+'円'}"></div>
-		</div>
-	</div>
-
-	<!-- 既存のHTMLコードの後続部分 -->
+<p class="blinking-text">～ピックアップ商品～</p>
+<div class="product-container">
+  <div th:each="product : ${productList}" class="product-card">
+    <form th:action="@{product}" method="get">
+      <div class="product-details">
+        <img class="product-card img" th:src="@{'/images/' + ${product.image_number}}" alt="Image">
+        <div class="product-info">
+          <button class="action-button product-card-name" type="submit" name="productId" th:value="${product.goods_id}">
+            <span th:text="${product.name}"></span>
+          </button>
+          <div class="product-card-price" th:text="${product.initial_price+'円'}"></div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
 
 
 </body>
