@@ -23,12 +23,11 @@
                 background-color: #f0f0f0;
                 color: rgb(0, 0, 0);
                 padding: 10px 0;
-                text-align: left; /* テキストを左寄せに配置 */
+                text-align: center; 
                 display: flex;
-                justify-content: space-between; /* 要素を左右に配置 */
+                justify-content: flex-start; /* 要素を左寄せに配置 */
                 align-items: center;
-                padding-left: 20px; /* ヘッダー全体のパディング */
-                padding-right: 20px; /* ヘッダー全体のパディング */
+                
             }
             .button-container {
 	display: flex;
@@ -45,8 +44,8 @@
             }
 
             .user-info {
-                display: flex;
-                align-items: center;
+              padding-left: 10px; /* 左側のパディング */
+	          padding-right: 10px; /* 右側のパディング */
             }
 
             .user-info img {
@@ -60,7 +59,7 @@
             }
 
             .cp_menu {
-                max-width: 360px;
+                max-width: 200px;
                 margin: 0;
                 padding: 0;
             }
@@ -133,48 +132,156 @@
             .search-form {
                 text-align: left;
             }
+            
+            
+           .profile-card {
+        width: 100%;
+        max-width: 600px;
+        position: fixed; /* プロフィールカードを固定 */
+        background: #fff; /* 背景の色 */
+        box-shadow: 0px 1px 3px rgba(0,0,0,.18);
+        overflow: hidden;
+        top: 130px; /* 上部からの距離を調整 */
+        right: 200px; /* 右側からの距離を調整 */
+        text-align: center; /* 内部のテキストを中央配置 */
+    }
+
+    .profile-card__inner {
+        position: relative;
+        text-align: center;
+    }
+
+    .profile-thumb {
+        overflow: hidden;
+        width: 110px;
+        height: 110px;
+        border: #fff 3px solid;
+        border-radius: px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 20px;
+        background: #fff;
+    }
+
+    .profile-thumb img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .profile-content {
+        padding: 15px;
+    }
+
+    .profile-content span {
+        display: block;
+    }
+
+    .profile-name {
+        margin-bottom: 3px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .profile-job {
+        margin-bottom: 10px;
+        color: #ccc;
+        font-size: 10px;
+        text-align: center;
+    }
+
+    .profile-intro {
+        font-size: 12px;
+    }
         </style>
     </head>
 
     <body>
-        <header>
-            <div class="site-name">
-                <h1 style="font-size: 32px; cursor: pointer;"
-                    onclick="redirectToSellPage()">キャルション！</h1>
-                <script>
-                    function redirectToSellPage() {
-                        window.location.href = '/afterLogin/sell';
-                    }
-                </script>
-            </div>
+   <header>
+		<div class="site-name">
+			 <h1 style="font-size: 32px; cursor: pointer;" onclick="redirectToSellPage()">キャルション！</h1>
+<script>
+            function redirectToSellPage() {
+       window.location.href = '/afterLogin/sell'; 
+}
+</script>
 
-            <div sec:authorize="isAuthenticated()" class="user-info">
-                <img src="/image/icon.png" alt="アイコン" width="50" height="50">
-                <span sec:authentication="name"></span>さんのマイページ
-                <form th:action="@{/logout}" method="post"></form>
-            </div>
-        </header>
-<div class="cp_menu">
+		</div>
+
+		<div sec:authorize="!isAuthenticated()" class="auth-buttons">
+			<form th:action="@{/sell/login}" method="get">
+				<button class="action-button">ログイン</button>
+			</form>
+		</div>
+
+		<!-- sec:authorizeを使って"isAuthenticated()"で認証済みかどうかを判定 -->
+		<!-- trueならば<div>内を表示 -->
+		<div sec:authorize="isAuthenticated()" class="user-info">
+			こんにちは：<span sec:authentication="name"></span>さん
+			<form th:action="@{/logout}" method="post"></form>
+
+			<div class="button-container" style="margin-top: -5px;">
+			
+				<form th:action="@{itemList}" method="get">
+					<button
+						style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;"
+						type="submit"></button>
+				</form>
+
+				<form th:action="@{showMypage}" method="get">
+					<button
+						style="background: url('/image/mypageicon.png') no-repeat center center; width: 60px; height: 65px; border: none;"
+						type="submit"></button>
+				</form>
+				<form th:action="@{create}" method="get">
+					<button
+						style="background: url('/image/upload.png') no-repeat center center; width: 60px; height: 65px; border: none;"
+						type="submit"></button>
+				</form>
+				<form th:action="@{/logout}" method="post">
+					<button
+						style="background: url('/image/logoutbutton.png') no-repeat center center; width: 145px; height: 65px; border: none;"
+						type="submit"></button>
+				</form>
+			</div>
+
+		</div>
+	</header>
+     <div class="cp_menu">
             <label for="cp_menu_bar1">アカウントメニュー</label>
             <input type="radio" name="radio" id="cp_menu_bar1" class="accordion" />
             <ul id="link1">
                 <li>
-                       <div class="button-container">
-				<form th:action="@{itemList}" method="get">
-					<button class="action-button">出品商品</button> <!-- 今は商品一覧ページに繋がっています(仮) -->
-				</form>
-        </div>
-
+                    <div class="button-container">
+                        <form th:action="@{itemList}" method="get">
+                           <button class="action-button" style="border: none;">出品商品</button><!-- 今は商品一覧ページに繋がっています(仮) -->
+                        </form>
+                    </div>
                 </li>
-                <li><a href="">出品中の商品</a></li>
                 <li><a href="">入札中の商品</a></li>
                 <li><a href="">評価</a></li>
-                <li><a href="">ログアウト</a></li>
+                <li>
+                    <form th:action="@{/logout}" method="get">
+                        <button class="action-button" style="border: none;">ログアウト</button>
+                    </form>
+                </li>
             </ul>
-             
-  
+        </div>
+
+     
 
         <!-- ここにページのコンテンツを追加 -->
+        <div class="profile-card">
+  <div class="profile-card__inner">
+  <div class="profile-thumb">
+   <img src="/image/icon.png" alt="アイコン" width="50" height="50">
+  </div>
+          <div class="profile-content">
+         
+        <span class="profile-name"><span sec:authentication="name"></span>
+   
+    <span class="profile-intro">さんのプロフィールです</span>
+  </div>
 
     </body>
 </html>
