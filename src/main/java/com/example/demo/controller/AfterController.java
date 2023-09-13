@@ -122,8 +122,13 @@ public class AfterController {
 
 		if (product != null) { // 商品が存在する場合のみ処理を行う
 			String remainingTime = calculateRemainingTime(product.getEnd_time());
-
-			int current_price = bitinfoService.highPrice(productId);
+			
+			int current_price =product.getInitial_price();
+			if(bitinfoService.highPrice(productId)!=0) {
+				current_price=(bitinfoService.highPrice(productId));
+			}
+		
+			
 			model.addAttribute("current_price", current_price);
 
 			model.addAttribute("product", product);
