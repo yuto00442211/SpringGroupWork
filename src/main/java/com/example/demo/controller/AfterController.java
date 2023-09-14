@@ -118,6 +118,8 @@ public class AfterController {
 		model.addAttribute("productList", productList);//最新金額を渡す
 		boolean issellMapping =false;
 		model.addAttribute("issellMapping",issellMapping);
+		
+		model.addAttribute("ok",true);
 
 		return "sell";
 	}
@@ -364,10 +366,35 @@ public class AfterController {
 		return "itemList";
 	}
 
-	@PostMapping("genreItemList")
-	public String showGenreItemList(Model model,@RequestParam int genre_id,@AuthenticationPrincipal UserPrincipal userPrincipal) {
-		List<GoodsList> productList = goodsListService.goodsList2(genre_id);
+	@PostMapping("/genreItemList")
+	public String showGenreItemList(Model model,@RequestParam int genre_id,@AuthenticationPrincipal UserPrincipal userPrincipal,
+			@RequestParam(required = false) String keyword) {
+		List<GoodsList> productList;
+		
+		System.out.println(genre_id+"***");
 
+		System.out.println(keyword+8);
+		if (keyword != null && !keyword.isEmpty() && genre_id > 0) {
+		    // キーワードとジャンルIDを使用して検索クエリを実行する
+			System.out.println(456);
+		    productList = goodsListService.searchGoodsByKeywordAndGenre(keyword, genre_id);
+		} else if (keyword != null && !keyword.isEmpty()&&genre_id==0) {
+		    // キーワードのみを使用して検索クエリを実行する
+			System.out.println(456456);
+		    productList = goodsListService.searchGoodsByKeyword(keyword);
+		} else if (genre_id > 0) {
+		    // ジャンルIDのみを使用して検索クエリを実行する
+			System.out.println(456456456);
+		    productList = goodsListService.goodsList2(genre_id);
+		} else {
+		    // どちらも提供されない場合、デフォルトの検索処理を行うか、エラーハンドリングを行う
+			System.out.println(654654654);
+		    productList = goodsListService.goodsList(); // デフォルトの検索処理の例
+		}
+
+		if(keyword != null && !keyword.isEmpty()) {
+			model.addAttribute("keyword",keyword);
+		}
 		if(master.equals(userPrincipal.getUsername())) {
 			boolean RoleAdmin = true;
 			boolean RoleYes = true;

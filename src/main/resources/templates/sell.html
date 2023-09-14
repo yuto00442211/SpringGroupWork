@@ -46,38 +46,40 @@ header {
 .search-select {
 	padding: 5px;
 }
+
 .product-details {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px; /* 各商品の下部にスペースを追加 */
+	display: flex;
+	align-items: center;
+	margin-bottom: 20px; /* 各商品の下部にスペースを追加 */
 }
 
 .product-info {
-  flex: 1;
-  padding-left: 20px; /* 商品情報の左側のスペースを調整 */
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+	flex: 1;
+	padding-left: 20px; /* 商品情報の左側のスペースを調整 */
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
 }
 
 .product-card img {
-  max-width: 30%;
-  height: auto;
+	max-width: 30%;
+	height: auto;
 }
 
 .product-card-name {
-  font-weight: bold;
-  margin-top: 10px;
-  text-align: left;
-  margin-bottom: 15px; /* ボタンと金額の下部にスペースを追加 */
+	font-weight: bold;
+	margin-top: 10px;
+	text-align: left;
+	margin-bottom: 15px; /* ボタンと金額の下部にスペースを追加 */
 }
 
 .product-card-price {
-  color: #e74c3c;
-  text-align: left;
-  font-weight: bold;
-  margin-top: 5px; /* ボタンと金額の間隔を広げる */
+	color: #e74c3c;
+	text-align: left;
+	font-weight: bold;
+	margin-top: 5px; /* ボタンと金額の間隔を広げる */
 }
+
 .auth-buttons {
 	display: flex;
 	align-items: center;
@@ -127,7 +129,6 @@ header {
 	background-color: #2980b9;
 }
 
-
 .user-info {
 	padding-left: 10px; /* 左側のパディング */
 	padding-right: 10px; /* 右側のパディング */
@@ -140,7 +141,6 @@ header {
 }
 
 .product-card {
-
 	flex: 1;
 	text-align: center;
 	padding: 20px;
@@ -153,15 +153,30 @@ header {
 	/* 高さを幅の0.75倍に設定（4:3の縦横比） */
 	height: calc(( % - 10px)* 0.75);
 }
-@keyframes blink {
-  0% { opacity: 1; } /* 非表示 */
-  50% { opacity: 0; } /* 表示 */
-  100% { opacity: 1; } /* 非表示 */
+
+@
+keyframes blink { 0% {
+	opacity: 1;
+} /* 非表示 */
+50
+%
+{
+opacity
+:
+0;
+} /* 表示 */
+100
+%
+{
+opacity
+:
+1;
+} /* 非表示 */
 }
 .blinking-text {
-  color: #e74c3c;
-  animation: blink 1s infinite; /* アニメーションを適用 */
-  text-align: center;
+	color: #e74c3c;
+	animation: blink 1s infinite; /* アニメーションを適用 */
+	text-align: center;
 }
 </style>
 
@@ -216,12 +231,14 @@ document.addEventListener("DOMContentLoaded", function () {
 			<!-- th:if="${issellMapping}"th:unless="${issellMapping}"でsellとafterLoginの判別 -->
 
 			<div class="button-container">
-				<form th:if="${issellMapping}" th:action="@{/sell/itemList}" method="get">
+				<form th:if="${issellMapping}" th:action="@{/sell/itemList}"
+					method="get">
 					<button
 						style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;"
 						type="submit"></button>
 				</form>
-				<form  th:unless="${issellMapping}" th:action="@{/afterLogin/itemList}" method="get">
+				<form th:unless="${issellMapping}"
+					th:action="@{/afterLogin/itemList}" method="get">
 					<button
 						style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;"
 						type="submit"></button>
@@ -247,60 +264,67 @@ document.addEventListener("DOMContentLoaded", function () {
 		</div>
 	</header>
 	<div class="container">
-		<div class="search-form">
-			<form th:if="${issellMapping}" th:action="@{/sell/genreItemList}" method="post">
-				<label class="search-label" for="genre">ジャンル：</label> <select
-					class="search-select" id="genre" name="genre_id">
-					<option value="0">全てのジャンル</option>
-					<option th:each="product : ${genreList}"
-						th:value="${product.genre_id}" th:text="${product.genreName}"></option>
+    <div class="search-form">
+        <form th:action="@{/sell/genreItemList}" method="post" th:unless="${ok}">
+            <label class="search-label" for="genre">ジャンル：</label> 
+            <select class="search-select" id="genre" name="genre_id">
+                <!-- name属性を追加 -->
+                <option value="0">全てのジャンル</option>
+                <option th:each="product : ${genreList}" th:value="${product.genre_id}" th:text="${product.genreName}"></option>
+            </select> 
+            <input type="text" name="keyword" placeholder="キーワードを入力"> 
+            <input type="submit" value="選択＆検索">
+        </form>
+        <form th:action="@{/afterLogin/genreItemList}" method="post" th:if="${ok}">
+            <label class="search-label" for="genre">ジャンル：</label> 
+            <select class="search-select" id="genre" name="genre_id">
+                <!-- name属性を追加 -->
+                <option value="0">全てのジャンル</option>
+                <option th:each="product : ${genreList}" th:value="${product.genre_id}" th:text="${product.genreName}"></option>
+            </select> 
+            <input type="text" name="keyword" placeholder="キーワードを入力"> 
+            <input type="submit" value="選択＆検索">
+        </form>
+    </div>
+</div>
 
 
-				</select><input type="submit" value="選択">
+
+	<p class="blinking-text" th:text="${pickUp}"></p>
+	<div class="product-container">
+		<div th:each="product : ${productList}" class="product-card">
+			<form th:if="${issellMapping}" th:action="@{/sell/product}"
+				method="get">
+				<div class="product-details">
+					<img class="product-card img"
+						th:src="@{'/images/' + ${product.image_number}}" alt="Image">
+					<div class="product-info">
+						<button class="action-button product-card-name" type="submit"
+							name="productId" th:value="${product.goods_id}">
+							<span th:text="${product.name}"></span>
+						</button>
+						<div class="product-card-price"
+							th:text="${product.initial_price+'円'}"></div>
+					</div>
+				</div>
 			</form>
-			<form th:unless="${issellMapping}" th:action="@{/afterLogin/genreItemList}" method="post">
-				<label class="search-label" for="genre">ジャンル：</label> <select
-					class="search-select" id="genre" name="genre_id">
-					<option value="0">全てのジャンル</option>
-					<option th:each="product : ${genreList}"
-						th:value="${product.genre_id}" th:text="${product.genreName}"></option>
-
-
-				</select><input type="submit" value="選択">
+			<form th:unless="${issellMapping}" th:action="@{/afterLogin/product}"
+				method="get">
+				<div class="product-details">
+					<img class="product-card img"
+						th:src="@{'/images/' + ${product.image_number}}" alt="Image">
+					<div class="product-info">
+						<button class="action-button product-card-name" type="submit"
+							name="productId" th:value="${product.goods_id}">
+							<span th:text="${product.name}"></span>
+						</button>
+						<div class="product-card-price"
+							th:text="${product.initial_price+'円'}"></div>
+					</div>
+				</div>
 			</form>
 		</div>
 	</div>
-
-
-
-
-<p class="blinking-text" th:text="${pickUp}"> </p>
-<div class="product-container">
-  <div th:each="product : ${productList}" class="product-card">
-    <form th:if="${issellMapping}" th:action="@{/sell/product}" method="get">
-      <div class="product-details">
-        <img class="product-card img" th:src="@{'/images/' + ${product.image_number}}" alt="Image">
-        <div class="product-info">
-          <button class="action-button product-card-name" type="submit" name="productId" th:value="${product.goods_id}">
-            <span th:text="${product.name}"></span>
-          </button>
-          <div class="product-card-price" th:text="${product.initial_price+'円'}"></div>
-        </div>
-      </div>
-    </form>
-     <form th:unless="${issellMapping}" th:action="@{/afterLogin/product}" method="get">
-      <div class="product-details">
-        <img class="product-card img" th:src="@{'/images/' + ${product.image_number}}" alt="Image">
-        <div class="product-info">
-          <button class="action-button product-card-name" type="submit" name="productId" th:value="${product.goods_id}">
-            <span th:text="${product.name}"></span>
-          </button>
-          <div class="product-card-price" th:text="${product.initial_price+'円'}"></div>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
 
 
 </body>
@@ -317,6 +341,7 @@ h1 {
 	text-align: center;
 	width: 200px;
 }
+
 .site-name p {
 	margin: 0;
 	padding: 10px;

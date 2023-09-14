@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.demo.Domain.UserPrincipal;
 import com.example.demo.Form.AccountForm;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.Genre;
@@ -76,6 +78,8 @@ public class SellController {
 		
 		boolean issellMapping =true;
 		model.addAttribute("issellMapping",issellMapping);
+		model.addAttribute("ok",false);
+		
 		return "sell"; // 出品ページのテンプレート名
 	}
 
@@ -196,10 +200,31 @@ public class SellController {
 
 		return "itemList";
 	}
-	@PostMapping("genreItemList")
-	public String showGenreItemList(Model model,@RequestParam int genre_id) {
-		List<GoodsList> productList = goodsListService.goodsList2(genre_id);
+	@PostMapping("/genreItemList")
+	public String showGenreItemList(Model model,@RequestParam int genre_id,@AuthenticationPrincipal UserPrincipal userPrincipal,
+			@RequestParam(required = false) String keyword) {
+		List<GoodsList> productList;
+		
+		System.out.println(genre_id+"***");
 
+		System.out.println(keyword+8);
+		if (keyword != null && !keyword.isEmpty() && genre_id > 0) {
+		    // キーワードとジャンルIDを使用して検索クエリを実行する
+			System.out.println(456);
+		    productList = goodsListService.searchGoodsByKeywordAndGenre(keyword, genre_id);
+		} else if (keyword != null && !keyword.isEmpty()&&genre_id==0) {
+		    // キーワードのみを使用して検索クエリを実行する
+			System.out.println(456456);
+		    productList = goodsListService.searchGoodsByKeyword(keyword);
+		} else if (genre_id > 0) {
+		    // ジャンルIDのみを使用して検索クエリを実行する
+			System.out.println(456456456);
+		    productList = goodsListService.goodsList2(genre_id);
+		} else {
+		    // どちらも提供されない場合、デフォルトの検索処理を行うか、エラーハンドリングを行う
+			System.out.println(654654654);
+		    productList = goodsListService.goodsList(); // デフォルトの検索処理の例
+		}
 
 		boolean RoleAdmin = false;
 		boolean RoleYes = false;
