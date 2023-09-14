@@ -118,7 +118,7 @@ public class AfterController {
 		model.addAttribute("productList", productList);//最新金額を渡す
 		boolean issellMapping =false;
 		model.addAttribute("issellMapping",issellMapping);
-		
+
 		model.addAttribute("ok",true);
 
 		return "sell";
@@ -263,16 +263,33 @@ public class AfterController {
 	public String showAuction(@RequestParam int productId,Model model) {
 		Goods product = goodsservice.getGoodsById(productId);
 		List<Bitinfo>bidInfo = bitinfoService.findByGoods(productId);
+
+		List<BitinfoDTO> bitinfoDTOs = new ArrayList<>(); // DTOのリストを初期化
+
+		for (Bitinfo bitinfo : bidInfo) {
+			BitinfoDTO bitinfoDTO = new BitinfoDTO();
+
+
+			// DTOに情報をコピー
+			bitinfoDTO.setAccount_id(bitinfo.getAccount_id());
+			bitinfoDTO.setBid_time(bitinfo.getBid_time());
+			bitinfoDTO.setCurrent_price(bitinfo.getCurrent_price());
+			bitinfoDTO.setGoods_id(bitinfo.getGoods_id());
+			bitinfoDTO.setName(accountService.findNameById(bitinfo.getAccount_id()));
+
+			bitinfoDTOs.add(bitinfoDTO); // DTOリストに追加
+		}
+
 		model.addAttribute("BitForm", new BitForm());
 		if (product != null&&bidInfo != null) { // 商品が存在する場合のみ処理を行う
 			String remainingTime = calculateRemainingTime(product.getEnd_time());
 			// 入札情報を金額の大きい順にソート
-			bidInfo.sort(Comparator.comparing(Bitinfo::getCurrent_price).reversed());
+			bitinfoDTOs.sort(Comparator.comparing(BitinfoDTO::getCurrent_price).reversed());
 
 
 			model.addAttribute("product", product);
 			model.addAttribute("remainingTime", remainingTime);
-			model.addAttribute("bidInfo", bidInfo);
+			model.addAttribute("bidInfo", bitinfoDTOs);
 
 			return "auction"; // 商品詳細ページのビュー名
 		} else {
@@ -370,26 +387,26 @@ public class AfterController {
 	public String showGenreItemList(Model model,@RequestParam int genre_id,@AuthenticationPrincipal UserPrincipal userPrincipal,
 			@RequestParam(required = false) String keyword) {
 		List<GoodsList> productList;
-		
+
 		System.out.println(genre_id+"***");
 
 		System.out.println(keyword+8);
 		if (keyword != null && !keyword.isEmpty() && genre_id > 0) {
-		    // キーワードとジャンルIDを使用して検索クエリを実行する
+			// キーワードとジャンルIDを使用して検索クエリを実行する
 			System.out.println(456);
-		    productList = goodsListService.searchGoodsByKeywordAndGenre(keyword, genre_id);
+			productList = goodsListService.searchGoodsByKeywordAndGenre(keyword, genre_id);
 		} else if (keyword != null && !keyword.isEmpty()&&genre_id==0) {
-		    // キーワードのみを使用して検索クエリを実行する
+			// キーワードのみを使用して検索クエリを実行する
 			System.out.println(456456);
-		    productList = goodsListService.searchGoodsByKeyword(keyword);
+			productList = goodsListService.searchGoodsByKeyword(keyword);
 		} else if (genre_id > 0) {
-		    // ジャンルIDのみを使用して検索クエリを実行する
+			// ジャンルIDのみを使用して検索クエリを実行する
 			System.out.println(456456456);
-		    productList = goodsListService.goodsList2(genre_id);
+			productList = goodsListService.goodsList2(genre_id);
 		} else {
-		    // どちらも提供されない場合、デフォルトの検索処理を行うか、エラーハンドリングを行う
+			// どちらも提供されない場合、デフォルトの検索処理を行うか、エラーハンドリングを行う
 			System.out.println(654654654);
-		    productList = goodsListService.goodsList(); // デフォルトの検索処理の例
+			productList = goodsListService.goodsList(); // デフォルトの検索処理の例
 		}
 
 		if(keyword != null && !keyword.isEmpty()) {
@@ -731,57 +748,57 @@ public class AfterController {
 	//入札ページ表示
 	@GetMapping("/showbitMypage")
 	public String showBitMypage(Model model) {
-	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-	    int accountId = accountService.findAccountIdByName(authentication.getName());
-	    System.out.println(authentication.getName());
-	    System.out.println(accountId);
+		int accountId = accountService.findAccountIdByName(authentication.getName());
+		System.out.println(authentication.getName());
+		System.out.println(accountId);
 
-	    // 入札情報を取得
-	    List<Bitinfo> mypageList = bitinfoService.bidListmypage(accountId);
+		// 入札情報を取得
+		List<Bitinfo> mypageList = bitinfoService.bidListmypage(accountId);
 
-	    // 常にtrueに設定されているが、これはテストやデバッグのためかもしれない
-	    boolean RoleAdmin = true;
-	    boolean RoleYes = true;
+		// 常にtrueに設定されているが、これはテストやデバッグのためかもしれない
+		boolean RoleAdmin = true;
+		boolean RoleYes = true;
 
-	    // モデルにロール情報を追加
-	    model.addAttribute("RoleAdmin", RoleAdmin);
-	    model.addAttribute("RoleYes", RoleYes);
+		// モデルにロール情報を追加
+		model.addAttribute("RoleAdmin", RoleAdmin);
+		model.addAttribute("RoleYes", RoleYes);
 
-	    // 入札情報が存在する場合の処理
-	    if (mypageList != null && !mypageList.isEmpty()) {
-	        List<BitinfoDTO> bitinfoDTOs = new ArrayList<>(); // DTOのリストを初期化
+		// 入札情報が存在する場合の処理
+		if (mypageList != null && !mypageList.isEmpty()) {
+			List<BitinfoDTO> bitinfoDTOs = new ArrayList<>(); // DTOのリストを初期化
 
-	        for (Bitinfo bitinfo : mypageList) {
-	            BitinfoDTO bitinfoDTO = new BitinfoDTO();
-	            
-	            int goodsaccount_id = goodsservice.findAccountIdByGoodsId(bitinfo.getGoods_id());
-	            Goods item = goodsservice.allgoodsSelect(bitinfo.getGoods_id());
+			for (Bitinfo bitinfo : mypageList) {
+				BitinfoDTO bitinfoDTO = new BitinfoDTO();
 
-	            // DTOに情報をコピー
-	            bitinfoDTO.setAccount_id(bitinfo.getAccount_id());
-	            bitinfoDTO.setBid_time(bitinfo.getBid_time());
-	            bitinfoDTO.setCurrent_price(bitinfo.getCurrent_price());
-	            bitinfoDTO.setGoods_id(bitinfo.getGoods_id());
-	            bitinfoDTO.setNotlook(commentService.existsUnapprovedComments(bitinfo.getGoods_id(), goodsaccount_id));
-	            bitinfoDTO.setTimeup(goodsservice.timeUp(LocalDateTime.now(),item.getEnd_time(),bitinfo.getGoods_id(),bitinfo));
-	            bitinfoDTO.setName(item.getName());
-	            System.out.println(bitinfoDTO.isTimeup());
-	            
-	            
-	            bitinfoDTOs.add(bitinfoDTO); // DTOリストに追加
-	            
-	            if(bitinfoDTO.isTimeup()) {
-	            	model.addAttribute("ok",true);
-	            }
-	        }
-	        
-	        model.addAttribute("mypageList", bitinfoDTOs); // モデルにDTOリストを追加
-	    } else {
-	        model.addAttribute("error", "入札している品物はありません。");
-	    }
+				int goodsaccount_id = goodsservice.findAccountIdByGoodsId(bitinfo.getGoods_id());
+				Goods item = goodsservice.allgoodsSelect(bitinfo.getGoods_id());
 
-	    return "bitmypage";
+				// DTOに情報をコピー
+				bitinfoDTO.setAccount_id(bitinfo.getAccount_id());
+				bitinfoDTO.setBid_time(bitinfo.getBid_time());
+				bitinfoDTO.setCurrent_price(bitinfo.getCurrent_price());
+				bitinfoDTO.setGoods_id(bitinfo.getGoods_id());
+				bitinfoDTO.setNotlook(commentService.existsUnapprovedComments(bitinfo.getGoods_id(), goodsaccount_id));
+				bitinfoDTO.setTimeup(goodsservice.timeUp(LocalDateTime.now(),item.getEnd_time(),bitinfo.getGoods_id(),bitinfo));
+				bitinfoDTO.setName(item.getName());
+				System.out.println(bitinfoDTO.isTimeup());
+
+
+				bitinfoDTOs.add(bitinfoDTO); // DTOリストに追加
+
+				if(bitinfoDTO.isTimeup()) {
+					model.addAttribute("ok",true);
+				}
+			}
+
+			model.addAttribute("mypageList", bitinfoDTOs); // モデルにDTOリストを追加
+		} else {
+			model.addAttribute("error", "入札している品物はありません。");
+		}
+
+		return "bitmypage";
 	}
 }
 

@@ -238,7 +238,7 @@ header {
     
       <tr th:each="bid : ${bidInfo}">
         <td th:text="${bid.goods_id}"></td>
-        <td th:text="${bid.account_id}"></td>
+        <td th:text="${bid.name}"></td>
         <td th:text="${bid.current_price}+円"></td>
        <td th:text="${#temporals.format(bid.bid_time, 'yyyy年MM月dd日HH時mm分ss秒')}"></td>
       </tr>
