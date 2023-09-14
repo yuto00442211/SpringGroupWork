@@ -19,7 +19,6 @@ public class BitinfoDTO{
     private int current_price;
     private boolean notlook;
     private boolean timeup;
-    private String name;
 
     // ゲッターとセッター
 }
