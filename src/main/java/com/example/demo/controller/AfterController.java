@@ -84,6 +84,7 @@ public class AfterController {
 	private CommentService commentService;
 	@Autowired
 	private GenreRepository genreRepository;
+	private String master="たなか";
 
 
 	//	highPrice(int goodsId)
@@ -107,7 +108,9 @@ public class AfterController {
 				g.setInitial_price(bitinfoService.highPrice(goodsId));
 			}
 		}
-
+		if(productList!=null) {
+			model.addAttribute("pickUp","～ピックアップ商品～");
+		}
 		List<Genre> genreList = genreService.getAllGenre();
 		model.addAttribute("genreList", genreList);
 
@@ -332,61 +335,59 @@ public class AfterController {
 
 	//-------------------------------------------------------------
 	@GetMapping("itemList")
-	public String showItemList(Model model) {
+	public String showItemList(Model model,@AuthenticationPrincipal UserPrincipal userPrincipal) {
 		System.out.println(123465);
 		// 商品データをデータベースから取得
 		List<GoodsList> productList = goodsListService.goodsList();
 		System.out.println(productList.get(0));
+		if(master.equals(userPrincipal.getUsername())) {
 
-		boolean RoleAdmin = true;
-		boolean RoleYes = true;
-		String genre = "全商品";
+			boolean RoleAdmin = true;
+			boolean RoleYes = true;
+			String genre = "全商品";
 
-		model.addAttribute("genre",genre);
-		model.addAttribute("RoleAdmin",RoleAdmin);
-		model.addAttribute("RoleYes",RoleYes);
-		model.addAttribute("productList",productList);
+			model.addAttribute("genre",genre);
+			model.addAttribute("RoleAdmin",RoleAdmin);
+			model.addAttribute("RoleYes",RoleYes);
+			model.addAttribute("productList",productList);
+		}else {
+			boolean RoleAdmin = false;
+			boolean RoleYes = true;
+			String genre = "全商品";
+
+			model.addAttribute("genre",genre);
+			model.addAttribute("RoleAdmin",RoleAdmin);
+			model.addAttribute("RoleYes",RoleYes);
+			model.addAttribute("productList",productList);
+		}
 
 		return "itemList";
 	}
 
 	@PostMapping("genreItemList")
-	public String showGenreItemList(Model model, @RequestParam int genre_id, @RequestParam(required = false) String keyword) {
-		List<GoodsList> productList;
-		
-		System.out.println(genre_id+"***");
+	public String showGenreItemList(Model model,@RequestParam int genre_id,@AuthenticationPrincipal UserPrincipal userPrincipal) {
+		List<GoodsList> productList = goodsListService.goodsList2(genre_id);
 
-		System.out.println(keyword+8);
-		if (keyword != null && !keyword.isEmpty() && genre_id > 0) {
-		    // キーワードとジャンルIDを使用して検索クエリを実行する
-			System.out.println(456);
-		    productList = goodsListService.searchGoodsByKeywordAndGenre(keyword, genre_id);
-		} else if (keyword != null && !keyword.isEmpty()&&genre_id==0) {
-		    // キーワードのみを使用して検索クエリを実行する
-			System.out.println(456456);
-		    productList = goodsListService.searchGoodsByKeyword(keyword);
-		} else if (genre_id > 0) {
-		    // ジャンルIDのみを使用して検索クエリを実行する
-			System.out.println(456456456);
-		    productList = goodsListService.goodsList2(genre_id);
-		} else {
-		    // どちらも提供されない場合、デフォルトの検索処理を行うか、エラーハンドリングを行う
-			System.out.println(654654654);
-		    productList = goodsListService.goodsList(); // デフォルトの検索処理の例
+		if(master.equals(userPrincipal.getUsername())) {
+			boolean RoleAdmin = true;
+			boolean RoleYes = true;
+
+			String genre = goodsListService.genreList(genre_id);
+			model.addAttribute("genre",genre);
+			model.addAttribute("RoleAdmin",RoleAdmin);
+			model.addAttribute("RoleYes",RoleYes);
+			model.addAttribute("productList",productList);
+		}else {
+			boolean RoleAdmin = false;
+			boolean RoleYes = true;
+
+			String genre = goodsListService.genreList(genre_id);
+			model.addAttribute("genre",genre);
+			model.addAttribute("RoleAdmin",RoleAdmin);
+			model.addAttribute("RoleYes",RoleYes);
+			model.addAttribute("productList",productList);
+
 		}
-
-		if(keyword != null && !keyword.isEmpty()) {
-			model.addAttribute("keyword",keyword);
-		}
-
-		boolean RoleAdmin = true;
-		boolean RoleYes = true;
-
-		String genre = goodsListService.genreList(genre_id);
-		model.addAttribute("genre",genre);
-		model.addAttribute("RoleAdmin",RoleAdmin);
-		model.addAttribute("RoleYes",RoleYes);
-		model.addAttribute("productList",productList);
 		return "itemList";
 	}
 
@@ -424,7 +425,7 @@ public class AfterController {
 		goodsRepositry.save(updatedgoods);
 
 		// 画像を保存するディレクトリパスを指定
-		String uploadDir = "src/main/resources/static/image"; // 画像保存先ディレクトリのパス
+		String uploadDir = goodsservice.uploadDirectory; // 画像保存先ディレクトリのパス
 
 		// 画像を保存する処理
 		if (imageFile != null && !imageFile.isEmpty()) {
@@ -699,64 +700,63 @@ public class AfterController {
 
 		return "redirect:/afterLogin/mychat2";  // リダイレクト先を適切なページに置き換えます。
 	}
-	
+
 	//入札ページ表示
-		@GetMapping("/showbitMypage")
-		public String showBitMypage(Model model) {
-		    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	@GetMapping("/showbitMypage")
+	public String showBitMypage(Model model) {
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-		    int accountId = accountService.findAccountIdByName(authentication.getName());
-		    System.out.println(authentication.getName());
-		    System.out.println(accountId);
+	    int accountId = accountService.findAccountIdByName(authentication.getName());
+	    System.out.println(authentication.getName());
+	    System.out.println(accountId);
 
-		    // 入札情報を取得
-		    List<Bitinfo> mypageList = bitinfoService.bidListmypage(accountId);
+	    // 入札情報を取得
+	    List<Bitinfo> mypageList = bitinfoService.bidListmypage(accountId);
 
-		    // 常にtrueに設定されているが、これはテストやデバッグのためかもしれない
-		    boolean RoleAdmin = true;
-		    boolean RoleYes = true;
+	    // 常にtrueに設定されているが、これはテストやデバッグのためかもしれない
+	    boolean RoleAdmin = true;
+	    boolean RoleYes = true;
 
-		    // モデルにロール情報を追加
-		    model.addAttribute("RoleAdmin", RoleAdmin);
-		    model.addAttribute("RoleYes", RoleYes);
+	    // モデルにロール情報を追加
+	    model.addAttribute("RoleAdmin", RoleAdmin);
+	    model.addAttribute("RoleYes", RoleYes);
 
-		    // 入札情報が存在する場合の処理
-		    if (mypageList != null && !mypageList.isEmpty()) {
-		        List<BitinfoDTO> bitinfoDTOs = new ArrayList<>(); // DTOのリストを初期化
+	    // 入札情報が存在する場合の処理
+	    if (mypageList != null && !mypageList.isEmpty()) {
+	        List<BitinfoDTO> bitinfoDTOs = new ArrayList<>(); // DTOのリストを初期化
 
-		        for (Bitinfo bitinfo : mypageList) {
-		            BitinfoDTO bitinfoDTO = new BitinfoDTO();
-		            
-		            int goodsaccount_id = goodsservice.findAccountIdByGoodsId(bitinfo.getGoods_id());
-		            Goods item = goodsservice.allgoodsSelect(bitinfo.getGoods_id());
+	        for (Bitinfo bitinfo : mypageList) {
+	            BitinfoDTO bitinfoDTO = new BitinfoDTO();
+	            
+	            int goodsaccount_id = goodsservice.findAccountIdByGoodsId(bitinfo.getGoods_id());
+	            Goods item = goodsservice.allgoodsSelect(bitinfo.getGoods_id());
 
-		            // DTOに情報をコピー
-		            bitinfoDTO.setAccount_id(bitinfo.getAccount_id());
-		            bitinfoDTO.setBid_time(bitinfo.getBid_time());
-		            bitinfoDTO.setCurrent_price(bitinfo.getCurrent_price());
-		            bitinfoDTO.setGoods_id(bitinfo.getGoods_id());
-		            bitinfoDTO.setNotlook(commentService.existsUnapprovedComments(bitinfo.getGoods_id(), goodsaccount_id));
-		            bitinfoDTO.setTimeup(goodsservice.timeUp(LocalDateTime.now(),item.getEnd_time(),bitinfo.getGoods_id(),bitinfo));
-		            
-		            System.out.println(bitinfoDTO.isTimeup());
-		            
-		            
-		            bitinfoDTOs.add(bitinfoDTO); // DTOリストに追加
-		            
-		            if(bitinfoDTO.isTimeup()) {
-		            	model.addAttribute("ok",true);
-		            }
-		        }
-		        
-		        model.addAttribute("mypageList", bitinfoDTOs); // モデルにDTOリストを追加
-		    } else {
-		        model.addAttribute("error", "入札している品物はありません。");
-		    }
+	            // DTOに情報をコピー
+	            bitinfoDTO.setAccount_id(bitinfo.getAccount_id());
+	            bitinfoDTO.setBid_time(bitinfo.getBid_time());
+	            bitinfoDTO.setCurrent_price(bitinfo.getCurrent_price());
+	            bitinfoDTO.setGoods_id(bitinfo.getGoods_id());
+	            bitinfoDTO.setNotlook(commentService.existsUnapprovedComments(bitinfo.getGoods_id(), goodsaccount_id));
+	            bitinfoDTO.setTimeup(goodsservice.timeUp(LocalDateTime.now(),item.getEnd_time(),bitinfo.getGoods_id(),bitinfo));
+	            bitinfoDTO.setName(item.getName());
+	            System.out.println(bitinfoDTO.isTimeup());
+	            
+	            
+	            bitinfoDTOs.add(bitinfoDTO); // DTOリストに追加
+	            
+	            if(bitinfoDTO.isTimeup()) {
+	            	model.addAttribute("ok",true);
+	            }
+	        }
+	        
+	        model.addAttribute("mypageList", bitinfoDTOs); // モデルにDTOリストを追加
+	    } else {
+	        model.addAttribute("error", "入札している品物はありません。");
+	    }
 
-		    return "bitmypage";
-		}
+	    return "bitmypage";
+	}
 }
-
 
 
 

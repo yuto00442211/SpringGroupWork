@@ -3,21 +3,15 @@ package com.example.demo.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.GoodsList;
-import com.example.demo.repositry.GenreRepository;
 import com.example.demo.repositry.GoodsListRepositry;
 
 @Service
 public class GoodsListService {
 	
 	 private GoodsListRepositry goodsListRepository;
-	 
-	 @Autowired
-	private GenreRepository genreRepository;
-
 
 	public GoodsListService(GoodsListRepositry goodsListRepository) {
 	        this.goodsListRepository = goodsListRepository;
@@ -48,30 +42,15 @@ public class GoodsListService {
 		return goodsList;
 	}
 	
-	//ジャンルが何か判定
+	//ジャンルが何か判定と設定
 		public String genreList(int genre_ID) {
-			
-			String genre =genreRepository.getGenreName(genre_ID);
-			System.out.println(genre+"6");
-		
+			String genre="";
+			switch (genre_ID) {
+			case 0: genre = "全商品";break;
+			case 1: genre = "家電製品";break;
+			case 2: genre = "服";break;
+			}
 			return genre;
 		}
-		
-		//ジャンルとキーワードを指定して
-		public List<GoodsList>searchGoodsByKeywordAndGenre(String keyword, int genre_id){
-			
-			 List<GoodsList>list = goodsListRepository.searchGoodsByKeywordAndGenre(keyword, genre_id);
-			
-			return list;
-		}
-		
-		//キーワード検索
-		public List<GoodsList>searchGoodsByKeyword(String keyword){
-			
-			System.out.println(keyword);
-			
-			 List<GoodsList>list = goodsListRepository.searchGoodsByKeyword(keyword);
-			
-			return list;
-		}
+
 }
