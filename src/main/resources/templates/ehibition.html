@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+</head>
+<body>
+
+    <!-- エラーメッセージの表示 -->
+     <div th:if="${error}" class="alert alert-danger">
+        <p th:text="${error}"></p>
+        <!-- エラーメッセージが存在する場合のみリンクを表示 -->
+        <a th:href="@{/afterLogin/create}" class="btn btn-primary">出品してみよう！</a>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>商品ID</th>
+                <th>商品名</th>
+                <th>商品の詳細</th>
+                <th>メールBox</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="goodsDTO : ${goodsList}">
+                <td th:text="${goodsDTO.goods_id}"></td>
+                <td th:text="${goodsDTO.name}"></td>
+                <td><a th:href="@{/afterLogin/product(productId=${goodsDTO.goods_id})}">詳細を見る</a></td>
+                <td><a
+                    th:href="@{/afterLogin/mailBox(goodsid=${goodsDTO.goods_id})}"
+                    th:text="${goodsDTO.readStatus}"></a></td>
+            </tr>
+        </tbody>
+
+    </table>
+
+</body>
+</html>

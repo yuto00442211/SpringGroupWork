@@ -178,7 +178,7 @@ img {
 </head>
 
 <body>
-<a th:href="@{/afterLogin/showbitMypage}" class="mypage-button">mypageにもどる</a>
+<a th:href="@{/afterLogin/showMypage}" class="mypage-button">mypageにもどる</a>
 	<div class="c-talk">
 		<div class="c-talk__head">LINE風チャットレイアウト</div>
 		<div class="c-talk__body">
@@ -202,12 +202,13 @@ img {
 				</div>
 			</div>
 
-			<form th:action="@{/afterLogin/sendMessage}" method="post"
+			<form th:action="@{/afterLogin/sendMessage2}" method="post"
 				th:object="${commentForm}">
 				<div class="c-talk__send">
 					<!-- Hidden fields for goods_id and account_id -->
-					<input type="hidden" name="goods_id" th:value="${goodsId}" /> <input
-						type="hidden" name="account_id" th:value="${accountId}" />
+					<input type="hidden" name="goods_id" th:value="${goodsId}" /> 
+					<input type="hidden" name="account_id" th:value="${accountId}" />
+					<input type="hidden" name="goodsaccount_id" th:value="${goodsaccount_id}" />
 					<textarea th:field="*{comment_content}" class="c-talk__input"
 						placeholder="メッセージを入力..."></textarea>
 					<button type="submit" class="c-talk__send-btn">送信</button>

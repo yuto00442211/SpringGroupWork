@@ -253,12 +253,12 @@
             <ul id="link1">
                 <li>
                     <div class="button-container">
-                        <form th:action="@{itemList}" method="get">
+                        <form th:action="@{/afterLogin/exhibition}" method="get">
                            <button class="action-button" style="border: none;">出品商品</button><!-- 今は商品一覧ページに繋がっています(仮) -->
                         </form>
                     </div>
                 </li>
-                <li><a href="">入札中の商品</a></li>
+                <li><a th:href="@{/afterLogin/showbitMypage}">入札中の商品</a></li>
                 <li><a href="">評価</a></li>
                 <li>
                     <form th:action="@{/logout}" method="get">

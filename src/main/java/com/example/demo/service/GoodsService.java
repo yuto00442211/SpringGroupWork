@@ -2,20 +2,24 @@ package com.example.demo.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.demo.entity.Bitinfo;
 import com.example.demo.entity.Goods;
 import com.example.demo.repositry.GoodsRepositry;
 
 @Service
 public class GoodsService {
 	private final GoodsRepositry goodsRepository;
-	private BitinfoService bitinfoService ;
+	@Autowired
+    private BitinfoService bitinfoService;
 	 public String uploadDirectory=System.getProperty("user.dir")+"\\images\\"; // ファイルを保存するディレクトリのパス
 
 	public GoodsService(GoodsRepositry goodsRepository) {
@@ -49,10 +53,45 @@ public class GoodsService {
 
 	public int findAccountIdByGoodsId(int goodsId) {
 		
-		int x = goodsRepository.findAccountIdByGoodsId(goodsId);
+		Integer x = goodsRepository.findAccountIdByGoodsId(goodsId);
 
+		if(x==null) {
+			x=-1;
+		}
+		
 		return x;
 	}
+	
+	//出品アイテム取得↓　上が出品者特定メソッド↑
+		public List<Goods> getMyItem(int accountId){
+			
+			List<Goods>myItem = goodsRepository.getMyItem(accountId);
+			
+			return myItem;
+		}
+		
+		//goods_idから全取得
+		public Goods allgoodsSelect(int goodsId) {
+			
+			Goods item = goodsRepository.allgoodsSelect(goodsId);
+			
+			return item;
+		}
+		
+		//落札出来たかどうか
+		public boolean timeUp(LocalDateTime nowTime,LocalDateTime endTime,int goods_id,Bitinfo mybit) {
+			
+			boolean xxx = nowTime.isAfter(endTime);
+			
+			if(xxx) {
+				if(mybit.getCurrent_price()==bitinfoService.highPrice(goods_id)) {
+				}else {
+					xxx = false;
+				}
+			}
+			return xxx;
+		}
+		
 	
 	  public String saveImage(MultipartFile file) throws IOException {
           String originalFileName = file.getOriginalFilename();
