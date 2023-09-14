@@ -258,7 +258,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-<p class="blinking-text">～ピックアップ商品～</p>
+<p class="blinking-text" th:text="${pickUp}"> </p>
 <div class="product-container">
   <div th:each="product : ${productList}" class="product-card">
     <form th:action="@{product}" method="get">

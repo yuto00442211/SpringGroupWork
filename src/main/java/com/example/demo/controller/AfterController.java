@@ -107,7 +107,9 @@ public class AfterController {
 				g.setInitial_price(bitinfoService.highPrice(goodsId));
 			}
 		}
-
+		if(productList!=null) {
+			model.addAttribute("pickUp","～ピックアップ商品～");
+		}
 		List<Genre> genreList = genreService.getAllGenre();
 		model.addAttribute("genreList", genreList);
 
