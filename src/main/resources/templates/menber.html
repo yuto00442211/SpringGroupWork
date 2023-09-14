@@ -37,6 +37,9 @@
             font-weight: bold;
             margin-top: 10px;
         }
+         .error-message {
+        color: red; /* エラーメッセージの文字色を赤に設定 */
+    }
         .registration-input {
             width: 100%;
             padding: 10px;
@@ -105,6 +108,7 @@
            <form method="POST" th:action="@{/sell/sub}"  th:object="${accountForm}" onsubmit="return validateForm()">
     <label class="registration-label" for="name">名前</label>
     <input class="registration-input" type="text" th:field="*{name}" required>
+    <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error-message"></span>
 
     <label class="registration-label" for="address">住所</label>
     <input class="registration-input" type="text"  th:field="*{address}" required>
