@@ -425,7 +425,7 @@ public class AfterController {
 		goodsRepositry.save(updatedgoods);
 
 		// 画像を保存するディレクトリパスを指定
-		String uploadDir = "src/main/resources/static/image"; // 画像保存先ディレクトリのパス
+		String uploadDir = goodsservice.uploadDirectory; // 画像保存先ディレクトリのパス
 
 		// 画像を保存する処理
 		if (imageFile != null && !imageFile.isEmpty()) {
