@@ -704,60 +704,59 @@ public class AfterController {
 	//入札ページ表示
 	@GetMapping("/showbitMypage")
 	public String showBitMypage(Model model) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-		int accountId = accountService.findAccountIdByName(authentication.getName());
-		System.out.println(authentication.getName());
-		System.out.println(accountId);
+	    int accountId = accountService.findAccountIdByName(authentication.getName());
+	    System.out.println(authentication.getName());
+	    System.out.println(accountId);
 
-		// 入札情報を取得
-		List<Bitinfo> mypageList = bitinfoService.bidListmypage(accountId);
+	    // 入札情報を取得
+	    List<Bitinfo> mypageList = bitinfoService.bidListmypage(accountId);
 
-		// 常にtrueに設定されているが、これはテストやデバッグのためかもしれない
-		boolean RoleAdmin = true;
-		boolean RoleYes = true;
+	    // 常にtrueに設定されているが、これはテストやデバッグのためかもしれない
+	    boolean RoleAdmin = true;
+	    boolean RoleYes = true;
 
-		// モデルにロール情報を追加
-		model.addAttribute("RoleAdmin", RoleAdmin);
-		model.addAttribute("RoleYes", RoleYes);
+	    // モデルにロール情報を追加
+	    model.addAttribute("RoleAdmin", RoleAdmin);
+	    model.addAttribute("RoleYes", RoleYes);
 
-		// 入札情報が存在する場合の処理
-		if (mypageList != null && !mypageList.isEmpty()) {
-			List<BitinfoDTO> bitinfoDTOs = new ArrayList<>(); // DTOのリストを初期化
+	    // 入札情報が存在する場合の処理
+	    if (mypageList != null && !mypageList.isEmpty()) {
+	        List<BitinfoDTO> bitinfoDTOs = new ArrayList<>(); // DTOのリストを初期化
 
-			for (Bitinfo bitinfo : mypageList) {
-				BitinfoDTO bitinfoDTO = new BitinfoDTO();
+	        for (Bitinfo bitinfo : mypageList) {
+	            BitinfoDTO bitinfoDTO = new BitinfoDTO();
+	            
+	            int goodsaccount_id = goodsservice.findAccountIdByGoodsId(bitinfo.getGoods_id());
+	            Goods item = goodsservice.allgoodsSelect(bitinfo.getGoods_id());
 
-				int goodsaccount_id = goodsservice.findAccountIdByGoodsId(bitinfo.getGoods_id());
-				Goods item = goodsservice.allgoodsSelect(bitinfo.getGoods_id());
+	            // DTOに情報をコピー
+	            bitinfoDTO.setAccount_id(bitinfo.getAccount_id());
+	            bitinfoDTO.setBid_time(bitinfo.getBid_time());
+	            bitinfoDTO.setCurrent_price(bitinfo.getCurrent_price());
+	            bitinfoDTO.setGoods_id(bitinfo.getGoods_id());
+	            bitinfoDTO.setNotlook(commentService.existsUnapprovedComments(bitinfo.getGoods_id(), goodsaccount_id));
+	            bitinfoDTO.setTimeup(goodsservice.timeUp(LocalDateTime.now(),item.getEnd_time(),bitinfo.getGoods_id(),bitinfo));
+	            bitinfoDTO.setName(item.getName());
+	            System.out.println(bitinfoDTO.isTimeup());
+	            
+	            
+	            bitinfoDTOs.add(bitinfoDTO); // DTOリストに追加
+	            
+	            if(bitinfoDTO.isTimeup()) {
+	            	model.addAttribute("ok",true);
+	            }
+	        }
+	        
+	        model.addAttribute("mypageList", bitinfoDTOs); // モデルにDTOリストを追加
+	    } else {
+	        model.addAttribute("error", "入札している品物はありません。");
+	    }
 
-				// DTOに情報をコピー
-				bitinfoDTO.setAccount_id(bitinfo.getAccount_id());
-				bitinfoDTO.setBid_time(bitinfo.getBid_time());
-				bitinfoDTO.setCurrent_price(bitinfo.getCurrent_price());
-				bitinfoDTO.setGoods_id(bitinfo.getGoods_id());
-				bitinfoDTO.setNotlook(commentService.existsUnapprovedComments(bitinfo.getGoods_id(), goodsaccount_id));
-				bitinfoDTO.setTimeup(goodsservice.timeUp(LocalDateTime.now(),item.getEnd_time(),bitinfo.getGoods_id(),bitinfo));
-				bitinfoDTO.setName(item.getName());
-				System.out.println(bitinfoDTO.isTimeup());
-
-
-				bitinfoDTOs.add(bitinfoDTO); // DTOリストに追加
-
-				if(bitinfoDTO.isTimeup()) {
-					model.addAttribute("ok",true);
-				}
-			}
-
-			model.addAttribute("mypageList", bitinfoDTOs); // モデルにDTOリストを追加
-		} else {
-			model.addAttribute("error", "入札している品物はありません。");
-		}
-
-		return "bitmypage";
+	    return "bitmypage";
 	}
 }
-
 
 
 
