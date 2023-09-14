@@ -213,9 +213,15 @@ document.addEventListener("DOMContentLoaded", function () {
 		<div sec:authorize="isAuthenticated()" class="user-info">
 			こんにちは：<span sec:authentication="name"></span>さん
 			<form th:action="@{/logout}" method="post"></form>
+			<!-- th:if="${issellMapping}"th:unless="${issellMapping}"でsellとafterLoginの判別 -->
 
 			<div class="button-container">
-				<form th:action="@{itemList}" method="get">
+				<form th:if="${issellMapping}" th:action="@{itemList}" method="get">
+					<button
+						style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;"
+						type="submit"></button>
+				</form>
+				<form  th:unless="${issellMapping}" th:action="@{itemList}" method="get">
 					<button
 						style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;"
 						type="submit"></button>
@@ -242,7 +248,17 @@ document.addEventListener("DOMContentLoaded", function () {
 	</header>
 	<div class="container">
 		<div class="search-form">
-			<form th:action="@{genreItemList}" method="post">
+			<form th:if="${issellMapping}" th:action="@{genreItemList}" method="post">
+				<label class="search-label" for="genre">ジャンル：</label> <select
+					class="search-select" id="genre" name="genre_id">
+					<option value="0">全てのジャンル</option>
+					<option th:each="product : ${genreList}"
+						th:value="${product.genre_id}" th:text="${product.genreName}"></option>
+
+
+				</select><input type="submit" value="選択">
+			</form>
+			<form th:unless="${issellMapping}" th:action="@{genreItemList}" method="post">
 				<label class="search-label" for="genre">ジャンル：</label> <select
 					class="search-select" id="genre" name="genre_id">
 					<option value="0">全てのジャンル</option>
@@ -261,7 +277,18 @@ document.addEventListener("DOMContentLoaded", function () {
 <p class="blinking-text" th:text="${pickUp}"> </p>
 <div class="product-container">
   <div th:each="product : ${productList}" class="product-card">
-    <form th:action="@{product}" method="get">
+    <form th:if="${issellMapping}" th:action="@{product}" method="get">
+      <div class="product-details">
+        <img class="product-card img" th:src="@{'/images/' + ${product.image_number}}" alt="Image">
+        <div class="product-info">
+          <button class="action-button product-card-name" type="submit" name="productId" th:value="${product.goods_id}">
+            <span th:text="${product.name}"></span>
+          </button>
+          <div class="product-card-price" th:text="${product.initial_price+'円'}"></div>
+        </div>
+      </div>
+    </form>
+     <form th:unless="${issellMapping}" th:action="@{product}" method="get">
       <div class="product-details">
         <img class="product-card img" th:src="@{'/images/' + ${product.image_number}}" alt="Image">
         <div class="product-info">
