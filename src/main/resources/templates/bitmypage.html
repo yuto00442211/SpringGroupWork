@@ -1,8 +1,5 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org">
-<link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css"
-	rel="stylesheet">
-
 <head>
     <meta charset="UTF-8">
     <title>Insert title here</title>
@@ -11,108 +8,7 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
         rel="stylesheet">
 </head>
-<style>
-body {
-	font-family: Arial, sans-serif;
-	margin: 0;
-	padding: 0;
-	background-color: #f0f0f0;
-}
-
-header {
-	background-color: #f0f0f0;
-	color: rgb(0, 0, 0);
-	padding: 10px 0;
-	text-align: center;
-	display: flex;
-	justify-content: flex-start; /* 要素を左寄せに配置 */
-	align-items: center;
-}
-
-.auth-buttons {
-	display: flex;
-	align-items: center;
-}
-
-
-.button-container {
-	display: flex;
-	align-items: center;
-	margin-left: auto;
-}
-
-.action-button {
-	background-color: #3498db;
-	color: white;
-	padding: 10px 20px;
-	border: none;
-	border-radius: 3px;
-	cursor: pointer;
-	margin-right: 10px; /* ボタン間の右側のマージン */
-}
-
-.action-button:last-child {
-	margin-right: 0; /* 最後のボタンにはマージンを適用しない */
-}
-
-.action-button:hover {
-	background-color: #2980b9;
-}
-
-
-.user-info {
-	padding-left: 10px; /* 左側のパディング */
-	padding-right: 10px; /* 右側のパディング */
-}
-
-</style>
-
 <body>
-
-
-<header>
-		<div class="site-name">
-			<h1 style="font-size: 32px;">キャルション！</h1>
-		</div>
-
-		<div sec:authorize="!isAuthenticated()" class="auth-buttons">
-			<form th:action="@{/sell/login}" method="get">
-				<button class="action-button">ログイン</button>
-			</form>
-		</div>
-
-		<!-- sec:authorizeを使って"isAuthenticated()"で認証済みかどうかを判定 -->
-		<!-- trueならば<div>内を表示 -->
-		<div sec:authorize="isAuthenticated()" class="user-info">
-			こんにちは：<span sec:authentication="name"></span>さん
-			<form th:action="@{/logout}" method="post"></form>
-
-			<div class="button-container">
-				<form th:action="@{itemList}" method="get">
-					<button
-						style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
-
-				<form th:action="@{showMypage}" method="get">
-					<button
-						style="background: url('/image/mypageicon.png') no-repeat center center; width: 60px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
-				<form th:action="@{create}" method="get">
-					<button
-						style="background: url('/image/upload.png') no-repeat center center; width: 60px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
-				<form th:action="@{/logout}" method="post">
-					<button
-						style="background: url('/image/logoutbutton.png') no-repeat center center; width: 145px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
-			</div>
-
-		</div>
-	</header>
 
     <!-- エラーメッセージの表示 -->
      <div th:if="${error}" class="alert alert-danger">
@@ -124,7 +20,7 @@ header {
    <table class="table table-striped">
 	<thead>
 		<tr>
-			<th>商品名</th>
+			<th>商品ID</th>
 			<th>あなたの入札価格</th>
 			<th>入札時間</th>
 			<th>チャットページへ</th>
@@ -140,15 +36,14 @@ header {
 		<!-- データを繰り返し処理 -->
 		<tr th:each="itemList : ${mypageList}">
 			<!-- 各セルにデータを表示 -->
-			<td th:text="${itemList.name}"></td>
-			<td th:text="${itemList.current_price}+円"></td>
-			<td th:text="${#temporals.format(itemList.bid_time, 'yyyy年MM月dd日HH時mm分ss秒')}"></td>
+			<td th:text="${itemList.goods_id}"></td>
+			<td th:text="${itemList.current_price}"></td>
+			<td th:text="${itemList.bid_time}"></td>
 			<td><a
 				th:href="@{/afterLogin/mychat(goods_id=${itemList.goods_id})}">チャット</a></td>
-				<td th:text="${itemList.notlook ? '未読あり' : ' '}"
-    th:class="${itemList.notlook ? 'text-danger' : ''}"></td>
+				<td th:text="${itemList.notlook} ? '←未読あり' : ' '"></td>
 			<td><a
-				th:href="@{/afterLogin/auction(productId=${itemList.goods_id})}">商品ページ</a></td>
+				th:href="@{/afterLogin/auction(productId=${itemList.goods_id})}">入札</a></td>
 			<td><a th:if="${itemList.timeup}"
 				th:href="@{/afterLogin/update(goods_id=${itemList.goods_id})}">☆落札できました☆</a></td>
 		</tr>
@@ -156,43 +51,4 @@ header {
 </table>
 
 </body>
-<style>
-h1 {
-	font-family: "Nico Moji";
-}
-
-.site-name {
-	background: #FFDA45; /*背景色の指定*/
-	color: #000000; /*テキストの色の指定*/
-	padding: 10px;
-	text-align: center;
-	width: 200px;
-}
-.site-name p {
-	margin: 0;
-	padding: 10px;
-}
-
-.search-form {
-	text-align: left;
-}
-
-.button-container {
-	display: flex;
-	align-items: center;
-}
-
-.action-button {
-	/* ボタンのスタイル */
-	
-}
-
-.action-button:hover {
-	/* ボタンのホバースタイル */
-	
-}
-.text-danger {
-    color: red;
-}
-</style>
 </html>
