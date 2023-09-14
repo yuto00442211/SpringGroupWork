@@ -16,6 +16,7 @@ public class Comment {
     private int goods_id; // 商品ID
     private int account_id; // アカウントID
     private Integer comment_number; // コメント番号
+    private int goodsaccount_id;
     private String comment_content; // コメント内容
     private LocalDateTime comment_time; // コメントのタイムスタンプ
     private Boolean is_approved = false; // 承認フラグ（デフォルトはfalse）

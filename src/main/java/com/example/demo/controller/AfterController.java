@@ -32,6 +32,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.demo.Domain.UserPrincipal;
 import com.example.demo.Form.AccountForm;
 import com.example.demo.Form.BitForm;
+import com.example.demo.Form.BitinfoDTO;
+import com.example.demo.Form.GoodsDTO;
 import com.example.demo.Form.GoodsForm;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.Bitinfo;
@@ -122,13 +124,13 @@ public class AfterController {
 
 		if (product != null) { // 商品が存在する場合のみ処理を行う
 			String remainingTime = calculateRemainingTime(product.getEnd_time());
-			
+
 			int current_price =product.getInitial_price();
 			if(bitinfoService.highPrice(productId)!=0) {
 				current_price=(bitinfoService.highPrice(productId));
 			}
-		
-			
+
+
 			model.addAttribute("current_price", current_price);
 
 			model.addAttribute("product", product);
@@ -157,7 +159,7 @@ public class AfterController {
 		return String.format("残り時間: %d日 %d時間 %d分", days, hours, minutes);
 	}
 
-	
+
 
 
 	@GetMapping("create")
@@ -447,48 +449,90 @@ public class AfterController {
 		System.out.println(accountId);
 		//入札情報
 		List<Bitinfo> mypageList = bitinfoService.bidListmypage(accountId);
+		// 常にtrueに設定されているが、これはテストやデバッグのためかもしれない
 		boolean RoleAdmin = true;
 		boolean RoleYes = true;
-		model.addAttribute("mypageList",mypageList);
-		model.addAttribute("RoleAdmin",RoleAdmin);
-		model.addAttribute("RoleYes",RoleYes);
+
+		// モデルにロール情報を追加
+		model.addAttribute("RoleAdmin", RoleAdmin);
+		model.addAttribute("RoleYes", RoleYes);
+
+		// 入札情報が存在する場合の処理
+		if (mypageList != null && !mypageList.isEmpty()) {
+			List<BitinfoDTO> bitinfoDTOs = new ArrayList<>(); // DTOのリストを初期化
+
+			for (Bitinfo bitinfo : mypageList) {
+				BitinfoDTO bitinfoDTO = new BitinfoDTO();
+
+				int goodsaccount_id = goodsservice.findAccountIdByGoodsId(bitinfo.getGoods_id());
+				Goods item = goodsservice.allgoodsSelect(bitinfo.getGoods_id());
+
+				// DTOに情報をコピー
+				bitinfoDTO.setAccount_id(bitinfo.getAccount_id());
+				bitinfoDTO.setBid_time(bitinfo.getBid_time());
+				bitinfoDTO.setCurrent_price(bitinfo.getCurrent_price());
+				bitinfoDTO.setGoods_id(bitinfo.getGoods_id());
+				bitinfoDTO.setNotlook(commentService.existsUnapprovedComments(bitinfo.getGoods_id(), goodsaccount_id));
+				bitinfoDTO.setTimeup(goodsservice.timeUp(LocalDateTime.now(),item.getEnd_time(),bitinfo.getGoods_id(),bitinfo));
+
+				System.out.println(bitinfoDTO.isTimeup());
+
+
+				bitinfoDTOs.add(bitinfoDTO); // DTOリストに追加
+
+				if(bitinfoDTO.isTimeup()) {
+					model.addAttribute("ok",true);
+				}
+			}
+
+			model.addAttribute("mypageList", bitinfoDTOs); // モデルにDTOリストを追加
+		} else {
+			model.addAttribute("error", "入札している品物はありません。");
+		}
 
 		return "mypage";
 	}
 
+
 	//入札者側mychat表示
 	@GetMapping("/mychat")
-	public String showMychat(@RequestParam(name = "goods_id")  int goodsId, Model model) {
+	public String showMychat(@RequestParam(name = "goods_id")  int goodsId, Model model,@RequestParam(name = "fromRedirect", required = false, defaultValue = "false") boolean fromRedirect) {
 		//入札者
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		int accountId = accountService.findAccountIdByName(authentication.getName());
 
 		//出品者
-		int accountID = goodsservice.findAccountIdByGoodsId(goodsId);
+		Integer accountID = goodsservice.findAccountIdByGoodsId(goodsId);
+
+		if(accountID!=-1) {
+			//取得したいid配列
+			List<Integer> accountIds = Arrays.asList(accountId, accountID); // 取得したい account_id のリスト
+			List<Integer> goodsaccountIdList = Arrays.asList(accountId, accountID); // 取得したい goodsaccount_id のリスト
+
+			if (!fromRedirect) {
+				// is_approvedをtrueに更新
+				commentService.updateIsApprovedByGoodsIdAndAccountIds(goodsId, accountID, accountId);
+			}
 
 
-		List<Integer> accountIds = Arrays.asList(accountId, accountID); // 取得したい account_id のリスト
+			//チャットリスト作成
+			List<Comment> comments = commentService.findByGoodsIdAndAccountIdInOrderByCommentTimeAsc(goodsId,accountIds,goodsaccountIdList);
 
-		List<Comment> comments = commentService.findByGoodsIdAndAccountIdInOrderByCommentTimeAsc(goodsId, accountIds);
+			//リダイレクト用インスタンス
+			Comment commentForm = new Comment();
 
-		Comment commentForm = new Comment();
-
-		model.addAttribute("goodsId",goodsId);
-		model.addAttribute("commentForm",commentForm);
-		model.addAttribute("accountId",accountId);
-		model.addAttribute("isBidder",false);
-		model.addAttribute("comments", comments);
-		return "mychat";
+			model.addAttribute("goodsId",goodsId);
+			model.addAttribute("commentForm",commentForm);
+			model.addAttribute("accountId",accountId);
+			model.addAttribute("isBidder",false);
+			model.addAttribute("comments", comments);
+			return "mychat";
+		}else {
+			return "mypage";
+		}
 	}
 
-	//出品者側mychat表示
-	@GetMapping("/mychat2")
-	public String showMychat2(@RequestParam(name = "goods_id")  int goodsId, Model model) {
-		List<Comment> comments = commentService.getCommentsByGoodsId(goodsId);
-		model.addAttribute("isBidder",false);
-		model.addAttribute("comments", comments);
-		return "mychat";
-	}
+
 
 	@PostMapping("/sendMessage")
 	public String sendMessage(@ModelAttribute Comment comment, RedirectAttributes redirectAttributes) {
@@ -499,11 +543,13 @@ public class AfterController {
 		int accountId=comment.getAccount_id();
 		String comments=comment.getComment_content();
 		LocalDateTime time =LocalDateTime.now();
+		int goodsaccount = goodsservice.findAccountIdByGoodsId(goodsId);
 
-		commentService.insertComment(goodsId, accountId, time, comments);
+		commentService.insertComment(goodsId, accountId, time, comments,goodsaccount);
 
 		// 保存成功メッセージやその他の情報を次のページに表示するためのオプション。
 		redirectAttributes.addAttribute("goods_id", comment.getGoods_id());
+		redirectAttributes.addAttribute("fromRedirect", true);
 
 
 		return "redirect:/afterLogin/mychat";  // リダイレクト先を適切なページに置き換えます。
@@ -521,8 +567,176 @@ public class AfterController {
 		}
 		return "mypage";
 	}
+
+	//出品リスト
+	@GetMapping("/exhibition")
+	public String showExhibition(Model model) {
+
+		//アカウントID取得
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		int accountId = accountService.findAccountIdByName(authentication.getName());
+
+		List<Goods> myItemList = goodsservice.getMyItem(accountId);
+		List<GoodsDTO> goodsDTOList = new ArrayList<>();
+
+
+		if (myItemList != null && !myItemList.isEmpty()) {
+			for (Goods item : myItemList) {
+				// GoodsからGoodsDTOに情報をコピー
+				GoodsDTO goodsDTO = new GoodsDTO();
+				goodsDTO.setGoods_id(item.getGoods_id());
+				goodsDTO.setName(item.getName());
+				goodsDTO.setAccount_id(item.getAccount_id());
+				goodsDTO.setEnd_time(item.getEnd_time());
+				goodsDTO.setInitial_price(item.getInitial_price());
+
+
+				Comment comment = commentService.lookComment(item.getGoods_id());
+				if (comment != null && comment.getGoods_id()==item.getGoods_id()) {
+					goodsDTO.setReadStatus("メッセージはあります。");
+				} else {
+					goodsDTO.setReadStatus("メッセージはありません。");  // もし必要ならデフォルトの値を設定
+				}
+
+				goodsDTOList.add(goodsDTO);
+			}
+		}else {
+			model.addAttribute("error","出品している品物はありません。");
+
+			return "ehibition";
+		}
+		model.addAttribute("goodsList", goodsDTOList);
+		return "ehibition";
+	}
+
+	//商品別mailBox表示
+	@GetMapping("/mailBox")
+	public String showMailBox(@RequestParam(name = "goodsid") int goods_id, Model model) {
+
+		//出品者
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		int accountId = accountService.findAccountIdByName(authentication.getName());
+
+		List<Comment> mailList = commentService.mailList(goods_id,accountId);
+
+		model.addAttribute("mailList",mailList);		
+		return"mailBox";
+	}
+
+	//出品者側mychat表示
+	@GetMapping("/mychat2")
+	public String showMychat2(@RequestParam(name = "goods_id") int goodsId, @RequestParam(name = "account_id") int accountID, 
+			@RequestParam(name = "fromRedirect", required = false, defaultValue = "false") boolean fromRedirect, Model model) {
+
+		//出品者
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		int accountId = accountService.findAccountIdByName(authentication.getName());
+
+		List<Integer> accountIds = Arrays.asList(accountId, accountID); // 取得したい account_id のリスト
+		List<Integer> goodsaccountIds = Arrays.asList(accountId, accountID); // 取得したい account_id のリスト
+
+		if (!fromRedirect) {
+			// is_approvedをtrueに更新
+			commentService.updateIsApprovedByGoodsIdAndAccountIds(goodsId, accountID, accountId);
+		}
+
+		// チャットリスト作成
+		List<Comment> comments = commentService.findByGoodsIdAndAccountIdInOrderByCommentTimeAsc2(goodsId, accountIds,goodsaccountIds);
+		//リダイレクトインスタンス
+		Comment commentForm = new Comment();
+
+		model.addAttribute("goodsaccount_id", accountID);
+		model.addAttribute("goodsId", goodsId);
+		model.addAttribute("commentForm", commentForm);
+		model.addAttribute("accountId", accountId);
+		model.addAttribute("isBidder", false);
+		model.addAttribute("comments", comments);
+		return "mychat2";
+	}
+
+
+	@PostMapping("/sendMessage2")
+	public String sendMessage2(@ModelAttribute Comment comment, RedirectAttributes redirectAttributes,@RequestParam(name = "goodsaccount_id")  int goodsaccount) {
+		// CommentFormから情報を取得し、データベースに保存する処理を記述します。
+		// エントリが保存されたら、適切なページにリダイレクトする。
+
+		int goodsId=comment.getGoods_id();
+		int accountId=comment.getAccount_id();
+		String comments=comment.getComment_content();
+		LocalDateTime time =LocalDateTime.now();
+
+
+		commentService.insertComment(goodsId, accountId, time, comments,goodsaccount);
+
+		// 保存成功メッセージやその他の情報を次のページに表示するためのオプション。
+		redirectAttributes.addAttribute("goods_id", comment.getGoods_id());
+		redirectAttributes.addAttribute("account_id", comment.getGoodsaccount_id());
+		redirectAttributes.addAttribute("fromRedirect", true);
+
+		return "redirect:/afterLogin/mychat2";  // リダイレクト先を適切なページに置き換えます。
+	}
 	
+	//入札ページ表示
+		@GetMapping("/showbitMypage")
+		public String showBitMypage(Model model) {
+		    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		    int accountId = accountService.findAccountIdByName(authentication.getName());
+		    System.out.println(authentication.getName());
+		    System.out.println(accountId);
+
+		    // 入札情報を取得
+		    List<Bitinfo> mypageList = bitinfoService.bidListmypage(accountId);
+
+		    // 常にtrueに設定されているが、これはテストやデバッグのためかもしれない
+		    boolean RoleAdmin = true;
+		    boolean RoleYes = true;
+
+		    // モデルにロール情報を追加
+		    model.addAttribute("RoleAdmin", RoleAdmin);
+		    model.addAttribute("RoleYes", RoleYes);
+
+		    // 入札情報が存在する場合の処理
+		    if (mypageList != null && !mypageList.isEmpty()) {
+		        List<BitinfoDTO> bitinfoDTOs = new ArrayList<>(); // DTOのリストを初期化
+
+		        for (Bitinfo bitinfo : mypageList) {
+		            BitinfoDTO bitinfoDTO = new BitinfoDTO();
+		            
+		            int goodsaccount_id = goodsservice.findAccountIdByGoodsId(bitinfo.getGoods_id());
+		            Goods item = goodsservice.allgoodsSelect(bitinfo.getGoods_id());
+
+		            // DTOに情報をコピー
+		            bitinfoDTO.setAccount_id(bitinfo.getAccount_id());
+		            bitinfoDTO.setBid_time(bitinfo.getBid_time());
+		            bitinfoDTO.setCurrent_price(bitinfo.getCurrent_price());
+		            bitinfoDTO.setGoods_id(bitinfo.getGoods_id());
+		            bitinfoDTO.setNotlook(commentService.existsUnapprovedComments(bitinfo.getGoods_id(), goodsaccount_id));
+		            bitinfoDTO.setTimeup(goodsservice.timeUp(LocalDateTime.now(),item.getEnd_time(),bitinfo.getGoods_id(),bitinfo));
+		            
+		            System.out.println(bitinfoDTO.isTimeup());
+		            
+		            
+		            bitinfoDTOs.add(bitinfoDTO); // DTOリストに追加
+		            
+		            if(bitinfoDTO.isTimeup()) {
+		            	model.addAttribute("ok",true);
+		            }
+		        }
+		        
+		        model.addAttribute("mypageList", bitinfoDTOs); // モデルにDTOリストを追加
+		    } else {
+		        model.addAttribute("error", "入札している品物はありません。");
+		    }
+
+		    return "bitmypage";
+		}
 }
+
+
+
+
+
 
 
 
