@@ -800,6 +800,12 @@ public class AfterController {
 
 		return "bitmypage";
 	}
+	
+	//商品別mailBox表示
+		@GetMapping("/game")
+		public String showGame() {
+			return"game";
+		}
 }
 
 
