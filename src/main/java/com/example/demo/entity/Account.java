@@ -31,5 +31,5 @@ public class Account {
     
     private String password;
     
-   
+    private int money;
 }

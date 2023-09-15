@@ -23,4 +23,8 @@ public class AccountService {
     public String findNameById(int accountId) {
         return accountRepositry.findNameById(accountId);
     }
+    
+    public int lookMoney(int accountId) {
+    	return accountRepositry.lookMoney(accountId);
+    }
 }

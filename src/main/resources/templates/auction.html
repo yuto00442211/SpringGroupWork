@@ -190,6 +190,22 @@ header {
 
 		</div>
 	</header>
+	
+	 <!-- エラーメッセージの表示 -->
+        <div th:if="${error}" class="alert alert-danger" >
+        <!-- エラーメッセージが存在する場合のみリンクを表示 -->
+       <a th:href="@{/afterLogin/sub}" class="btn btn-primary"></a>
+    </div>
+    
+     <!-- エラーメッセージの表示 -->
+        <div th:if="${error1}" class="alert alert-danger" >
+        <!-- エラーメッセージが存在する場合のみリンクを表示 -->
+       <a th:href="@{/afterLogin/game}" class="btn btn-primary">POINT残高が足りません</a>
+       ゲームでPOINTゲットだぜ！！！！！！！！！！！！
+    </div>
+    
+	
+	
 <div class="product-details-container">
   <div class="product-details-title">商品詳細</div>
   <div class="product-details-content">

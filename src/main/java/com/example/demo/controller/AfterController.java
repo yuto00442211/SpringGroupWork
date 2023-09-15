@@ -260,7 +260,13 @@ public class AfterController {
 
 	}
 	@GetMapping("/auction")
-	public String showAuction(@RequestParam int productId,Model model) {
+	public String showAuction(@RequestParam int productId,Model model,
+			@RequestParam(name = "error1", required = false) Boolean error1) {
+		
+		if (Boolean.TRUE.equals(error1)) {
+	        model.addAttribute("error1", true);
+	    }
+		
 		Goods product = goodsservice.getGoodsById(productId);
 		List<Bitinfo>bidInfo = bitinfoService.findByGoods(productId);
 
@@ -302,53 +308,74 @@ public class AfterController {
 
 	@PostMapping("/auction")
 	public String placeBid(@RequestParam int productId, @Valid @ModelAttribute BitForm BitForm,
-			BindingResult bindingResult, RedirectAttributes redirectAttributes, @RequestParam String username, Model model) {
-		if (bindingResult.hasErrors()) {
-			model.addAttribute("BitForm", new BitForm());
-			return "auction";
-		}
+	                       BindingResult bindingResult, RedirectAttributes redirectAttributes, 
+	                       @RequestParam String username, Model model) {
 
+	    // 入力エラーがある場合
+	    if (bindingResult.hasErrors()) {
+	        model.addAttribute("BitForm", new BitForm());
+	        return "auction";
+	    }
 
-		int x = accountService.findAccountIdByName(username);
-		Goods product = goodsservice.getGoodsById(productId);
-		model.addAttribute("product", product);
+	    // ユーザ名からアカウントIDを取得
+	    int x = accountService.findAccountIdByName(username);
 
-		model.addAttribute("BitForm", new BitForm());
-		if (product != null) {
-			int a = bitinfoService.highPrice(productId);
+	    // productIdを使用して商品情報を取得
+	    Goods product = goodsservice.getGoodsById(productId);
+	    model.addAttribute("product", product);
 
-			int bidAmount = BitForm.getBidAmount();
-			model.addAttribute("bidAmount", bidAmount); // bidAmountをコンテキストに追加
+	    model.addAttribute("BitForm", new BitForm());
 
-			if (bidAmount <= a) {
-				model.addAttribute("error", true); // エラーがある場合、エラー変数を設定
+	    // 商品が存在する場合
+	    int a = bitinfoService.highPrice(productId);
+        int bidAmount = BitForm.getBidAmount();
+        
+       //残高確認
+	    int money = accountService.lookMoney(x);
+	    if(money<a) {
+	    	
+	    	System.out.println(456456);
+	    	 // エラーメッセージをモデルに追加
+	    	redirectAttributes.addAttribute("error1", true);
+	    	redirectAttributes.addAttribute("productId",productId);
+            // エラーがある場合、入札ページにリダイレクト
+            return "redirect:/afterLogin/auction";
+	    }
+        
+	    if (product != null) {
+	        // bidAmountをモデルに追加 (ビューに表示するため)
+	        model.addAttribute("bidAmount", bidAmount);
+	        // 入札価格が現在の最高入札価格以下の場合
+	        if (bidAmount <= a) {
+	            //  エラーメッセージをモデルに追加
+	            model.addAttribute("error", true);
+	            // エラーがある場合、入札ページにリダイレクト
+	            return "redirect:/afterLogin/auction?productId="+productId;
+	        }
+	    }
+	    
+	    model.addAttribute("BitForm", new BitForm());
 
-				return "redirect:/afterLogin/auction?productId="+productId;// エラーがある場合、入札ページに戻る
-			}
-		}
-		model.addAttribute("BitForm", new BitForm());
+	    // 現在の日時を表示 (デバッグ用)
+	    System.out.println(LocalDateTime.now());
+	    System.out.println(BitForm.getBidAmount());
 
-		System.out.println(LocalDateTime.now());
-		System.out.println(BitForm.getBidAmount());
+	    // 入札情報を作成
+	    int goodsId = productId;
+	    int accountId = x;
+	    LocalDateTime bidTime = LocalDateTime.now();
+	    int currentPrice = BitForm.getBidAmount();
 
-		int goodsId = productId;
-		int accountId=x;
-		LocalDateTime bidTime = LocalDateTime.now();
-		int currentPrice = BitForm.getBidAmount();
-		// 入札情報を作成
+	    // 新しい入札情報を保存し、その結果を表示 (デバッグ用)
+	    int o = bitinfoService.insertbid(goodsId, accountId, bidTime, currentPrice);
+	    System.out.println(o);
 
-		// 新しい入札情報を保存
-		int o =bitinfoService.insertbid(goodsId, accountId, bidTime, currentPrice);
-		System.out.println(o);
+	    // 入札成功のメッセージをリダイレクト先に渡す
+	    redirectAttributes.addFlashAttribute("message", "入札が完了しました");
+	    System.out.println(BitForm.getBidAmount());
 
-		// 商品テーブルの価格を更新
-		//goodsRepositry.save(product);
-
-		//成功メッセージをリダイレクト先に渡す
-		redirectAttributes.addFlashAttribute("message", "入札が完了しました");
-		System.out.println(BitForm.getBidAmount());
-
-		return "redirect:/afterLogin/sell"; // 入札完了後、トップページにリダイレクト
+	    // 入札完了後、トップページにリダイレクト
+	    return "redirect:/afterLogin/sell";
 	}
 
 

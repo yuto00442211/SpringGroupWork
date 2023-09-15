@@ -19,4 +19,6 @@ public interface AccountRepositry extends CrudRepository<Account, Integer> {
     @Query("Select a.name From Account a Where a.account_id = :account_id")
     String findNameById(@Param("account_id")int account_id);
 
+    @Query("SELECT a.money FROM Account a WHERE a.account_id = :accountId")
+    int lookMoney(@Param("accountId") int accountId);
 }
