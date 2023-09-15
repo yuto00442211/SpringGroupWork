@@ -379,6 +379,7 @@ public class AfterController {
 	}
 
 
+
 	//-------------------------------------------------------------
 	@GetMapping("itemList")
 	public String showItemList(Model model,@AuthenticationPrincipal UserPrincipal userPrincipal) {
@@ -538,8 +539,10 @@ public class AfterController {
 	@GetMapping("/showMypage")
 	public String showMypage(Model model) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
 		int accountId = accountService.findAccountIdByName(authentication.getName());
+		int money = accountService.lookMoney(accountId);
+		model.addAttribute("money",money);
+		
 		System.out.println(authentication.getName());
 		System.out.println(accountId);
 		//入札情報

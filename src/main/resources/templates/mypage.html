@@ -218,6 +218,8 @@
 		<!-- trueならば<div>内を表示 -->
 		<div sec:authorize="isAuthenticated()" class="user-info">
 			こんにちは：<span sec:authentication="name"></span>さん
+			 <br>
+    あなたの所持ポイントは <span th:text="${money}"></span> キャルペイです。
 			<form th:action="@{/logout}" method="post"></form>
 
 			<div class="button-container" style="margin-top: -5px;">
