@@ -191,10 +191,16 @@ header {
 		</div>
 	</header>
 	
-	 <!-- エラーメッセージの表示 -->
+	<!-- エラーメッセージの表示 -->
         <div th:if="${error}" class="alert alert-danger" >
         <!-- エラーメッセージが存在する場合のみリンクを表示 -->
-       <a th:href="@{/afterLogin/sub}" class="btn btn-primary"></a>
+       <div>最高額未満の入札額です</div>
+    </div>
+	
+	 <!-- エラーメッセージの表示 -->
+        <div th:if="${error2}" class="alert alert-danger" >
+        <!-- エラーメッセージが存在する場合のみリンクを表示 -->
+       <a th:href="@{/afterLogin/itemList}" class="btn btn-primary">あなたが出品した品物です</a>
     </div>
     
      <!-- エラーメッセージの表示 -->
@@ -209,6 +215,7 @@ header {
 <div class="product-details-container">
   <div class="product-details-title">商品詳細</div>
   <div class="product-details-content">
+  <!-- 入札０円でしたらエラー出る-->
     <div class="product-name" th:text="${product.name}">商品名：</div>
     <div class="product-price"> 
       <span th:if="${bidInfo != null && bidInfo.size() > 0}" th:text="${ bidInfo[0].current_price+'円' }">現在価格：</span>
@@ -223,7 +230,7 @@ header {
         <label for="bidAmount">入札額：</label>
         <input type="number" id="bidAmount" name="bidAmount" th:value="${bidInfo != null && bidInfo.size() > 0 ? bidInfo[0].current_price : ''}" required />
         <span>円</span>
-        <p th:if="${bidAmount <= a}" class="error-message">入札金額は現在価格または初期価格より高くしてください</p>
+        <p th:if="${bidAmount >= a}" class="error-message">入札金額は現在価格または初期価格より高くしてください</p>
       </div>
       <!-- 入札金額が高い場合のみ入札ボタンを表示 -->
       <button class="bid-button" type="submit">入札する</button>

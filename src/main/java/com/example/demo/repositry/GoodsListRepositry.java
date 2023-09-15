@@ -48,4 +48,47 @@ public interface GoodsListRepositry extends CrudRepository<GoodsList, Integer> {
 		       "GROUP BY g.goods_id, g.name, g.end_time, g.image_number " +
 		       "ORDER BY current_price DESC")
 	List<GoodsList> searchGoodsByKeyword(@Param("name") String name);
+	
+	@Query("SELECT g.goods_id AS goods_id, g.name AS name,COALESCE(MAX(b.current_price), 0) AS current_price, " +
+		       "COALESCE(COUNT(b.account_id), 0) AS bidcount, " + // COUNTを使用して集約関数に変更
+		       "g.end_time AS end_time, g.image_number AS image_number " +
+		       "FROM goods g " +
+		       "LEFT JOIN bitinfo b ON g.goods_id = b.goods_id " + // LEFT JOINで結合
+		       "WHERE g.account_id <> :account_id " +
+		       "GROUP BY g.goods_id, g.name, g.end_time, g.image_number " + // GROUP BYで指定
+		       "ORDER BY current_price DESC")
+		List<GoodsList> findGoodsWithHighestBidAndBidCount1(@Param("account_id") int account_id);
+
+	@Query("SELECT g.goods_id AS goods_id, g.name AS name,COALESCE(MAX(b.current_price), 0) AS current_price, " +
+		       "COALESCE(COUNT(b.account_id), 0) AS bidcount, " + // COUNTを使用して集約関数に変更
+		       "g.end_time AS end_time, g.image_number AS image_number " +
+		       "FROM goods g " +
+		       "LEFT JOIN bitinfo b ON g.goods_id = b.goods_id " + // LEFT JOINで結合
+		       "WHERE g.genre_id = :genre_id " +
+		       "AND g.account_id <> :account_id " +
+		       "GROUP BY g.goods_id, g.name, g.end_time, g.image_number " + // GROUP BYで指定
+		       "ORDER BY current_price DESC")
+ List<GoodsList> findGoodsByGenre1(@Param("genre_id") int genre_id,@Param("account_id") int account_id);
+
+	@Query("SELECT g.goods_id AS goods_id, g.name AS name, COALESCE(MAX(b.current_price), 0) AS current_price, " +
+		       "COALESCE(COUNT(b.account_id), 0) AS bidcount, " +
+		       "g.end_time AS end_time, g.image_number AS image_number " +
+		       "FROM goods g " +
+		       "LEFT JOIN bitinfo b ON g.goods_id = b.goods_id " +
+		       "WHERE g.genre_id = :genre_id AND g.name LIKE '%' || :name || '%' "+// :name パラメータをバインド
+		       "AND g.account_id <> :account_id " + 
+		       "GROUP BY g.goods_id, g.name, g.end_time, g.image_number " +
+		       "ORDER BY current_price DESC")
+		List<GoodsList> searchGoodsByKeywordAndGenre1(@Param("name") String name, @Param("genre_id") int genre_id,@Param("account_id") int account_id);
+	
+	@Query("SELECT g.goods_id AS goods_id, g.name AS name, COALESCE(MAX(b.current_price), 0) AS current_price, " +
+		       "COALESCE(COUNT(b.account_id), 0) AS bidcount, " +
+		       "g.end_time AS end_time, g.image_number AS image_number " +
+		       "FROM goods g " +
+		       "LEFT JOIN bitinfo b ON g.goods_id = b.goods_id " +
+		       "WHERE g.name LIKE '%' || :name || '%' " + // nameであいまい検索
+		       "AND g.account_id <> :account_id " +
+		       "GROUP BY g.goods_id, g.name, g.end_time, g.image_number " +
+		       "ORDER BY current_price DESC")
+	List<GoodsList> searchGoodsByKeyword1(@Param("name") String name,@Param("account_id") int account_id);
 }

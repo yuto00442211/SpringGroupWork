@@ -36,6 +36,13 @@ public class GoodsService {
 		goodsRepository.findAll().forEach(goodsList::add);
 		return goodsList;
 	}
+	
+	//出品者を除くピックアップ
+	public List<Goods> getAllGoods2(int accountId) {
+		List<Goods> goodsList = new ArrayList<>();
+		goodsRepository.findAllAll(accountId);
+		return goodsList;
+	}
 
 	public int GetNowPrice(int goodsId) {
 		return bitinfoService.highPrice(goodsId);
@@ -129,4 +136,8 @@ public class GoodsService {
           }
       }
 
+      //出品者取得
+      public int getGoodsAccountID(int goodsId) {
+    	  return goodsRepository.getGoodsAccountID(goodsId);
+      }
 }

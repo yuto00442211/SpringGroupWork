@@ -182,7 +182,7 @@ public class SellController {
 	public String loginForm() {
 		return "login";
 	}
-	@GetMapping("itemList")
+	@GetMapping("/itemList")
 	public String showItemList(Model model) {
 		System.out.println(123465);
 		// 商品データをデータベースから取得

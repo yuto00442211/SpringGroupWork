@@ -12,31 +12,31 @@ import com.example.demo.repositry.GoodsListRepositry;
 
 @Service
 public class GoodsListService {
-	
-	 private GoodsListRepositry goodsListRepository;
-	 
-	 @Autowired
-		private GenreRepository genreRepository;
+
+	private GoodsListRepositry goodsListRepository;
+
+	@Autowired
+	private GenreRepository genreRepository;
 
 	public GoodsListService(GoodsListRepositry goodsListRepository) {
-	        this.goodsListRepository = goodsListRepository;
-	    }
- 
-	public List<GoodsList> getAllGoodsList() {
-        List<GoodsList> goodsList = new ArrayList<>();
-        
-        
-        return goodsList;
-    }
-	
-	public List<GoodsList>goodsList(){
-		
-		List<GoodsList> goodsList = goodsListRepository.findGoodsWithHighestBidAndBidCount();
-		
-		return goodsList;
-		
+		this.goodsListRepository = goodsListRepository;
 	}
-	
+
+	public List<GoodsList> getAllGoodsList() {
+		List<GoodsList> goodsList = new ArrayList<>();
+
+
+		return goodsList;
+	}
+
+	public List<GoodsList>goodsList(){
+
+		List<GoodsList> goodsList = goodsListRepository.findGoodsWithHighestBidAndBidCount();
+
+		return goodsList;
+
+	}
+
 	public List<GoodsList> goodsList2(int genre_id){
 		List<GoodsList> goodsList;
 		if(genre_id==0) {
@@ -46,32 +46,69 @@ public class GoodsListService {
 		}
 		return goodsList;
 	}
-	
-	//ジャンルが何か判定
-			public String genreList(int genre_ID) {
-				
-				String genre =genreRepository.getGenreName(genre_ID);
-				System.out.println(genre+"6");
-			
-				return genre;
-			}
-			
-			//ジャンルとキーワードを指定して
-			public List<GoodsList>searchGoodsByKeywordAndGenre(String keyword, int genre_id){
-				
-				 List<GoodsList>list = goodsListRepository.searchGoodsByKeywordAndGenre(keyword, genre_id);
-				
-				return list;
-			}
-			
-			//キーワード検索
-			public List<GoodsList>searchGoodsByKeyword(String keyword){
-				
-				System.out.println(keyword);
-				
-				 List<GoodsList>list = goodsListRepository.searchGoodsByKeyword(keyword);
-				
-				return list;
-			}
 
+	//ジャンルが何か判定
+	public String genreList(int genre_ID) {
+
+		String genre =genreRepository.getGenreName(genre_ID);
+		System.out.println(genre+"6");
+
+		return genre;
+	}
+
+	//ジャンルとキーワードを指定して
+	public List<GoodsList>searchGoodsByKeywordAndGenre(String keyword, int genre_id){
+
+		List<GoodsList>list = goodsListRepository.searchGoodsByKeywordAndGenre(keyword, genre_id);
+
+		return list;
+	}
+
+	//キーワード検索
+	public List<GoodsList>searchGoodsByKeyword(String keyword){
+
+		System.out.println(keyword);
+
+		List<GoodsList>list = goodsListRepository.searchGoodsByKeyword(keyword);
+
+		return list;
+	}
+
+
+
+	//ジャンルとキーワードを指定して
+	public List<GoodsList>searchGoodsByKeywordAndGenre1(String keyword, int genre_id,int accountId){
+
+		List<GoodsList>list = goodsListRepository.searchGoodsByKeywordAndGenre1(keyword, genre_id,accountId);
+
+		return list;
+	}
+
+	//キーワード検索
+	public List<GoodsList>searchGoodsByKeyword1(String keyword,int accountId){
+
+		System.out.println(keyword);
+
+		List<GoodsList>list = goodsListRepository.searchGoodsByKeyword1(keyword,accountId);
+
+		return list;
+	}
+	
+	public List<GoodsList>goodsList1(int accountId){
+
+		List<GoodsList> goodsList = goodsListRepository.findGoodsWithHighestBidAndBidCount1(accountId);
+
+		return goodsList;
+
+	}
+
+	public List<GoodsList> goodsList21(int genre_id,int accountId){
+		List<GoodsList> goodsList;
+		if(genre_id==0) {
+			goodsList = goodsListRepository.findGoodsWithHighestBidAndBidCount1(accountId);
+		}else {
+			goodsList = goodsListRepository.findGoodsByGenre1(genre_id,accountId);
+		}
+		return goodsList;
+	}
 }

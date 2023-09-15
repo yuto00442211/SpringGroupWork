@@ -96,7 +96,10 @@ public class AfterController {
 	 */
 	@GetMapping("/sell")
 	public String showTop(Model model,@AuthenticationPrincipal UserPrincipal userPrincipal) {
-
+		//ログイン情報取得
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		int accountid = accountService.findAccountIdByName(authentication.getName());
+		
 		// ログインしたユーザー情報を画面に表示するために記述。
 		model.addAttribute("loginUsername", userPrincipal.getUsername());
 		List<Goods> productList = goodsservice.getAllGoods(); // 商品情報をデータベースからListに代入
@@ -261,12 +264,18 @@ public class AfterController {
 	}
 	@GetMapping("/auction")
 	public String showAuction(@RequestParam int productId,Model model,
-			@RequestParam(name = "error1", required = false) Boolean error1) {
-		
+			@RequestParam(name = "error", required = false) Boolean error,
+			@RequestParam(name = "error1", required = false) Boolean error1,
+			@RequestParam(name = "error2", required = false) Boolean error2) {
+
 		if (Boolean.TRUE.equals(error1)) {
-	        model.addAttribute("error1", true);
-	    }
-		
+			model.addAttribute("error1", true);
+		}else if(Boolean.TRUE.equals(error)) {
+			model.addAttribute("error", true);
+		}else if(Boolean.TRUE.equals(error2)) {
+			model.addAttribute("error2", true);
+		}	
+
 		Goods product = goodsservice.getGoodsById(productId);
 		List<Bitinfo>bidInfo = bitinfoService.findByGoods(productId);
 
@@ -308,84 +317,104 @@ public class AfterController {
 
 	@PostMapping("/auction")
 	public String placeBid(@RequestParam int productId, @Valid @ModelAttribute BitForm BitForm,
-	                       BindingResult bindingResult, RedirectAttributes redirectAttributes, 
-	                       @RequestParam String username, Model model) {
+			BindingResult bindingResult, RedirectAttributes redirectAttributes, 
+			@RequestParam String username, Model model) {
 
-	    // 入力エラーがある場合
-	    if (bindingResult.hasErrors()) {
-	        model.addAttribute("BitForm", new BitForm());
-	        return "auction";
-	    }
+		// 入力エラーがある場合
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("BitForm", new BitForm());
+			return "auction";
+		}
 
-	    // ユーザ名からアカウントIDを取得
-	    int x = accountService.findAccountIdByName(username);
+		// ユーザ名からアカウントIDを取得
+		int x = accountService.findAccountIdByName(username);
 
-	    // productIdを使用して商品情報を取得
-	    Goods product = goodsservice.getGoodsById(productId);
-	    model.addAttribute("product", product);
+		// productIdを使用して商品情報を取得
+		Goods product = goodsservice.getGoodsById(productId);
+		model.addAttribute("product", product);
 
-	    model.addAttribute("BitForm", new BitForm());
+		model.addAttribute("BitForm", new BitForm());
 
-	    // 商品が存在する場合
-	    int a = bitinfoService.highPrice(productId);
-        int bidAmount = BitForm.getBidAmount();
-        
-       //残高確認
-	    int money = accountService.lookMoney(x);
-	    if(money<a) {
-	    	
-	    	System.out.println(456456);
-	    	 // エラーメッセージをモデルに追加
-	    	redirectAttributes.addAttribute("error1", true);
-	    	redirectAttributes.addAttribute("productId",productId);
-            // エラーがある場合、入札ページにリダイレクト
-            return "redirect:/afterLogin/auction";
-	    }
-        
-	    if (product != null) {
-	        // bidAmountをモデルに追加 (ビューに表示するため)
-	        model.addAttribute("bidAmount", bidAmount);
-	        // 入札価格が現在の最高入札価格以下の場合
-	        if (bidAmount <= a) {
-	            //  エラーメッセージをモデルに追加
-	            model.addAttribute("error", true);
-	            // エラーがある場合、入札ページにリダイレクト
-	            return "redirect:/afterLogin/auction?productId="+productId;
-	        }
-	    }
-	    
-	    model.addAttribute("BitForm", new BitForm());
+		// 商品が存在する場合
+		int a = bitinfoService.highPrice(productId);
+		System.out.println("ddd"+a);
+		int bidAmount = BitForm.getBidAmount();
 
-	    // 現在の日時を表示 (デバッグ用)
-	    System.out.println(LocalDateTime.now());
-	    System.out.println(BitForm.getBidAmount());
+		//入札者と出品者が同じかどうか
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		int accountid = accountService.findAccountIdByName(authentication.getName());
+		int goodsAccountId = goodsservice.getGoodsAccountID(productId);
+		if(accountid==goodsAccountId) {
+			System.out.println("eee"+a);
+			// エラーメッセージをモデルに追加
+			redirectAttributes.addAttribute("error2", true);
+			redirectAttributes.addAttribute("productId",productId);
+			// エラーがある場合、入札ページにリダイレクト
+			return "redirect:/afterLogin/auction";
+		}
 
-	    // 入札情報を作成
-	    int goodsId = productId;
-	    int accountId = x;
-	    LocalDateTime bidTime = LocalDateTime.now();
-	    int currentPrice = BitForm.getBidAmount();
+		//残高確認
+		int money = accountService.lookMoney(x);
+		if(money<=a) {
+			System.out.println("eee"+a);
+			// エラーメッセージをモデルに追加
+			redirectAttributes.addAttribute("error1", true);
+			redirectAttributes.addAttribute("productId",productId);
+			// エラーがある場合、入札ページにリダイレクト
+			return "redirect:/afterLogin/auction";
+		}
 
-	    // 新しい入札情報を保存し、その結果を表示 (デバッグ用)
-	    int o = bitinfoService.insertbid(goodsId, accountId, bidTime, currentPrice);
-	    System.out.println(o);
+		if (product != null) {
 
-	    // 入札成功のメッセージをリダイレクト先に渡す
-	    redirectAttributes.addFlashAttribute("message", "入札が完了しました");
-	    System.out.println(BitForm.getBidAmount());
+			System.out.println("kkk"+a);
+			// bidAmountをモデルに追加 (ビューに表示するため)
+			model.addAttribute("bidAmount", bidAmount);
+			// 入札価格が現在の最高入札価格以下の場合
+			if (bidAmount <= a) {
+				System.out.println("kkk"+a);
+				//  エラーメッセージをモデルに追加
+				redirectAttributes.addAttribute("error", true);
+				redirectAttributes.addAttribute("productId",productId);
+				// エラーがある場合、入札ページにリダイレクト
+				return "redirect:/afterLogin/auction";
+			}
+		}
 
-	    // 入札完了後、トップページにリダイレクト
-	    return "redirect:/afterLogin/sell";
+		model.addAttribute("BitForm", new BitForm());
+
+		// 現在の日時を表示 (デバッグ用)
+		System.out.println(LocalDateTime.now());
+		System.out.println(BitForm.getBidAmount());
+
+		// 入札情報を作成
+		int goodsId = productId;
+		int accountId = x;
+		LocalDateTime bidTime = LocalDateTime.now();
+		int currentPrice = BitForm.getBidAmount();
+
+		// 新しい入札情報を保存し、その結果を表示 (デバッグ用)
+		int o = bitinfoService.insertbid(goodsId, accountId, bidTime, currentPrice);
+		System.out.println(o);
+
+		// 入札成功のメッセージをリダイレクト先に渡す
+		redirectAttributes.addFlashAttribute("message", "入札が完了しました");
+		System.out.println(BitForm.getBidAmount());
+
+		// 入札完了後、トップページにリダイレクト
+		return "redirect:/afterLogin/sell";
 	}
 
 
 
 	//-------------------------------------------------------------
-	@GetMapping("itemList")
+	@GetMapping("/itemList")
 	public String showItemList(Model model,@AuthenticationPrincipal UserPrincipal userPrincipal) {
 		System.out.println(123465);
+		//入札者と出品者が同じかどうか
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		int accountid = accountService.findAccountIdByName(authentication.getName());
 		// 商品データをデータベースから取得
-		List<GoodsList> productList = goodsListService.goodsList();
+		List<GoodsList> productList = goodsListService.goodsList1(accountid);
 		System.out.println(productList.get(0));
 		if(master.equals(userPrincipal.getUsername())) {
 
@@ -416,25 +445,26 @@ public class AfterController {
 			@RequestParam(required = false) String keyword) {
 		List<GoodsList> productList;
 
-		System.out.println(genre_id+"***");
+		//入札者と出品者が同じかどうか
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		int accountid = accountService.findAccountIdByName(authentication.getName());
 
-		System.out.println(keyword+8);
 		if (keyword != null && !keyword.isEmpty() && genre_id > 0) {
 			// キーワードとジャンルIDを使用して検索クエリを実行する
 			System.out.println(456);
-			productList = goodsListService.searchGoodsByKeywordAndGenre(keyword, genre_id);
+			productList = goodsListService.searchGoodsByKeywordAndGenre1(keyword, genre_id,accountid);
 		} else if (keyword != null && !keyword.isEmpty()&&genre_id==0) {
 			// キーワードのみを使用して検索クエリを実行する
 			System.out.println(456456);
-			productList = goodsListService.searchGoodsByKeyword(keyword);
+			productList = goodsListService.searchGoodsByKeyword1(keyword,accountid);
 		} else if (genre_id > 0) {
 			// ジャンルIDのみを使用して検索クエリを実行する
 			System.out.println(456456456);
-			productList = goodsListService.goodsList2(genre_id);
+			productList = goodsListService.goodsList21(genre_id,accountid);
 		} else {
 			// どちらも提供されない場合、デフォルトの検索処理を行うか、エラーハンドリングを行う
 			System.out.println(654654654);
-			productList = goodsListService.goodsList(); // デフォルトの検索処理の例
+			productList = goodsListService.goodsList1(accountid); // デフォルトの検索処理の例
 		}
 
 		if(keyword != null && !keyword.isEmpty()) {
@@ -542,7 +572,7 @@ public class AfterController {
 		int accountId = accountService.findAccountIdByName(authentication.getName());
 		int money = accountService.lookMoney(accountId);
 		model.addAttribute("money",money);
-		
+
 		System.out.println(authentication.getName());
 		System.out.println(accountId);
 		//入札情報
@@ -829,12 +859,12 @@ public class AfterController {
 
 		return "bitmypage";
 	}
-	
+
 	//商品別mailBox表示
-		@GetMapping("/game")
-		public String showGame() {
-			return"game";
-		}
+	@GetMapping("/game")
+	public String showGame() {
+		return"game";
+	}
 }
 
 
