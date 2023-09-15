@@ -456,12 +456,11 @@ public class AfterController {
 		// 画像ファイル名をIDと連結した名前に設定
 		String newImageName;// = updatedQuestion.getId() + "_" + (imageFile != null ? imageFile.getOriginalFilename() : oldImageName);
 
-		if (imageFile == null) {
+		if (imageFile.isEmpty()) {
 			newImageName = goodsservice.getImageName(updatedgoods.getGoods_id()); // ファイルが選択されていない場合の処理
-			System.out.println(newImageName);
 		} else {
 			// 画像ファイル名をIDと連結した名前に設定
-			newImageName = updatedgoods.getGoods_id() + "_" + imageFile.getOriginalFilename();
+			newImageName = imageFile.getOriginalFilename();
 		}
 
 
