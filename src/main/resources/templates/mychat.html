@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css"
+	rel="stylesheet">
+
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
@@ -174,13 +177,100 @@ img {
     background-color: #7599A6;
 }
 
+header {
+	background-color: #f0f0f0;
+	color: rgb(0, 0, 0);
+	padding: 10px 0;
+	text-align: center;
+	display: flex;
+	justify-content: flex-start; /* 要素を左寄せに配置 */
+	align-items: center;
+
+.button-container {
+	display: flex;
+	align-items: center;
+	margin-left: auto;
+}
+
+.action-button {
+	background-color: #3498db;
+	color: white;
+	padding: 10px 20px;
+	border: none;
+	border-radius: 3px;
+	cursor: pointer;
+	margin-right: 10px; /* ボタン間の右側のマージン */
+}
+
+.action-button:last-child {
+	margin-right: 0; /* 最後のボタンにはマージンを適用しない */
+}
+
+.action-button:hover {
+	background-color: #2980b9;
+}
+.user-info {
+	padding-left: 10px; /* 左側のパディング */
+	padding-right: 10px; /* 右側のパディング */
+}
+
 </style>
 </head>
 
 <body>
-<a th:href="@{/afterLogin/showbitMypage}" class="mypage-button">mypageにもどる</a>
+<header>
+		<div class="site-name">
+			 <h1 style="font-size: 32px; cursor: pointer;" onclick="redirectToSellPage()">キャルション！</h1>
+<script>
+            function redirectToSellPage() {
+       window.location.href = '/afterLogin/sell'; 
+}
+</script>
+
+		</div>
+
+		<div sec:authorize="!isAuthenticated()" class="auth-buttons">
+			<form th:action="@{/sell/login}" method="get">
+				<button class="action-button">ログイン</button>
+			</form>
+		</div>
+
+		<!-- sec:authorizeを使って"isAuthenticated()"で認証済みかどうかを判定 -->
+		<!-- trueならば<div>内を表示 -->
+		<div sec:authorize="isAuthenticated()" class="user-info">
+			こんにちは：<span sec:authentication="name"></span>さん
+			<form th:action="@{/logout}" method="post"></form>
+
+			<div class="button-container" style="margin-top: -5px;">
+			
+				<form th:action="@{itemList}" method="get">
+					<button
+						style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;"
+						type="submit"></button>
+				</form>
+
+				<form th:action="@{showMypage}" method="get">
+					<button
+						style="background: url('/image/mypageicon.png') no-repeat center center; width: 60px; height: 65px; border: none;"
+						type="submit"></button>
+				</form>
+				<form th:action="@{create}" method="get">
+					<button
+						style="background: url('/image/upload.png') no-repeat center center; width: 60px; height: 65px; border: none;"
+						type="submit"></button>
+				</form>
+				<form th:action="@{/logout}" method="post">
+					<button
+						style="background: url('/image/logoutbutton.png') no-repeat center center; width: 145px; height: 65px; border: none;"
+						type="submit"></button>
+				</form>
+			</div>
+
+		</div>
+	</header>
+<a th:href="@{/afterLogin/showbitMypage}" class="mypage-button">マイページにもどる</a>
 	<div class="c-talk">
-		<div class="c-talk__head">LINE風チャットレイアウト</div>
+		<div class="c-talk__head">キャルション！チャット-入札-</div>
 		<div class="c-talk__body">
 
 			<!-- コメントを表示 -->
@@ -217,4 +307,43 @@ img {
 		</div>
 	</div>
 </body>
+
+<style>
+h1 {
+	font-family: "Nico Moji";
+}
+
+.site-name {
+	background: #FFDA45; /*背景色の指定*/
+	color: #000000; /*テキストの色の指定*/
+	padding: 15px;
+	text-align: center;
+	width: 200px;
+}
+.site-name p {
+	margin: 0;
+	padding: 10px;
+}
+
+.search-form {
+	text-align: left;
+}
+
+.button-container {
+	display: flex;
+	align-items: center;
+}
+
+.action-button {
+	/* ボタンのスタイル */
+	
+}
+
+.action-button:hover {
+	/* ボタンのホバースタイル */
+	
+}
+
+
+</style>
 </html>
