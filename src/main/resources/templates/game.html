@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,24 +13,66 @@
             display: block;
             margin: 0 auto;
         }
+
+        #gameOverMessage {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            display: none;
+        }
+        
+        /* ボタンを中央に配置するスタイル */
+    #scoreForm {
+        text-align: center;
+        position: fixed;
+        top: 30%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    
+    /* ボタンのスタイル */
+    #scoreForm button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #007bff; /* ボタンの背景色 */
+        color: #fff; /* ボタンのテキスト色 */
+        border: none;
+        cursor: pointer;
+    }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
-    <button id="戻る" style="display: block; margin: 20px auto;">Restart Game</button>
+    <div id="gameOverMessage" style="display: none;">
+        <p>ゲームオーバー ☆ スコア送信ボタンをクリックしてね！<span id="scoreDisplay"></span></p>
+    </div>
+
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
+    <button id="startGame" style="display: block; margin: 20px auto;">ここをクリックでゲームスタート</button>
+    <button id="戻る" style="display: block; margin: 20px auto;">topに戻る</button>
+   
+
+    <form id="scoreForm" th:action="@{/afterLogin/submitScore}" th:object="${myRequestData}" method="post" style="display: none;">
+        <input type="number" id="scoreField" th:field="*{score}" placeholder="スコアを入力してください" th:readonly="true">
+        <button type="submit">送信でポイント獲得</button>
+    </form>
+
     <script>
-    
-    document.getElementById('戻る').addEventListener('click', function() {
-    window.location.href = '/afterLogin/sell';  // '遷移先のURL'の部分を実際のURLに置き換えてください。
-});
+        document.getElementById('戻る').addEventListener('click', function() {
+            window.location.href = '/afterLogin/sell';
+        });
+
         const canvas = document.getElementById('gameCanvas');
         const context = canvas.getContext('2d');
 
         let playerX = 50;
         let playerY = canvas.height - 50;
         let playerSize = 30;
-        let playerSpeed = 3;
+        let playerSpeed = 2;
         let gravity = 1;
         let velocityY = 0;
         let isJumping = false;
@@ -39,40 +80,61 @@
         let obstacles = [];
         let keys = {};
         let obstacleTimer = 0;
-        let obstacleInterval = 100;  // 障害物が出現する間隔
+        let obstacleInterval = 100;
+        let isGameOver = false;
+        let isGameRunning = false;
 
         let angle = 0;
         const HILL_AMPLITUDE = 50;
         const HILL_SPEED = 0.02;
 
         let backgroundX1 = 0;
+        let backgroundX2 = canvas.width;
 
         let background = new Image();
-background.src = "/forest.jpg"; // 画像のパスを適切に設定してください
-background.onload = function() {
-    gameLoop();  // 画像が読み込まれてからゲームループを開始
-};
-let backgroundX2 = canvas.width;
+        background.src = "/forest.jpg";
 
-function drawBackground() {
-    // Draw the two instances of the background image
-    context.drawImage(background, backgroundX1, 0, canvas.width, canvas.height);
-    context.drawImage(background, backgroundX2, 0, canvas.width, canvas.height);
+        background.onload = function() {
+            // 背景を描画
+            drawBackground();
 
-    // Move the images to the left
-    backgroundX1 -= 1; 
-    backgroundX2 -= 1; 
+            // スタートボタンがクリックされたときのイベントハンドラ
+            document.getElementById('startGame').addEventListener('click', function() {
+                if (!isGameRunning && !isGameOver) { // ゲームが実行中でなく、ゲームオーバー状態でない場合にのみ実行
+                    startGame();
+                    // ボタンを非表示にする
+                    document.getElementById('startGame').style.display = 'none';
+                }
+            });
+        };
 
-    // When the first image goes out of the screen, reset its position to the right of the second image
-    if (backgroundX1 <= -canvas.width) {
-        backgroundX1 = backgroundX2 + canvas.width;
-    }
+        let gameTime = 0;
 
-    // When the second image goes out of the screen, reset its position to the right of the first image
-    if (backgroundX2 <= -canvas.width) {
-        backgroundX2 = backgroundX1 + canvas.width;
-    }
-}
+        function startGame() {
+            // ゲームの初期化ロジックをここに追加
+            gameTime = 0;
+            isGameOver = false;
+            isGameRunning = true; // ゲームが開始されたことを設定
+
+            // ゲームループを開始
+            gameLoop();
+        }
+
+        function drawBackground() {
+            context.drawImage(background, backgroundX1, 0, canvas.width, canvas.height);
+            context.drawImage(background, backgroundX2, 0, canvas.width, canvas.height);
+
+            backgroundX1 -= 1;
+            backgroundX2 -= 1;
+
+            if (backgroundX1 <= -canvas.width) {
+                backgroundX1 = backgroundX2 + canvas.width;
+            }
+
+            if (backgroundX2 <= -canvas.width) {
+                backgroundX2 = backgroundX1 + canvas.width;
+            }
+        }
 
         function getHillY(x) {
             return HILL_AMPLITUDE * Math.sin((x + angle) * HILL_SPEED);
@@ -82,94 +144,115 @@ function drawBackground() {
         document.addEventListener('keyup', (e) => { keys[e.code] = false; });
 
         function update() {
-            if (keys['ArrowLeft']) playerX -= playerSpeed;
-            if (keys['ArrowRight']) playerX += playerSpeed;
-
-            // Ensure player doesn't move outside the canvas boundaries
-            if (playerX < 0) {
-                playerX = 0;
-            }
-            if (playerX + playerSize > canvas.width) {
-                playerX = canvas.width - playerSize;
+            if (isGameRunning && !isGameOver) {
+                gameTime = gameTime + 1;
             }
 
-            if (keys['ArrowDown']) {
-                isDucking = true;
-                playerSize = 15;
-            } else {
-                isDucking = false;
-                playerSize = 30;
-            }
+            if (isGameRunning) {
+                if (keys['ArrowLeft']) playerX -= playerSpeed;
+                if (keys['ArrowRight']) playerX += playerSpeed;
 
-            if (keys['Space'] && !isJumping) {
-                velocityY = -15;
-                isJumping = true;
-            }
-
-            velocityY += gravity;
-            playerY += velocityY;
-
-            if (playerY >= canvas.height - playerSize) {
-                playerY = canvas.height - playerSize;
-                isJumping = false;
-            }
-
-            if (Math.random() < 0.01) {
-                let isHighObstacle = Math.random() < 0.5;
-                let onHill = Math.random() < 0.5;
-                let obstacleSize;
-                let obstacleX = canvas.width;
-                let obstacleY;
-
-                if (isHighObstacle) {
-                    obstacleSize = 25;
-                } else {
-                    obstacleSize = 20;
+                if (playerX < 0) {
+                    playerX = 0;
+                }
+                if (playerX + playerSize > canvas.width) {
+                    playerX = canvas.width - playerSize;
                 }
 
-                if (onHill) {
-                    obstacleY = canvas.height - getHillY(obstacleX) - obstacleSize;
+                if (keys['ArrowDown']) {
+                    isDucking = true;
+                    playerSize = 15;
                 } else {
-                    obstacleY = canvas.height - obstacleSize;
+                    isDucking = false;
+                    playerSize = 30;
                 }
 
-                obstacles.push({
-                    x: obstacleX,
-                    y: obstacleY,
-                    size: obstacleSize,
-                    onHill: onHill
+                if (keys['Space'] && !isJumping) {
+                    velocityY = -15;
+                    isJumping = true;
+                }
+
+                velocityY += gravity;
+                playerY += velocityY;
+
+                if (playerY >= canvas.height - playerSize) {
+                    playerY = canvas.height - playerSize;
+                    isJumping = false;
+                }
+
+                if (Math.random() < 0.01) {
+                    let isHighObstacle = Math.random() < 0.5;
+                    let onHill = Math.random() < 0.5;
+                    let obstacleSize;
+                    let obstacleX = canvas.width;
+                    let obstacleY;
+
+                    if (isHighObstacle) {
+                        obstacleSize = 25;
+                    } else {
+                        obstacleSize = 20;
+                    }
+
+                    if (onHill) {
+                        obstacleY = canvas.height - getHillY(obstacleX) - obstacleSize;
+                    } else {
+                        obstacleY = canvas.height - obstacleSize;
+                    }
+
+                    obstacles.push({
+                        x: obstacleX,
+                        y: obstacleY,
+                        size: obstacleSize,
+                        onHill: onHill
+                    });
+                }
+
+                obstacles.forEach((obstacle, i) => {
+                    obstacle.x -= playerSpeed;
+
+                    if (obstacle.onHill) {
+                        obstacle.y = canvas.height - obstacle.size - getHillY(obstacle.x);
+                    }
+
+                    if (obstacle.x < -obstacle.size) {
+                        obstacles.splice(i, 1);
+                    }
+
+                    if (
+                        playerX < obstacle.x + obstacle.size &&
+                        playerX + playerSize > obstacle.x &&
+                        playerY < obstacle.y + obstacle.size &&
+                        playerY + playerSize > obstacle.y
+                    ) {
+                        // ゲームオーバーの処理
+                        isGameOver = true; // ゲームオーバー状態に設定
+                        isGameRunning = false; // ゲームを停止
+
+                        // スコアをフォームに設定
+                        document.getElementById('scoreField').value = gameTime;
+
+                        // フォームを表示してデータを送信
+                        document.getElementById('scoreForm').style.display = 'block';
+
+                        // ゲームオーバーメッセージを表示
+                        document.getElementById('scoreDisplay').textContent = gameTime + 'pt';
+                        document.getElementById('gameOverMessage').style.display = 'block';
+
+                        // ゲームループの停止（ゲームオーバー時に動作を止めるため）
+                        cancelAnimationFrame(gameLoop);
+                    }
                 });
             }
-
-            obstacles.forEach((obstacle, i) => {
-                obstacle.x -= playerSpeed;
-
-                if (obstacle.onHill) {
-                    obstacle.y = canvas.height - obstacle.size - getHillY(obstacle.x);
-                }
-
-                if (obstacle.x < -obstacle.size) {
-                    obstacles.splice(i, 1);
-                }
-
-                if (
-            playerX < obstacle.x + obstacle.size &&
-            playerX + playerSize > obstacle.x &&
-            playerY < obstacle.y + obstacle.size &&
-            playerY + playerSize > obstacle.y
-        ) {
-            alert('Game Over');
-            restartGame(); // Restart the game directly after collision is detected
         }
-    });
-}
-        
-        
 
         function draw() {
             context.clearRect(0, 0, canvas.width, canvas.height);
 
             drawBackground();
+
+            context.fillStyle = 'black';
+            context.font = '24px Arial';
+            context.fillText('スコア: ' + gameTime + 'pt', 20, 30);
 
             context.fillStyle = '#0F0';
             context.beginPath();
@@ -186,24 +269,13 @@ function drawBackground() {
 
         function gameLoop() {
             update();
+            if (!isGameOver) {
+                drawBackground();
+            }
             draw();
             requestAnimationFrame(gameLoop);
         }
-
-        function restartGame() {
-    playerX = 50;
-    playerY = canvas.height - 50;
-    velocityY = 0;
-    isJumping = false;
-    isDucking = false;
-    obstacles = [];
-    keys = {};  // keysオブジェクトをクリアします
-}
-
-        document.getElementById('restartButton').addEventListener('click', restartGame);
-
-        gameLoop();
     </script>
 </body>
-
 </html>
+

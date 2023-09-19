@@ -98,19 +98,7 @@ public class GoodsService {
 			}
 			return xxx;
 		}
-		//そもそも落札者がいたかどうか:落札者がおらず時間切れだとtrue
-		public boolean timeUpOrDrop(LocalDateTime nowTime,LocalDateTime endTime,Goods goods) {
-			
-			boolean xxx = nowTime.isAfter(endTime);
-			
-			if(xxx) {
-				if(bitinfoService.highPrice(goods.getGoods_id())==0) {
-				}else {
-					xxx = false;
-				}
-			}
-			return xxx;
-		}
+		
 	
 	  public String saveImage(MultipartFile file) throws IOException {
           String originalFileName = file.getOriginalFilename();

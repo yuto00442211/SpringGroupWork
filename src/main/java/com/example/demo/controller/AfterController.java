@@ -41,6 +41,7 @@ import com.example.demo.entity.Comment;
 import com.example.demo.entity.Genre;
 import com.example.demo.entity.Goods;
 import com.example.demo.entity.GoodsList;
+import com.example.demo.entity.MyRequestData;
 import com.example.demo.repositry.AccountRepositry;
 import com.example.demo.repositry.BitRepositry;
 import com.example.demo.repositry.GenreRepository;
@@ -868,7 +869,9 @@ public class AfterController {
 
 	//商品別mailBox表示
 	@GetMapping("/game")
-	public String showGame() {
+	public String showGame(Model model) {
+		
+		model.addAttribute("myRequestData", new MyRequestData());
 		return"game";
 	}
 
@@ -925,8 +928,31 @@ public class AfterController {
 
 	@GetMapping("buybuy")
 	public String showBuyBuy() {
+		
+		
 		return "buybuy";
 	}
+	
+	
+	@PostMapping("/submitScore")
+    public String submitScore(@RequestParam Integer score,RedirectAttributes redirectAttributes) {
+		
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		int accountId = accountService.findAccountIdByName(authentication.getName());
+		
+		Account account = new Account();
+		account = accountService.findAccountIdByID(accountId);
+		
+		int newmoney = account.getMoney()+score;
+		
+		accountService.updateMoney(accountId, newmoney);
+		
+        
+        
+        // レスポンスを返す
+        return "redirect:/afterLogin/sell";
+    }
+
 }
 
 

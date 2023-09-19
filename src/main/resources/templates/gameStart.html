@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Start</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+            font-family: 'Orbitron', sans-serif;
+            color: white;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+            background:
+                url('/image/Uyunisaltlake_ba830576-e09e-42e5-97d8-c832f0236d7d.png')
+                no-repeat center center fixed;
+            background-size: cover;
+            
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        a {
+            display: inline-block;
+            padding: 25px 45px;
+            background: linear-gradient(45deg, #ff5252, #e02424);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.8rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(255, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            text-align: center;
+            letter-spacing: 1.5px;
+        }
+
+        a:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(255, 0, 0, 0.8);
+        }
+
+        a:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 60px;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="button-container">
+        <a href="/afterLogin/gameSelect" onmouseover="playHoverSound()" onclick="return playClickSoundAndNavigate('/afterLogin/gameSelect')">Game Start</a>
+    </div>
+
+    <audio id="hoverSound" preload="auto">
+        <source src="/image/btn03.mp3" type="audio/mp3">
+    </audio>
+    <audio id="clickSound" preload="auto">
+        <source src="/image/btn14.mp3" type="audio/mp3">
+    </audio>
+
+    <script>
+        const hoverSound = document.getElementById("hoverSound");
+        const clickSound = document.getElementById("clickSound");
+
+        function playHoverSound() {
+            hoverSound.currentTime = 0;
+            hoverSound.play();
+        }
+
+        function playClickSound() {
+            clickSound.currentTime = 0;
+            clickSound.play();
+            setTimeout(function() {
+                clickSound.pause();
+                clickSound.currentTime = 0;
+            }, 2000);
+        }
+
+        function playClickSoundAndNavigate(url) {
+            playClickSound();
+            setTimeout(function() {
+                window.location.href = url;
+            }, 2000);
+            return false;  // This prevents the link from navigating immediately
+        }
+    </script>
+</body>
+</html>
