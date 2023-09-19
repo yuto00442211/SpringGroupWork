@@ -1,0 +1,63 @@
+@charset "UTF-8";
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+    background-image: url('/image/tetris_background_game_f726f51c-b090-4fbd-bfae-f8a520f615d9.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+
+
+
+
+
+#next-tetromino {
+    background-color: #f0f0f0;  // 背景色を#f0f0f0に設定
+}
+
+canvas {
+    border: 5px solid gold;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0
+
+    
+    
+    
+    .game-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+     background-color: rgb(67, 27, 90); 
+}
+
+
+
+#game {
+    border: 1px solid #000; /* キャンバスの境界線を追加 */
+    margin-bottom: 20px; /* キャンバスとボタンとの間にマージンを追加 */
+}
+
+.return-button {
+    padding: 10px 20px; /* パディングを追加 */
+    background-color: #007BFF; /* ボタンの背景色 */
+    color: #fff; /* テキストの色 */
+    border: none; /* ボーダーを削除 */
+    border-radius: 5px; /* 角を丸くする */
+    cursor: pointer; /* カーソルをポインターに変更 */
+    text-decoration: none; /* テキストの下線を削除 */
+    transition: background-color 0.3s; /* 背景色の遷移効果を追加 */
+}
+
+.return-button:hover {
+    background-color: #0056b3; /* マウスオーバー時の背景色 */
+}
+
+    
