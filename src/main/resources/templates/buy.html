@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <title>問題削除</title>
 </head>
+
+<style>
+.product-card img {
+	max-width: 30%;
+	height: 30%;
+}</style>
+
+
 <body>
 	<h2>落札承認</h2>
 	<!-- 問題削除用フォーム -->
@@ -38,7 +46,8 @@
 			<span th:text="${itemDTO.end_time}"></span>
 		</p>
 		<p>
-			<label>商品画像：</label> <img
+			<label>商品画像：</label> 
+			<img class="product-card img" 
 				th:src="@{'/images/' + ${itemDTO.image_number}}" alt="Image" />
 			<span th:text="${itemDTO.image_number}"></span>
 		</p>
