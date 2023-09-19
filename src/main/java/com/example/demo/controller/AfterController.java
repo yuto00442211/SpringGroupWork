@@ -99,7 +99,7 @@ public class AfterController {
 		//ログイン情報取得
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		int accountid = accountService.findAccountIdByName(authentication.getName());
-		
+
 		// ログインしたユーザー情報を画面に表示するために記述。
 		model.addAttribute("loginUsername", userPrincipal.getUsername());
 		List<Goods> productList = goodsservice.getAllGoods(); // 商品情報をデータベースからListに代入
@@ -806,7 +806,13 @@ public class AfterController {
 
 	//入札ページ表示
 	@GetMapping("/showbitMypage")
-	public String showBitMypage(Model model) {
+	public String showBitMypage(Model model,@RequestParam(name = "error", required = false) Boolean error1) {
+
+
+		if (Boolean.TRUE.equals(error1)) {
+			model.addAttribute("error1", true);
+		}
+
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		int accountId = accountService.findAccountIdByName(authentication.getName());
@@ -864,6 +870,62 @@ public class AfterController {
 	@GetMapping("/game")
 	public String showGame() {
 		return"game";
+	}
+
+	@GetMapping("/buy")
+	public String showBuypage(@RequestParam(name = "goods_id") int goodsId,Model model) {
+
+		Goods item = goodsservice.getGoodsById(goodsId);
+		GoodsDTO itemDTO = new GoodsDTO();
+
+		itemDTO.setGoods_id(item.getGoods_id());
+		itemDTO.setName(item.getName());
+		itemDTO.setGenre_id(item.getGenre_id());
+		itemDTO.setEnd_time(item.getEnd_time());
+		itemDTO.setImage_number(item.getImage_number());
+		itemDTO.setComment(item.getComment());
+		itemDTO.setCurrent_price(bitinfoService.highPrice(goodsId));
+
+
+		model.addAttribute("itemDTO",itemDTO);
+
+
+		return "buy";
+	}
+
+	@PostMapping("/buybuy/{goodsId}")
+	public String showBuybuypage(@PathVariable Integer goodsId,Model model, RedirectAttributes redirectAttributes) {
+
+		//入金出金処理
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		int accountId = accountService.findAccountIdByName(authentication.getName());
+		int goodsAccountId = goodsRepositry.getGoodsAccountID(goodsId);
+		Account buyAccount = accountRepositry.findAccountIdByID(accountId);
+		Account sellAcoount = accountRepositry.findAccountIdByID(goodsAccountId);
+		int goodsprice = bitRepositry.highPrice(goodsId);
+
+		System.out.println("Goods Price: " + goodsprice);
+		System.out.println("Account Money: " + buyAccount.getMoney());
+
+		if(goodsprice<=buyAccount.getMoney()) {
+
+			int sellprice = sellAcoount.getMoney()+goodsprice;
+			int buyprice = buyAccount.getMoney()-goodsprice;
+			buyAccount.setMoney(buyprice);
+			sellAcoount.setMoney(sellprice);	
+			accountService.updateMoney(accountId, buyprice);
+			accountService.updateMoney(goodsAccountId, sellprice);
+			redirectAttributes.addFlashAttribute("message", "購入が完了しました");
+			return "redirect:/afterLogin/buybuy";
+		}
+
+		redirectAttributes.addFlashAttribute("error1", true);
+		return "redirect:/afterLogin/showbitMypage";
+	}
+
+	@GetMapping("buybuy")
+	public String showBuyBuy() {
+		return "buybuy";
 	}
 }
 

@@ -30,5 +30,7 @@ public class GoodsDTO {
     private String comment;
     
     private Integer account_id;
+    
+    private int current_price;//落札ページ用
 
 }

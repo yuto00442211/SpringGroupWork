@@ -112,6 +112,14 @@ header {
 			</div>
 
 		</div>
+		
+		  <!-- エラーメッセージの表示 -->
+        <div th:if="${error1}" class="alert alert-danger" >
+        <!-- エラーメッセージが存在する場合のみリンクを表示 -->
+       <a th:href="@{/afterLogin/game}" class="btn btn-primary">POINT残高が足りません</a>
+       ゲームでPOINTゲットだぜ！！！！！！！！！！！！
+    </div>
+		
 	</header>
 
     <!-- エラーメッセージの表示 -->
@@ -150,7 +158,7 @@ header {
 			<td><a
 				th:href="@{/afterLogin/auction(productId=${itemList.goods_id})}">商品ページ</a></td>
 			<td><a th:if="${itemList.timeup}"
-				th:href="@{/afterLogin/update(goods_id=${itemList.goods_id})}">☆落札できました☆</a></td>
+				th:href="@{/afterLogin/buy(goods_id=${itemList.goods_id})}">☆落札できました☆</a></td>
 		</tr>
 	</tbody>
 </table>

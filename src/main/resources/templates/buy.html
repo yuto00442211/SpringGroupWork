@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>問題削除</title>
+</head>
+<body>
+	<h2>落札承認</h2>
+	<!-- 問題削除用フォーム -->
+	<form th:action="@{/afterLogin/buybuy/{goodsId}(goodsId=${itemDTO.goods_id})}" th:method="post">
+
+		
+		<!-- 隠しフィールド: 問題のID -->
+		<input type="hidden" th:field="*{itemDTO.goods_id}" />
+		<p>
+			<label>商品ID：</label>
+			<!-- 問題テキストの表示 -->
+			<span th:text="${itemDTO.goods_id}"></span>
+		</p>
+		<p>
+			<label>商品名：</label>
+			<!-- 選択肢1の表示 -->
+			<span th:text="${itemDTO.name}"></span>
+		</p>
+		<p>
+			<label>ジャンルID：</label>
+			<!-- 選択肢2の表示 -->
+			<span th:text="${itemDTO.genre_id}"></span>
+		</p>
+		<p>
+			<label>落札価格：</label>
+			<!-- 選択肢3の表示 -->
+			<span th:text="${itemDTO.Current_price}"></span>
+		</p>
+		<p>
+			<label>落札時間：</label>
+			<!-- 選択肢4の表示 -->
+			<span th:text="${itemDTO.end_time}"></span>
+		</p>
+		<p>
+			<label>商品画像：</label> <img
+				th:src="@{'/images/' + ${itemDTO.image_number}}" alt="Image" />
+			<span th:text="${itemDTO.image_number}"></span>
+		</p>
+		<p>
+			<label>詳細：</label>
+			<!-- 解説の表示 -->
+			<span th:text="${itemDTO.comment}"></span>
+		</p>
+		<!--   <p><label>アカウントID：</label><!-- 画像idの表示 <span th:text="${goods.account_id}"></span></p> -->
+
+		<p>
+			<!-- 削除ボタン -->
+			<button type="submit">確定</button>
+		</p>
+	</form>
+
+	<!-- ボタン -->
+	<a th:href="@{sell}" class="btn btn-secondary">戻る</a>
+</body>
+</html>
