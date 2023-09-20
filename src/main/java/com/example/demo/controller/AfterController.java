@@ -85,7 +85,7 @@ public class AfterController {
 	private CommentService commentService;
 	@Autowired
 	private GenreRepository genreRepository;
-	private String master="たなか";
+	private String master="マスター";
 
 
 	//	highPrice(int goodsId)
