@@ -186,7 +186,7 @@ public class AfterController {
 
 			model.addAttribute("goodsForm", new GoodsForm());
 			System.out.println("yyyyyyyyyyyyyyyyyyyyyyy");
-			return "exhibit"; // 入力エラーがある場合は同じページに戻る
+			return "redirect:/afterLogin/create"; // 入力エラーがある場合は同じページに戻る
 		} 
 		System.out.println("あああああ");
 
