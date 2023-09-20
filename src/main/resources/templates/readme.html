@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -94,13 +94,8 @@ VALUES
         </code></pre>
     </ol>
 
-    <h2>アカウントのアップデート</h2>
-    <p>アカウントの残高を設定するために、以下のSQL文を使用します。`<お金を持たせたいaccount_id>` の部分を実際のアカウントIDに置き換えてください。</p>
-    <pre><code>
-UPDATE account SET money = 500000 WHERE account_id = &lt;お金を持たせたいaccount_id&gt;;
-    </code></pre>
-
-    <p>このガイドを使用して、データベースのセットアップとアカウントのアップデートを行うことができます。データベース操作に関する詳細な情報が必要な場合は、データベース管理システムのドキュメンテーションを参照してください。</p>
+    
+    <p>このガイドを使用して、データベースのセットアップを行うことができます。データベース操作に関する詳細な情報が必要な場合は、データベース管理システムのドキュメンテーションを参照してください。</p>
     
      <!-- ボタン -->
         <a th:href="@{/sell/sub}" class="btn btn-secondary">会員登録へ</a>

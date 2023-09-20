@@ -1,70 +1,75 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+	margin: 0;
+	overflow: hidden;
+}
 
-        canvas {
-            background: #001f3f;
-            display: block;
-            margin: 0 auto;
-        }
+canvas {
+	background: #001f3f;
+	display: block;
+	margin: 0 auto;
+}
 
-        #gameOverMessage {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255, 255, 255, 0.8);
-            padding: 20px;
-            display: none;
-        }
+#gameOverMessage {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: rgba(255, 255, 255, 0.8);
+	padding: 20px;
+	display: none;
+}
 
-        /* ボタンを中央に配置するスタイル */
-        #scoreForm {
-            text-align: center;
-            position: fixed;
-            top: 30%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
+/* ボタンを中央に配置するスタイル */
+#scoreForm {
+	text-align: center;
+	position: fixed;
+	top: 30%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
 
-        /* ボタンのスタイル */
-        #scoreForm button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #007bff; /* ボタンの背景色 */
-            color: #fff; /* ボタンのテキスト色 */
-            border: none;
-            cursor: pointer;
-        }
-    </style>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+/* ボタンのスタイル */
+#scoreForm button {
+	padding: 10px 20px;
+	font-size: 16px;
+	background-color: #007bff; /* ボタンの背景色 */
+	color: #fff; /* ボタンのテキスト色 */
+	border: none;
+	cursor: pointer;
+}
+</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
-    <div id="gameOverMessage" style="display: none;">
-        <p>ゲームオーバー ☆ スコア送信ボタンをクリックしてね！<span id="scoreDisplay"></span></p>
-        <button id="restartGame">もう一度プレイ</button>
-    </div>
+	<div id="gameOverMessage" style="display: none;">
+		<p>
+			ゲームオーバー ☆ スコア送信ボタンをクリックしてね！<span id="scoreDisplay"></span>
+		</p>
+	</div>
 
-    <canvas id="gameCanvas" width="1200" height="500"></canvas>
-    <button id="startGame" style="display: block; margin: 20px auto;">ここをクリックでゲームスタート</button>
-    <button id="戻る" style="display: block; margin: 20px auto;">topに戻る</button>
+	<canvas id="gameCanvas" width="1200" height="500"></canvas>
+	<button id="startGame" style="display: block; margin: 20px auto;">ここをクリックでゲームスタート</button>
+	<button id="戻る" style="display: block; margin: 20px auto;">
+    <a th:href="@{/afterLogin/sell}">topに戻る</a>
+</button>
 
-    <form id="scoreForm" th:action="@{/afterLogin/submitScore}" th:object="${myRequestData}" method="post"
-        style="display: none;">
-        <input type="number" id="scoreField" th:field="*{score}" placeholder="スコアを入力してください"
-            th:readonly="true">
-        <button type="submit">送信でポイント獲得</button>
-    </form>
+	<form id="scoreForm" th:action="@{/afterLogin/submitScore}"
+		th:object="${myRequestData}" method="post" style="display: none;">
+		<input type="number" id="scoreField" th:field="*{score}"
+			placeholder="スコアを入力してください" th:readonly="true">
+		<button type="submit">送信でポイント獲得</button>
+	</form>
 
-    <script>
+	<script>
+	
+	
         // キャンバスの描画コンテキストを取得
         const canvas = document.getElementById('gameCanvas');
         const context = canvas.getContext('2d');
@@ -268,7 +273,7 @@
                 }
 
                 // 一定の確率で障害物を生成
-                if (Math.random() < 0.01) {
+                if (Math.random() < 0.007) {
                     let isHighObstacle = Math.random() < 0.5;
                     let onHill = Math.random() < 0.5;
                     let obstacleSize;
@@ -282,7 +287,7 @@
                     }
 
                     // プレイヤーと同じ高さで障害物を登場させる
-                    obstacleY = playerY+200;
+                    obstacleY = playerY+175;
 
                     obstacles.push({
                         x: obstacleX,
@@ -306,13 +311,26 @@
                         obstacles.splice(i, 1);
                     }
 
+                 // プレイヤーの当たり判定エリア
+                    const playerCollisionX = playerX + 20; // プレイヤーの左端から20ピクセル右にずらす
+                    const playerCollisionY = playerY + 20; // プレイヤーの上端から20ピクセル下にずらす
+                    const playerCollisionWidth = playerWidth - 40; // プレイヤーの幅から40ピクセル引く
+                    const playerCollisionHeight = playerHeight - 40; // プレイヤーの高さから40ピクセル引く
+
+                    // 障害物の当たり判定エリア
+                    const obstacleCollisionX = obstacle.x + 10; // 障害物の左端から10ピクセル右にずらす
+                    const obstacleCollisionY = obstacle.y + 10; // 障害物の上端から10ピクセル下にずらす
+                    const obstacleCollisionWidth = obstacle.size * 4 - 20; // 障害物の幅から20ピクセル引く
+                    const obstacleCollisionHeight = obstacle.size * 4 - 20; // 障害物の高さから20ピクセル引く
+
                     // プレイヤーと障害物の衝突判定
                     if (
-                        playerX < obstacle.x + obstacle.size &&
-                        playerX + playerWidth > obstacle.x &&
-                        playerY < obstacle.y + obstacle.size &&
-                        playerY + playerHeight > obstacle.y
+                        playerCollisionX < obstacleCollisionX + obstacleCollisionWidth &&
+                        playerCollisionX + playerCollisionWidth > obstacleCollisionX &&
+                        playerCollisionY < obstacleCollisionY + obstacleCollisionHeight &&
+                        playerCollisionY + playerCollisionHeight > obstacleCollisionY
                     ) {
+                        // 衝突した場合の処理
                         isGameOver = true;
                         isGameRunning = false;
 
@@ -329,6 +347,7 @@
                         // アニメーションを停止
                         clearInterval(animationInterval);
                     }
+
                 });
             }
         }
@@ -375,14 +394,31 @@
         }
 
         // ゲームループ
-        function gameLoop() {
-            update();
-            if (!isGameOver) {
-                drawBackground();
-            }
-            draw();
-            requestAnimationFrame(gameLoop);
+       function gameLoop() {
+    update();
+
+    // 障害物の位置を更新
+    obstacles.forEach((obstacle, i) => {
+        obstacle.x -= playerSpeed;
+
+        // 丘の上に障害物を配置
+        if (obstacle.onHill) {
+            obstacle.y = canvas.height - obstacle.size - getHillY(obstacle.x);
         }
+
+        // 画面外に出たら障害物を削除
+        if (obstacle.x < -obstacle.size) {
+            obstacles.splice(i, 1);
+        }
+    });
+
+    if (!isGameOver) {
+        drawBackground();
+    }
+    draw();
+    requestAnimationFrame(gameLoop);
+}
+
     </script>
 </body>
 </html>
