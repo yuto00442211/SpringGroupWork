@@ -189,7 +189,7 @@
             <input class="sell-input" type="number" th:field="*{initial_price}" placeholder="開始価格">
             <!-- 終了時間選択 -->
             <label>終了時間：</label>
-            <input class="sell-input" type="datetime-local" th:field="*{endtime}" id="endTime">
+            <input class="sell-input" type="datetime-local" th:field="*{endtime}" id="endTime" required>
             <!-- ジャンル選択 -->
             <label for="genre">ジャンル：</label>
             <select class="sell-select" id="genre" name="genre" th:field="*{genre_id}">

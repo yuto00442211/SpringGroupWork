@@ -189,7 +189,8 @@
         </table>
 
         <!-- 戻るボタン -->
-        <a th:href="@{/afterLogin/sell}" class="btn btn-secondary">戻る</a>
+       <a th:if="${ID}" th:href="@{/sell}" class="btn btn-secondary">戻る</a>
+		<a th:unless="${ID}" th:href="@{/afterLogin/sell}" class="btn btn-secondary">戻る</a>
     </div>
 
     <style>

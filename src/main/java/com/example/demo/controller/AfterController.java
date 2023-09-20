@@ -171,11 +171,10 @@ public class AfterController {
 	@GetMapping("create")
 	public String bbb(Model model) {
 
-		List<Genre> genreList = genreService.getAllGenre();
-		model.addAttribute("genreList", genreList);
-
-		model.addAttribute("goodsForm",new GoodsForm());
-		System.out.println("x");
+		 List<Genre> genreList = genreService.getAllGenre();
+		    model.addAttribute("genreList", genreList);
+		    model.addAttribute("goodsForm", new GoodsForm());
+		    System.out.println("x");
 		return "exhibit";
 	}
 	@PostMapping("create")
@@ -441,6 +440,8 @@ public class AfterController {
 	public String showGenreItemList(Model model,@RequestParam int genre_id,@AuthenticationPrincipal UserPrincipal userPrincipal,
 			@RequestParam(required = false) String keyword) {
 		List<GoodsList> productList;
+		boolean ID=false;
+		model.addAttribute("ID",ID);
 
 		//入札者と出品者が同じかどうか
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

@@ -199,6 +199,8 @@ public class SellController {
 	public String showGenreItemList(Model model,@RequestParam int genre_id,@AuthenticationPrincipal UserPrincipal userPrincipal,
 			@RequestParam(required = false) String keyword) {
 		List<GoodsList> productList;
+		boolean ID=true;
+		model.addAttribute("ID",ID);
 		
 		System.out.println(genre_id+"***");
 
