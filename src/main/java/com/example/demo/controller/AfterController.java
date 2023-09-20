@@ -412,6 +412,13 @@ public class AfterController {
 		int accountid = accountService.findAccountIdByName(authentication.getName());
 		// 商品データをデータベースから取得
 		List<GoodsList> productList = goodsListService.goodsList1(accountid);
+		for(int i =0; i<productList.size(); i++) {
+			if(productList.get(i).getCurrent_price()==0) {
+				Goods goods =goodsservice.findAllAllbygoodsID (productList.get(i).getGoods_id());
+				
+				productList.get(i).setCurrent_price(goods.getInitial_price());
+			}
+		}
 		if(master.equals(userPrincipal.getUsername())) {
 
 			boolean RoleAdmin = true;
@@ -442,6 +449,7 @@ public class AfterController {
 		List<GoodsList> productList;
 		boolean ID=false;
 		model.addAttribute("ID",ID);
+		
 
 		//入札者と出品者が同じかどうか
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -467,6 +475,13 @@ public class AfterController {
 
 		if(keyword != null && !keyword.isEmpty()) {
 			model.addAttribute("keyword",keyword);
+		}
+		for(int i =0; i<productList.size(); i++) {
+			if(productList.get(i).getCurrent_price()==0) {
+				Goods goods =goodsservice.findAllAllbygoodsID (productList.get(i).getGoods_id());
+				
+				productList.get(i).setCurrent_price(goods.getInitial_price());
+			}
 		}
 		if(master.equals(userPrincipal.getUsername())) {
 			boolean RoleAdmin = true;

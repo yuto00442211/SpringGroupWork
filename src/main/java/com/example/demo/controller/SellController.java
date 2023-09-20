@@ -183,7 +183,13 @@ public class SellController {
 		// 商品データをデータベースから取得
 		List<GoodsList> productList = goodsListService.goodsList();
 		System.out.println(productList.get(0));
-
+		for(int i =0; i<productList.size(); i++) {
+			if(productList.get(i).getCurrent_price()==0) {
+				Goods goods =goodsservice.findAllAllbygoodsID (productList.get(i).getGoods_id());
+				
+				productList.get(i).setCurrent_price(goods.getInitial_price());
+			}
+		}
 		boolean RoleAdmin = false;
 		boolean RoleYes = false;
 		String genre = "全商品";
@@ -221,6 +227,13 @@ public class SellController {
 		    // どちらも提供されない場合、デフォルトの検索処理を行うか、エラーハンドリングを行う
 			System.out.println(654654654);
 		    productList = goodsListService.goodsList(); // デフォルトの検索処理の例
+		}
+		for(int i =0; i<productList.size(); i++) {
+			if(productList.get(i).getCurrent_price()==0) {
+				Goods goods =goodsservice.findAllAllbygoodsID (productList.get(i).getGoods_id());
+				
+				productList.get(i).setCurrent_price(goods.getInitial_price());
+			}
 		}
 
 		boolean RoleAdmin = false;

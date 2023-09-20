@@ -34,6 +34,10 @@ public interface GoodsRepositry extends CrudRepository<Goods, Integer>{
 	    //出品者を除くピックアップ
 	    @Query("Select * from goods where account_id <> :account_id")
 	    List<Goods>findAllAll(@Param("account_id") int accountId);
+	    
+	  //出品者を除くピックアップ
+	    @Query("Select * from goods where goods_id = :goods_id")
+	    Goods findAllAllbygoodsID(@Param("goods_id") int goodsId);
 	   
 }
 

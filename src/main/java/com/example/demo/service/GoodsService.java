@@ -149,4 +149,9 @@ public class GoodsService {
     public int getGoodsAccountID(int goodsId) {
         return goodsRepository.getGoodsAccountID(goodsId);
     }
+    public Goods findAllAllbygoodsID( int goodsId) {
+    	Goods goods=goodsRepository.findAllAllbygoodsID(goodsId);
+		return goods;
+    	
+    }
 }
