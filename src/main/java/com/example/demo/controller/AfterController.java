@@ -104,14 +104,17 @@ public class AfterController {
 		// ログインしたユーザー情報を画面に表示するために記述。
 		model.addAttribute("loginUsername", userPrincipal.getUsername());
 		List<Goods> productList = goodsservice.getAllGoods(); // 商品情報をデータベースからListに代入
-		productList=goodsservice.getRandomElements(productList, 3);
-		//入札情報を参照し、もし入札が一件でもあればTOPページの金額に代入するfor文
-		for(Goods g :productList) {
-			int goodsId=g.getGoods_id();
-			g.setInitial_price(bitinfoService.highPrice(g));
-		}
+
+		productList=goodsservice.timeUpDelete(productList);//時間切れ商品のDelete
 		if(productList!=null) {
 			model.addAttribute("pickUp","～ピックアップ商品～");
+			productList=goodsservice.getRandomElements(productList, 3);
+			
+			//入札情報を参照し、もし入札が一件でもあればTOPページの金額に代入するfor文
+			for(Goods g :productList) {
+				g.setInitial_price(bitinfoService.highPrice(g));
+			}
+
 		}
 		List<Genre> genreList = genreService.getAllGenre();
 		model.addAttribute("genreList", genreList);
@@ -332,7 +335,7 @@ public class AfterController {
 
 		// 商品が存在する場合
 		int a=bitinfoService.highPrice(product);
-		
+
 		System.out.println("ddd"+a);
 		int bidAmount = BitForm.getBidAmount();
 
@@ -411,7 +414,6 @@ public class AfterController {
 		int accountid = accountService.findAccountIdByName(authentication.getName());
 		// 商品データをデータベースから取得
 		List<GoodsList> productList = goodsListService.goodsList1(accountid);
-		System.out.println(productList.get(0));
 		if(master.equals(userPrincipal.getUsername())) {
 
 			boolean RoleAdmin = true;

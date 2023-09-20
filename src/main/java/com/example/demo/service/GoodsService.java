@@ -92,6 +92,23 @@ public class GoodsService {
         return xxx;
     }
 
+	//List内の時間切れ商品の入札者がいるかをチェックするメソッド 該当商品はDelete
+	public List<Goods> timeUpDelete(List<Goods> goodslist) {
+		LocalDateTime nowTime= LocalDateTime.now();;
+		List<Goods> list =new ArrayList<>();
+		for(Goods g:goodslist) {
+			boolean xxx = nowTime.isAfter(g.getEnd_time());
+
+			if(xxx) {
+				if(bitinfoService.highPrice(g)==g.getInitial_price()) {
+					goodsRepository.delete(g);
+				}
+			}else {
+				list.add(g);
+			}
+		}
+		return list;
+	}
     // 画像を保存
     public String saveImage(MultipartFile file) throws IOException {
         String originalFileName = file.getOriginalFilename();
