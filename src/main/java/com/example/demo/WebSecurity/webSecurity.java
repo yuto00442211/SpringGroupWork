@@ -37,7 +37,8 @@ public class webSecurity {
                         "/sell/product",
                         "/sell/genreItemList",
                         "/sell/itemList",
-                        "/sell/success"
+                        "/sell/success",
+                        "/sell/readme"
                     ).permitAll()
                     
                     // その他のリクエストは認証が必要

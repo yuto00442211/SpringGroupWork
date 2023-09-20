@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>データベースセットアップと操作ガイド</title>
+</head>
+<body>
+    <h1>データベースセットアップと操作ガイド</h1>
+    <p>このガイドでは、データベースのセットアップと基本的な操作手順を説明します。データベースは PostgreSQL を使用しています。</p>
+
+    <h2>データベースセットアップ</h2>
+    <ol>
+        <li>データベースを作成します。</li>
+        <pre><code>
+-- 会員マスタ
+CREATE TABLE account (
+    account_id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    address VARCHAR(255),
+    tel VARCHAR(20),
+    mail VARCHAR(100),
+    password VARCHAR(100),
+    money INT DEFAULT 0
+);
+
+-- 商品マスタ
+CREATE TABLE goods (
+    goods_id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    genre_id INT,
+    initial_price INT,
+    start_time TIMESTAMP,
+    end_time TIMESTAMP,
+    image_number VARCHAR(255),
+    comment TEXT,
+    account_id INT
+);
+
+-- ジャンルマスタ
+CREATE TABLE genre (
+    genre_id SERIAL PRIMARY KEY,
+    genre_name VARCHAR(100)
+);
+
+-- 入札情報
+CREATE TABLE bitinfo (
+    goods_id INT,
+    account_id INT,
+    bid_time TIMESTAMP,
+    current_price INT,
+    PRIMARY KEY (goods_id, account_id, bid_time)
+);
+
+-- コメントテーブル
+CREATE TABLE comment (
+    goods_id INT,
+    account_id INT,
+    comment_number SERIAL,
+    goodsaccount_id INT,
+    comment_content TEXT,
+    comment_time TIMESTAMP,
+    is_approved BOOLEAN DEFAULT false,
+    PRIMARY KEY (goods_id, account_id, comment_number)
+);
+
+-- 落札商品マスタ
+CREATE TABLE dropgoods (
+    goods_id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    genre_id INT,
+    initial_price INT,
+    drop_time TIMESTAMP,
+    image_number VARCHAR(255),
+    comment TEXT,
+    account_id INT
+);
+        </code></pre>
+
+        <li>ジャンルマスタに初期データを挿入します。</li>
+        <pre><code>
+INSERT INTO genre (genre_id, genre_name)
+VALUES
+    (1, '家電'),
+    (2, 'ファッション'),
+    (3, 'スポーツ用品'),
+    (4, 'コレクション'),
+    (5, '美容・健康'),
+    (6, '本・雑誌'),
+    (7, '趣味・アウトドア'),
+    (8, '車・バイク'),
+    (9, '食品・お酒'),
+    (10, 'その他');
+        </code></pre>
+    </ol>
+
+    <h2>アカウントのアップデート</h2>
+    <p>アカウントの残高を設定するために、以下のSQL文を使用します。`<お金を持たせたいaccount_id>` の部分を実際のアカウントIDに置き換えてください。</p>
+    <pre><code>
+UPDATE account SET money = 500000 WHERE account_id = &lt;お金を持たせたいaccount_id&gt;;
+    </code></pre>
+
+    <p>このガイドを使用して、データベースのセットアップとアカウントのアップデートを行うことができます。データベース操作に関する詳細な情報が必要な場合は、データベース管理システムのドキュメンテーションを参照してください。</p>
+    
+     <!-- ボタン -->
+        <a th:href="@{/sell/sub}" class="btn btn-secondary">会員登録へ</a>
+</body>
+</html>

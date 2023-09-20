@@ -248,5 +248,9 @@ public class SellController {
 	//	}
 
 
+	@GetMapping("/readme")
+	public String readmePage() {
+		return "readme";
+	}
 
 }

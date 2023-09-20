@@ -265,6 +265,11 @@ document.addEventListener("DOMContentLoaded", function () {
 		
 		 <!-- ボタン -->
         <a th:if="${ok}" th:href="@{game}" class="btn btn-secondary">スタート</a>
+        
+          
+		 <!-- ボタン -->
+        <a th:if="${!ok}" th:href="@{/sell/readme}" class="btn btn-secondary">初めに読んでください</a>
+		
 		
 	</header>
 	<div class="container">

@@ -52,6 +52,7 @@
         /* 登録入力フィールドのスタイル */
         .registration-input {
             width: 100%;
+            box-sizing: border-box; /* パディング・ボーダーも含めたボックスサイズを設定 */
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ddd;
@@ -131,24 +132,24 @@
             <form method="POST" th:action="@{/sell/sub}" th:object="${accountForm}" onsubmit="return validateForm()">
                 <!-- 名前入力 -->
                 <label class="registration-label" for="name">名前</label>
-                <input class="registration-input" type="text" th:field="*{name}" required>
+                <input class="registration-input" type="text" th:field="*{name}" id="name" required>
                 <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error-message"></span>
 
                 <!-- 住所入力 -->
                 <label class="registration-label" for="address">住所</label>
-                <input class="registration-input" type="text" th:field="*{address}" required>
+                <input class="registration-input" type="text" th:field="*{address}" id="address" required>
 
                 <!-- 電話番号入力 -->
                 <label class="registration-label" for="tel">電話番号</label>
-                <input class="registration-input" type="tel" th:field="*{tel}" required>
+                <input class="registration-input" type="tel" th:field="*{tel}" id="tel" required>
 
                 <!-- メールアドレス入力 -->
                 <label class="registration-label" for="email">メールアドレス</label>
-                <input class="registration-input" type="email" th:field="*{mail}" required>
+                <input class="registration-input" type="email" th:field="*{mail}" id="email" required>
 
                 <!-- パスワード入力 -->
                 <label class="registration-label" for="password">パスワード</label>
-                <input class="registration-input" type="password" th:field="*{password}" required>
+                <input class="registration-input" type="password" th:field="*{password}" id="password" required>
 
                 <!-- 登録ボタン -->
                 <button class="registration-button" type="submit">登録</button>
