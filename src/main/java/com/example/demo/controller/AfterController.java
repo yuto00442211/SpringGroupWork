@@ -108,9 +108,7 @@ public class AfterController {
 		//入札情報を参照し、もし入札が一件でもあればTOPページの金額に代入するfor文
 		for(Goods g :productList) {
 			int goodsId=g.getGoods_id();
-			if(bitinfoService.highPrice(goodsId)!=0) {
-				g.setInitial_price(bitinfoService.highPrice(goodsId));
-			}
+			g.setInitial_price(bitinfoService.highPrice(g));
 		}
 		if(productList!=null) {
 			model.addAttribute("pickUp","～ピックアップ商品～");
@@ -134,11 +132,7 @@ public class AfterController {
 		if (product != null) { // 商品が存在する場合のみ処理を行う
 			String remainingTime = calculateRemainingTime(product.getEnd_time());
 
-			int current_price =product.getInitial_price();
-			if(bitinfoService.highPrice(productId)!=0) {
-				current_price=(bitinfoService.highPrice(productId));
-			}
-
+			int current_price =bitinfoService.highPrice(product);
 
 			model.addAttribute("current_price", current_price);
 
@@ -337,7 +331,8 @@ public class AfterController {
 		model.addAttribute("BitForm", new BitForm());
 
 		// 商品が存在する場合
-		int a = bitinfoService.highPrice(productId);
+		int a=bitinfoService.highPrice(product);
+		
 		System.out.println("ddd"+a);
 		int bidAmount = BitForm.getBidAmount();
 
@@ -870,7 +865,7 @@ public class AfterController {
 	//商品別mailBox表示
 	@GetMapping("/game")
 	public String showGame(Model model) {
-		
+
 		model.addAttribute("myRequestData", new MyRequestData());
 		return"game";
 	}
@@ -887,7 +882,7 @@ public class AfterController {
 		itemDTO.setEnd_time(item.getEnd_time());
 		itemDTO.setImage_number(item.getImage_number());
 		itemDTO.setComment(item.getComment());
-		itemDTO.setCurrent_price(bitinfoService.highPrice(goodsId));
+		itemDTO.setCurrent_price(bitinfoService.highPrice(item));
 
 
 		model.addAttribute("itemDTO",itemDTO);
@@ -928,30 +923,30 @@ public class AfterController {
 
 	@GetMapping("buybuy")
 	public String showBuyBuy() {
-		
-		
+
+
 		return "buybuy";
 	}
-	
-	
+
+
 	@PostMapping("/submitScore")
-    public String submitScore(@RequestParam Integer score,RedirectAttributes redirectAttributes) {
-		
+	public String submitScore(@RequestParam Integer score,RedirectAttributes redirectAttributes) {
+
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		int accountId = accountService.findAccountIdByName(authentication.getName());
-		
+
 		Account account = new Account();
 		account = accountService.findAccountIdByID(accountId);
-		
+
 		int newmoney = account.getMoney()+score;
-		
+
 		accountService.updateMoney(accountId, newmoney);
-		
-        
-        
-        // レスポンスを返す
-        return "redirect:/afterLogin/sell";
-    }
+
+
+
+		// レスポンスを返す
+		return "redirect:/afterLogin/sell";
+	}
 
 }
 

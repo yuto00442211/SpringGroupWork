@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.Bitinfo;
+import com.example.demo.entity.Goods;
 import com.example.demo.repositry.BitRepositry;
 
 @Service
@@ -37,12 +38,12 @@ public class BitinfoService {
 	}
 	
 	 //最高額取得
-	public int highPrice(int goodsId) {
-	    Integer price = bitRepository.highPrice(goodsId); // Integer型を使用し、nullを受け入れる
+	public Integer highPrice(Goods g) {
+	    Integer price = bitRepository.highPrice(g.getGoods_id()); // Integer型を使用し、nullを受け入れる
 	    if (price != null) {
 	        return price; // priceがnullでない場合はそのまま返す
 	    } else {
-	        return 0; // もしくは適切なデフォルト値を返す
+	        return g.getInitial_price(); // もしくは適切なデフォルト値を返す
 	    }
 	}
 	

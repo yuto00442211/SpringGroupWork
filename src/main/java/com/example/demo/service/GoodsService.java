@@ -44,8 +44,8 @@ public class GoodsService {
 		return goodsList;
 	}
 
-	public int GetNowPrice(int goodsId) {
-		return bitinfoService.highPrice(goodsId);
+	public int GetNowPrice(Goods g) {
+		return bitinfoService.highPrice(g);
 
 	}
 
