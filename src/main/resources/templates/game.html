@@ -50,6 +50,7 @@
 <body>
     <div id="gameOverMessage" style="display: none;">
         <p>ゲームオーバー ☆ スコア送信ボタンをクリックしてね！<span id="scoreDisplay"></span></p>
+        <button id="restartGame">もう一度プレイ</button>
     </div>
 
     <canvas id="gameCanvas" width="1200" height="500"></canvas>
@@ -64,13 +65,15 @@
     </form>
 
     <script>
+        // キャンバスの描画コンテキストを取得
         const canvas = document.getElementById('gameCanvas');
         const context = canvas.getContext('2d');
 
-        let playerX = 50; // プレイヤーの初期X位置
-        let playerY = canvas.height - 250; // プレイヤーの初期Y位置（高く飛ばすために変更）
-        let playerWidth = 171; // プレイヤーの幅
-        let playerHeight = 182; // プレイヤーの高さ
+        // プレイヤーの初期設定
+        let playerX = 50;
+        let playerY = canvas.height - 250;
+        let playerWidth = 171;
+        let playerHeight = 182;
         let playerSpeed = 2;
         let gravity = 0.5;
         let velocityY = 0;
@@ -82,17 +85,18 @@
         let isGameRunning = false;
         let animationInterval;
 
+        // 丘の設定
         let angle = 0;
         const HILL_AMPLITUDE = 50;
         const HILL_SPEED = 0.02;
 
+        // 背景の設定
         let backgroundX1 = 0;
         let backgroundX2 = canvas.width;
-
         let background = new Image();
         background.src = "/forest.png";
 
-        // プレイヤー画像のパスとフレーム数を定義
+        // プレイヤー画像のパス
         const playerImagePaths = [
             "/001.png",
             "/002.png",
@@ -108,17 +112,18 @@
             "/012.png"
         ];
 
+        // ジャンプ時の画像パス
         const jumpImagePath = "/jump.png";
 
         const jumpImage = new Image();
         jumpImage.src = jumpImagePath;
 
+        // プレイヤー画像のアニメーション関連
         const numFrames = playerImagePaths.length;
         let currentFrame = 0;
-
-        // プレイヤー画像のアニメーション用のImageオブジェクトを作成
         const playerImages = [];
 
+        // プレイヤー画像を読み込む
         playerImagePaths.forEach((path) => {
             const image = new Image();
             image.src = path;
@@ -129,11 +134,12 @@
         const obstacleImage = new Image();
         obstacleImage.src = "/enemy.png";
 
+        // 背景画像の読み込み完了時の処理
         background.onload = function () {
             // 背景を描画
             drawBackground();
 
-            // スタートボタンがクリックされたときのイベントハンドラ
+            // ゲーム開始ボタンのクリックイベントハンドラ
             document.getElementById('startGame').addEventListener('click', function () {
                 if (!isGameRunning && !isGameOver) { // ゲームが実行中でなく、ゲームオーバー状態でない場合にのみ実行
                     startGame();
@@ -142,7 +148,7 @@
                 }
             });
 
-            // リスタートボタンがクリックされたときのイベントハンドラ
+            // ゲームリスタートボタンのクリックイベントハンドラ
             document.getElementById('restartGame').addEventListener('click', function () {
                 if (isGameOver) {
                     resetGame();
@@ -150,10 +156,11 @@
             });
         };
 
+        // ゲームの経過時間
         let gameTime = 0;
 
+        // ゲーム開始関数
         function startGame() {
-            // ゲームの初期化ロジックをここに追加
             gameTime = 0;
             isGameOver = false;
             isGameRunning = true; // ゲームが開始されたことを設定
@@ -167,8 +174,8 @@
             gameLoop();
         }
 
+        // ゲームリセット関数
         function resetGame() {
-            // ゲームのリセットロジックをここに追加
             obstacles = [];
             playerX = 50;
             playerY = canvas.height - 250;
@@ -176,7 +183,7 @@
             velocityY = 0;
             gameTime = 0;
 
-            // ボタンを再び非表示にする
+            // ゲームオーバーメッセージを非表示にする
             document.getElementById('gameOverMessage').style.display = 'none';
 
             // アニメーション速度を設定 (0.5秒ごとにフレームを切り替える)
@@ -184,11 +191,12 @@
             clearInterval(animationInterval);
             animationInterval = setInterval(drawPlayer, animationSpeed);
 
-            // ゲームループを再開
+            // ゲーム再開
             isGameRunning = true;
             gameLoop();
         }
 
+        // 背景を描画する関数
         function drawBackground() {
             context.drawImage(background, backgroundX1, 0, canvas.width, canvas.height);
             context.drawImage(background, backgroundX2, 0, canvas.width, canvas.height);
@@ -205,50 +213,61 @@
             }
         }
 
+        // 丘の高さを計算する関数
         function getHillY(x) {
             return HILL_AMPLITUDE * Math.sin((x + angle) * HILL_SPEED);
         }
 
+        // キーボードイベントリスナーを追加
         document.addEventListener('keydown', (e) => { keys[e.code] = true; });
         document.addEventListener('keyup', (e) => { keys[e.code] = false; });
 
+        // ゲームのアップデートロジック
         function update() {
             if (isGameRunning && !isGameOver) {
                 gameTime = gameTime + 1;
             }
 
             if (isGameRunning) {
+                // 左右キーによるプレイヤーの移動
                 if (keys['ArrowLeft']) playerX -= playerSpeed;
                 if (keys['ArrowRight']) playerX += playerSpeed;
 
+                // 画面左端での制約
                 if (playerX < 0) {
                     playerX = 0;
                 }
+                // 画面右端での制約
                 if (playerX + playerWidth > canvas.width) {
                     playerX = canvas.width - playerWidth;
                 }
 
+                // ↓キーによるしゃがみ状態の切り替え
                 if (keys['ArrowDown']) {
                     isDucking = true;
-                    playerHeight = 91; // ダック中のプレイヤーの高さ
+                    playerHeight = 91;
                 } else {
                     isDucking = false;
-                    playerHeight = 182; // ダックしていないプレイヤーの高さ
+                    playerHeight = 182;
                 }
 
+                // スペースキーでジャンプ
                 if (keys['Space'] && !isJumping) {
-                    velocityY = -18; // 高くジャンプするために値を増やす
+                    velocityY = -18; // 上方向への速度を設定してジャンプ
                     isJumping = true;
                 }
 
+                // 重力による落下
                 velocityY += gravity;
                 playerY += velocityY;
 
+                // 地面に着地したらジャンプ状態を解除
                 if (playerY >= canvas.height - playerHeight) {
                     playerY = canvas.height - playerHeight;
                     isJumping = false;
                 }
 
+                // 一定の確率で障害物を生成
                 if (Math.random() < 0.01) {
                     let isHighObstacle = Math.random() < 0.5;
                     let onHill = Math.random() < 0.5;
@@ -262,11 +281,8 @@
                         obstacleSize = 20;
                     }
 
-                    if (onHill) {
-                        obstacleY = canvas.height - getHillY(obstacleX) - obstacleSize;
-                    } else {
-                        obstacleY = canvas.height - obstacleSize;
-                    }
+                    // プレイヤーと同じ高さで障害物を登場させる
+                    obstacleY = playerY+200;
 
                     obstacles.push({
                         x: obstacleX,
@@ -276,86 +292,89 @@
                     });
                 }
 
+                // 障害物の更新
                 obstacles.forEach((obstacle, i) => {
                     obstacle.x -= playerSpeed;
 
+                    // 丘の上に障害物を配置
                     if (obstacle.onHill) {
                         obstacle.y = canvas.height - obstacle.size - getHillY(obstacle.x);
                     }
 
+                    // 画面外に出たら障害物を削除
                     if (obstacle.x < -obstacle.size) {
                         obstacles.splice(i, 1);
                     }
 
+                    // プレイヤーと障害物の衝突判定
                     if (
                         playerX < obstacle.x + obstacle.size &&
                         playerX + playerWidth > obstacle.x &&
                         playerY < obstacle.y + obstacle.size &&
                         playerY + playerHeight > obstacle.y
                     ) {
-                        // ゲームオーバーの処理
-                        isGameOver = true; // ゲームオーバー状態に設定
-                        isGameRunning = false; // ゲームを停止
+                        isGameOver = true;
+                        isGameRunning = false;
 
                         // スコアをフォームに設定
                         document.getElementById('scoreField').value = gameTime;
 
-                        // フォームを表示してデータを送信
+                        // スコアフォームを表示
                         document.getElementById('scoreForm').style.display = 'block';
 
                         // ゲームオーバーメッセージを表示
                         document.getElementById('scoreDisplay').textContent = gameTime + 'pt';
                         document.getElementById('gameOverMessage').style.display = 'block';
 
-                        // ゲームループの停止（ゲームオーバー時に動作を止めるため）
+                        // アニメーションを停止
                         clearInterval(animationInterval);
                     }
                 });
             }
         }
 
+        // ゲームの描画
         function draw() {
             context.clearRect(0, 0, canvas.width, canvas.height);
 
+            // 背景を描画
             drawBackground();
 
+            // スコアを表示
             context.fillStyle = 'black';
             context.font = '24px Arial';
             context.fillText('スコア: ' + gameTime + 'pt', 20, 30);
 
-            // プレイヤー画像を描画
+            // プレイヤーを描画
             drawPlayer();
 
-            // 障害物画像を描画
+            // 障害物を描画
             drawObstacles();
         }
 
-        // プレイヤーのアニメーションを描画する関数
+        // プレイヤーの描画
         function drawPlayer() {
-            // ジャンプ中の場合、jump.png を描画
             if (isJumping) {
                 context.drawImage(jumpImage, playerX, playerY, playerWidth, playerHeight);
             } else {
                 context.drawImage(playerImages[currentFrame], playerX, playerY, playerWidth, playerHeight);
-                // 次のフレームに進める
                 currentFrame = (currentFrame + 1) % numFrames;
             }
         }
 
+        // 障害物の描画
         function drawObstacles() {
             obstacles.forEach((obstacle, i) => {
-                // 障害物画像のサイズと位置を設定
                 const obstacleWidth = obstacle.size * 4;
                 const obstacleHeight = obstacle.size * 4;
                 const obstacleX = obstacle.x;
-                const obstacleY = obstacle.y - obstacleHeight; // 画像が地面の上に表示されるように調整
-                
+                const obstacleY = obstacle.y - obstacleHeight;
 
-                // 障害物画像を描画
                 context.drawImage(obstacleImage, obstacleX, obstacleY, obstacleWidth, obstacleHeight);
             });
         }
 
+        // ゲームループ
         function gameLoop() {
             update();
             if (!isGameOver) {
