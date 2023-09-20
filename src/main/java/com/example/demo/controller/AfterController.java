@@ -405,7 +405,6 @@ public class AfterController {
 
 
 
-	//-------------------------------------------------------------
 	@GetMapping("/itemList")
 	public String showItemList(Model model,@AuthenticationPrincipal UserPrincipal userPrincipal) {
 		System.out.println(123465);

@@ -92,6 +92,7 @@ public class GoodsService {
         return xxx;
     }
 
+    
 	//List内の時間切れ商品の入札者がいるかをチェックするメソッド 該当商品はDelete
 	public List<Goods> timeUpDelete(List<Goods> goodslist) {
 		LocalDateTime nowTime= LocalDateTime.now();;

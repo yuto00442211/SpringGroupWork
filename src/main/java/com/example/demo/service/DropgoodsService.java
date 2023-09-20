@@ -12,7 +12,6 @@ import com.example.demo.repositry.DropgoodsRepository;
 public class DropgoodsService {
 	private final DropgoodsRepository dropgoodsRepository;
 	@Autowired
-	
 		public DropgoodsService(DropgoodsRepository dropgoodsRepository) {
 		this.dropgoodsRepository = dropgoodsRepository;
 	}

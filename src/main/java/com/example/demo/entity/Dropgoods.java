@@ -29,4 +29,5 @@ public class Dropgoods {
     private String comment;
     
     private Integer account_id;
+    
 }

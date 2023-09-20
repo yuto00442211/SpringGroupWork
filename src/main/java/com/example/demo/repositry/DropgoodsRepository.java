@@ -16,4 +16,5 @@ public interface DropgoodsRepository  extends CrudRepository<Dropgoods, Integer>
     @Query("select * From goods where goods_id = :goodsId")
     Dropgoods allgoodsSelect(@Param("goodsId") int goodsId);
 	
+    
 }
