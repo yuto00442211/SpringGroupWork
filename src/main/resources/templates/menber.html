@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org">
-<link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css"
-	rel="stylesheet">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>キャルション - 新規登録</title>
     <style>
+        /* 全体のページスタイル */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -15,6 +13,8 @@
             background-color: #f0f0f0;
             color: #333;
         }
+
+        /* 登録コンテナのスタイル */
         .registration-container {
             max-width: 600px;
             margin: 100px auto;
@@ -23,23 +23,33 @@
             box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
             padding: 20px;
         }
+
+        /* 登録タイトルのスタイル */
         .registration-title {
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 20px;
             text-align: center;
         }
+
+        /* 登録フォームのスタイル */
         .registration-form {
             text-align: center;
         }
+
+        /* 登録ラベルのスタイル */
         .registration-label {
             display: block;
             font-weight: bold;
             margin-top: 10px;
         }
-         .error-message {
-        color: red; /* エラーメッセージの文字色を赤に設定 */
-    }
+
+        /* エラーメッセージのスタイル */
+        .error-message {
+            color: red; /* エラーメッセージの文字色を赤に設定 */
+        }
+
+        /* 登録入力フィールドのスタイル */
         .registration-input {
             width: 100%;
             padding: 10px;
@@ -47,6 +57,8 @@
             border: 1px solid #ddd;
             border-radius: 3px;
         }
+
+        /* 登録ボタンのスタイル */
         .registration-button {
             background-color: #3498db;
             color: white;
@@ -55,79 +67,96 @@
             border-radius: 3px;
             cursor: pointer;
         }
+
         .registration-button:hover {
             background-color: #2980b9;
         }
+
+        /* ヘッダーのスタイル */
         header {
-	background-color: #f0f0f0;
-	color: rgb(0, 0, 0);
-	padding: 10px 0;
-	text-align: center;
-	display: flex;
-	justify-content: flex-start; /* 要素を左寄せに配置 */
-	align-items: center;
+            background-color: #f0f0f0;
+            color: rgb(0, 0, 0);
+            padding: 10px 0;
+            text-align: center;
+            display: flex;
+            justify-content: flex-start; /* 要素を左寄せに配置 */
+            align-items: center;
+        }
 
-.button-container {
-	display: flex;
-	align-items: center;
-	margin-left: auto;
-}
+        /* ボタンコンテナのスタイル */
+        .button-container {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+        }
 
-.action-button {
-	background-color: #3498db;
-	color: white;
-	padding: 10px 20px;
-	border: none;
-	border-radius: 3px;
-	cursor: pointer;
-	margin-right: 10px; /* ボタン間の右側のマージン */
-}
+        /* アクションボタンのスタイル */
+        .action-button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 10px; /* ボタン間の右側のマージン */
+        }
 
-.action-button:last-child {
-	margin-right: 0; /* 最後のボタンにはマージンを適用しない */
-}
+        .action-button:last-child {
+            margin-right: 0; /* 最後のボタンにはマージンを適用しない */
+        }
 
-.action-button:hover {
-	background-color: #2980b9;
-}
-.user-info {
-	padding-left: 10px; /* 左側のパディング */
-	padding-right: 10px; /* 右側のパディング */
-}
+        .action-button:hover {
+            background-color: #2980b9;
+        }
+
+        /* ユーザー情報のスタイル */
+        .user-info {
+            padding-left: 10px; /* 左側のパディング */
+            padding-right: 10px; /* 右側のパディング */
+        }
     </style>
 </head>
 <body>
-
-		<div class="site-name">
-			<h1 style="font-size: 32px;">キャルション！</h1>
-		</div>
+    <!-- サイト名部分 -->
+    <div class="site-name">
+        <h1 style="font-size: 32px;">キャルション！</h1>
+    </div>
+    <!-- 新規登録コンテナ -->
     <div class="registration-container">
+        <!-- 登録タイトル -->
         <div class="registration-title">新規登録</div>
+        <!-- 登録フォーム -->
         <div class="registration-form">
-          
-           <form method="POST" th:action="@{/sell/sub}"  th:object="${accountForm}" onsubmit="return validateForm()">
-    <label class="registration-label" for="name">名前</label>
-    <input class="registration-input" type="text" th:field="*{name}" required>
-    <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error-message"></span>
+            <!-- Thymeleafを使用したフォーム -->
+            <form method="POST" th:action="@{/sell/sub}" th:object="${accountForm}" onsubmit="return validateForm()">
+                <!-- 名前入力 -->
+                <label class="registration-label" for="name">名前</label>
+                <input class="registration-input" type="text" th:field="*{name}" required>
+                <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error-message"></span>
 
-    <label class="registration-label" for="address">住所</label>
-    <input class="registration-input" type="text"  th:field="*{address}" required>
+                <!-- 住所入力 -->
+                <label class="registration-label" for="address">住所</label>
+                <input class="registration-input" type="text" th:field="*{address}" required>
 
-    <label class="registration-label" for="tel">電話番号</label>
-    <input class="registration-input" type="tel"  th:field="*{tel}"required>
+                <!-- 電話番号入力 -->
+                <label class="registration-label" for="tel">電話番号</label>
+                <input class="registration-input" type="tel" th:field="*{tel}" required>
 
-    <label class="registration-label" for="email">メールアドレス</label>
-    <input class="registration-input" type="email"   th:field="*{mail}"required>
+                <!-- メールアドレス入力 -->
+                <label class="registration-label" for="email">メールアドレス</label>
+                <input class="registration-input" type="email" th:field="*{mail}" required>
 
-    <label class="registration-label" for="password">パスワード</label>
-    <input class="registration-input" type="password"  th:field="*{password}" required>
+                <!-- パスワード入力 -->
+                <label class="registration-label" for="password">パスワード</label>
+                <input class="registration-input" type="password" th:field="*{password}" required>
 
-    <button class="registration-button" type="submit">登録</button>
-</form>
-
+                <!-- 登録ボタン -->
+                <button class="registration-button" type="submit">登録</button>
+            </form>
         </div>
     </div>
 
+    <!-- JavaScriptのバリデーション関数 -->
     <script>
         function validateForm() {
             var name = document.getElementById('name').value.trim();
@@ -147,43 +176,4 @@
         }
     </script>
 </body>
-<style>
-
-h1 {
-	font-family: "Nico Moji";
-}
-
-.site-name {
-	background: #FFDA45; /*背景色の指定*/
-	color: #000000; /*テキストの色の指定*/
-	padding: 10px;
-	text-align: center;
-	width: 200px;
-}
-.site-name p {
-	margin: 0;
-	padding: 10px;
-}
-
-.search-form {
-	text-align: left;
-}
-
-.button-container {
-	display: flex;
-	align-items: center;
-}
-
-.action-button {
-	/* ボタンのスタイル */
-	
-}
-
-.action-button:hover {
-	/* ボタンのホバースタイル */
-	
-}
-
-</style>
-
 </html>

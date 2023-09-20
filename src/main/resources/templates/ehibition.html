@@ -1,207 +1,170 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org">
-<link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css"
-	rel="stylesheet">
 <head>
     <meta charset="UTF-8">
     <title>Insert title here</title>
 
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
         rel="stylesheet">
 </head>
 
 <style>
-
+/* ヘッダーのスタイル */
 header {
-	background-color: #f0f0f0;
-	color: rgb(0, 0, 0);
-	padding: 10px 0;
-	text-align: center;
-	display: flex;
-	justify-content: flex-start; /* 要素を左寄せに配置 */
-	align-items: center;
+    background-color: #f0f0f0;
+    color: rgb(0, 0, 0);
+    padding: 10px 0;
+    text-align: center;
+    display: flex;
+    justify-content: flex-start; /* 要素を左寄せに配置 */
+    align-items: center;
+}
 
+/* ボタンコンテナのスタイル */
 .button-container {
-	display: flex;
-	align-items: center;
-	margin-left: auto;
+    display: flex;
+    align-items: center;
+    margin-left: auto;
 }
 
+/* アクションボタンのスタイル */
 .action-button {
-	background-color: #3498db;
-	color: white;
-	padding: 10px 20px;
-	border: none;
-	border-radius: 3px;
-	cursor: pointer;
-	margin-right: 10px; /* ボタン間の右側のマージン */
+    background-color: #3498db;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-right: 10px; /* ボタン間の右側のマージン */
 }
 
+/* 最後のアクションボタンにはマージンを適用しない */
 .action-button:last-child {
-	margin-right: 0; /* 最後のボタンにはマージンを適用しない */
+    margin-right: 0;
 }
 
+/* アクションボタンのホバースタイル */
 .action-button:hover {
-	background-color: #2980b9;
-}
-.user-info {
-	padding-left: 10px; /* 左側のパディング */
-	padding-right: 10px; /* 右側のパディング */
-}
-h1 {
-	font-family: "Nico Moji";
+    background-color: #2980b9;
 }
 
-.site-name {
-	background: #FFDA45; /*背景色の指定*/
-	color: #000000; /*テキストの色の指定*/
-	padding: 15px;
-	text-align: center;
-	width: 200px;
+/* ユーザー情報のスタイル */
+.user-info {
+    padding-left: 10px; /* 左側のパディング */
+    padding-right: 10px; /* 右側のパディング */
 }
+
+/* h1要素のスタイル */
+h1 {
+    font-family: "Nico Moji";
+}
+
+/* サイト名のスタイル */
+.site-name {
+    background: #FFDA45; /* 背景色の指定 */
+    color: #000000; /* テキストの色の指定 */
+    padding: 15px;
+    text-align: center;
+    width: 200px;
+}
+
 .site-name p {
-	margin: 0;
-	padding: 10px;
+    margin: 0;
+    padding: 10px;
 }
 
 .search-form {
-	text-align: left;
+    text-align: left;
 }
 
+/* ボタンコンテナのスタイル */
 .button-container {
-	display: flex;
-	align-items: center;
+    display: flex;
+    align-items: center;
 }
 
+/* アクションボタンのスタイル */
 .action-button {
-	/* ボタンのスタイル */
-	
+    /* ボタンのスタイル */
 }
 
+/* アクションボタンのホバースタイル */
 .action-button:hover {
-	/* ボタンのホバースタイル */
-	
+    /* ボタンのホバースタイル */
 }
-
-
 </style>
+
 <body>
 <header>
-		<div class="site-name">
-			 <h1 style="font-size: 32px; cursor: pointer;" onclick="redirectToSellPage()">キャルション！</h1>
-<script>
-            function redirectToSellPage() {
-       window.location.href = '/afterLogin/sell'; 
-}
-</script>
+    <!-- サイト名 -->
+    <div class="site-name">
+         <h1 style="font-size: 32px; cursor: pointer;" onclick="redirectToSellPage()">キャルション！</h1>
+    </div>
+    <script>
+        // サイト名がクリックされたときに指定のページにリダイレクトする関数
+        function redirectToSellPage() {
+            window.location.href = '/afterLogin/sell'; 
+        }
+    </script>
 
-		</div>
-
-		<div sec:authorize="!isAuthenticated()" class="auth-buttons">
-			<form th:action="@{/sell/login}" method="get">
-				<button class="action-button">ログイン</button>
-			</form>
-		</div>
-
-		<!-- sec:authorizeを使って"isAuthenticated()"で認証済みかどうかを判定 -->
-		<!-- trueならば<div>内を表示 -->
-		<div sec:authorize="isAuthenticated()" class="user-info">
-			こんにちは：<span sec:authentication="name"></span>さん
-			<form th:action="@{/logout}" method="post"></form>
-
-			<div class="button-container" style="margin-top: -5px;">
-			
-				<form th:action="@{itemList}" method="get">
-					<button
-						style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
-
-				<form th:action="@{showMypage}" method="get">
-					<button
-						style="background: url('/image/mypageicon.png') no-repeat center center; width: 60px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
-				<form th:action="@{create}" method="get">
-					<button
-						style="background: url('/image/upload.png') no-repeat center center; width: 60px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
-				<form th:action="@{/logout}" method="post">
-					<button
-						style="background: url('/image/logoutbutton.png') no-repeat center center; width: 145px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
-			</div>
-
-		</div>
-	</header>
-    <!-- エラーメッセージの表示 -->
-     <div th:if="${error}" class="alert alert-danger">
-        <p th:text="${error}"></p>
-        <!-- エラーメッセージが存在する場合のみリンクを表示 -->
-        <a th:href="@{/afterLogin/create}" class="btn btn-primary">出品してみよう！</a>
+    <!-- 認証情報による表示切り替え -->
+    <div sec:authorize="!isAuthenticated()" class="auth-buttons">
+        <form th:action="@{/sell/login}" method="get">
+            <button class="action-button">ログイン</button>
+        </form>
     </div>
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>商品ID</th>
-                <th>商品名</th>
-                <th>商品の詳細</th>
-                <th>メールBox</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="goodsDTO : ${goodsList}">
-                <td th:text="${goodsDTO.goods_id}"></td>
-                <td th:text="${goodsDTO.name}"></td>
-                <td><a th:href="@{/afterLogin/product(productId=${goodsDTO.goods_id})}">詳細を見る</a></td>
-                <td><a
-                    th:href="@{/afterLogin/mailBox(goodsid=${goodsDTO.goods_id})}"
-                    th:text="${goodsDTO.readStatus}"></a></td>
-            </tr>
-        </tbody>
+    <!-- 認証済みユーザーの情報 -->
+    <div sec:authorize="isAuthenticated()" class="user-info">
+        こんにちは：<span sec:authentication="name"></span>さん
+        <form th:action="@{/logout}" method="post"></form>
 
-    </table>
+        <!-- ボタンコンテナ -->
+        <div class="button-container" style="margin-top: -5px;">
+            <!-- 各ボタンのスタイルとアクション -->
+            <form th:action="@{itemList}" method="get">
+                <button style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
+            </form>
 
+            <form th:action="@{showMypage}" method="get">
+                <button style="background: url('/image/mypageicon.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
+            </form>
+            <form th:action="@{create}" method="get">
+                <button style="background: url('/image/upload.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
+            </form>
+            <form th:action="@{/logout}" method="post">
+                <button style="background: url('/image/logoutbutton.png') no-repeat center center; width: 145px; height: 65px; border: none;" type="submit"></button>
+            </form>
+        </div>
+    </div>
+</header>
+
+<!-- エラーメッセージの表示 -->
+<div th:if="${error}" class="alert alert-danger">
+    <p th:text="${error}"></p>
+    <!-- エラーメッセージが存在する場合のみリンクを表示 -->
+    <a th:href="@{/afterLogin/create}" class="btn btn-primary">出品してみよう！</a>
+</div>
+
+<!-- 商品一覧のテーブル -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>商品ID</th>
+            <th>商品名</th>
+            <th>商品の詳細</th>
+            <th>メールBox</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- 商品情報を繰り返し表示 -->
+        <tr th:each="goodsDTO : ${goodsList}">
+            <td th:text="${goodsDTO.goods_id}"></td>
+            <td th:text="${goodsDTO.name}"></td>
+            <td><a th:href="@{/afterLogin/product(productId=${goodsDTO.goods_id})}">詳細を見る</a></td>
+            <td><a th:href="@{/afterLogin/mailBox(goodsid=${goodsDTO.goods_id})}" th:text="${goodsDTO.readStatus}"></a></td>
+        </tr>
+    </tbody>
+</table>
 </body>
-<style>
-h1 {
-	font-family: "Nico Moji";
-}
-
-.site-name {
-	background: #FFDA45; /*背景色の指定*/
-	color: #000000; /*テキストの色の指定*/
-	padding: 15px;
-	text-align: center;
-	width: 200px;
-}
-.site-name p {
-	margin: 0;
-	padding: 10px;
-}
-
-.search-form {
-	text-align: left;
-}
-
-.button-container {
-	display: flex;
-	align-items: center;
-}
-
-.action-button {
-	/* ボタンのスタイル */
-	
-}
-
-.action-button:hover {
-	/* ボタンのホバースタイル */
-	
-}
-</style>
 </html>
-

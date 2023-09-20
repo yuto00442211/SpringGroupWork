@@ -1,63 +1,136 @@
-
-
-<!-- update.html -->
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>問題更新</title>
+    <style>
+        /* スタイルの設定 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        /* フォーム全体のスタイル */
+        .update-form {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ラベルのスタイル */
+        label {
+            display: inline-block;
+            width: 150px;
+            font-weight: bold;
+        }
+
+        /* テキストエリアと入力フィールドのスタイル */
+        textarea,
+        input[type="text"],
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        /* 更新ボタンのスタイル */
+        .update-button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        /* 戻るボタンのスタイル */
+        .btn-secondary {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            background-color: #555;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 3px;
+        }
+
+        /* ボタンのホバースタイル */
+        .btn-secondary:hover {
+            background-color: #333;
+        }
+    </style>
 </head>
 <body>
-    <h2>問題更新</h2>
-    <!-- 問題更新用フォーム -->
-    <form th:action="@{/afterLogin/updateGood}" th:object="${updateGoods}" th:method="post" enctype="multipart/form-data">
+    <h2>商品情報更新</h2>
 
+    <!-- 問題更新用フォーム -->
+    <form th:action="@{/afterLogin/updateGood}" th:object="${updateGoods}" th:method="post" enctype="multipart/form-data" class="update-form">
 
         <!-- 隠しフィールド: 問題のID -->
-        <input type="hidden" th:field="*{goods_id}" /> 
+        <input type="hidden" th:field="*{goods_id}" />
+
+        <!-- 商品名 -->
         <p>
-            <label>商品名：</label>
-            <!-- 問題テキストの入力エリア -->
-            <textarea th:field="*{name}" rows="3" cols="50"></textarea>
+            <label for="name">商品名：</label>
+            <textarea th:field="*{name}" rows="3" cols="50" id="name"></textarea>
         </p>
+
+        <!-- ジャンルID -->
         <p>
-            <label>ジャンルID：</label>
-            <!-- 選択肢1の入力フィールド -->
-            <input th:field="*{genre_id}" />
+            <label for="genre_id">ジャンルID：</label>
+            <input th:field="*{genre_id}" id="genre_id" />
         </p>
+
+        <!-- 開始価格 -->
         <p>
-            <label>開始価格：</label>
-            <!-- 選択肢2の入力フィールド -->
-            <input th:field="*{initial_price}" />
+            <label for="initial_price">開始価格：</label>
+            <input th:field="*{initial_price}" id="initial_price" />
         </p>
+
+        <!-- 終了時間 -->
         <p>
-            <label>終了時間：</label>
-            <!-- 選択肢3の入力フィールド -->
-            <input th:field="*{end_time}" />
+            <label for="end_time">終了時間：</label>
+            <input th:field="*{end_time}" id="end_time" />
         </p>
+
+        <!-- ファイル名 -->
         <p>
-            <label>ファイル名：</label>
-            <!-- 選択肢4の入力フィールド -->
-            <span th:text="*{image_number}"></span>
+            <label for="image_number">ファイル名：</label>
+            <span th:text="*{image_number}" id="image_number"></span>
         </p>
+
+        <!-- 詳細 -->
         <p>
-            <label>詳細：</label>
-            <!-- 正解の選択肢を選ぶ入力フィールド -->
-            <input th:field="*{comment}" />
+            <label for="comment">詳細：</label>
+            <input th:field="*{comment}" id="comment" />
         </p>
-         <p>
-            <label>画像の更新及び追加：</label>
-            <!-- 画像のテキストの入力エリア -->
+
+        <!-- 画像の更新及び追加 -->
+        <p>
+            <label for="image">画像の更新及び追加：</label>
             <input type="file" class="form-control-file" id="image" name="image" accept="image/*">
         </p>
-               
-       	<p>
-            <!-- 更新ボタン -->
-            <button type="submit">更新</button>
+
+        <!-- 更新ボタン -->
+        <p>
+            <button type="submit" class="update-button">更新</button>
         </p>
     </form>
-    
-     <!-- ボタン -->
-        <a th:href="@{itemList}" class="btn btn-secondary">戻る</a>
+
+    <!-- 戻るボタン -->
+    <a th:href="@{itemList}" class="btn btn-secondary">戻る</a>
 </body>
 </html>

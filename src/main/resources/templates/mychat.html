@@ -1,349 +1,304 @@
 <!DOCTYPE html>
-<link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css"
-	rel="stylesheet">
-
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BugFix Web Page</title>
-<meta name="description"
-	content="sample text sample text sample text sample text sample text sample text ...">
+    <!-- 文字コードとビューポートの設定 -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ページタイトルとメタ情報の設定 -->
+    <title>BugFix Web Page</title>
+    <meta name="description" content="sample text sample text sample text sample text sample text sample text ...">
+    <!-- 外部フォントの読み込み -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <!-- スタイルシートの読み込み -->
+    <link rel="stylesheet" href="./assets/css/sanitize.css">
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <!-- ファビコンの設定 -->
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./assets/images/favicon/favicon-16x16.png">
+    <link rel="manifest" href="./assets/images/favicon/site.webmanifest">
+    <link rel="mask-icon" href="./assets/images/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    
+    <!-- ページ内のスタイル定義 -->
+    <style>
+        /* 全体の会話スタイル */
+        .c-talk {
+            border: 5px solid #A0C3D2; /* ボーダーの色 */
+        }
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link
-	href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap"
-	rel="stylesheet">
+        /* 会話ヘッダーのスタイル */
+        .c-talk__head {
+            background-color: #EAE0DA; /* タイトル背景色 */
+            padding: 10px;
+        }
 
-<link rel="stylesheet" href="./assets/css/sanitize.css">
-<link rel="stylesheet" href="./assets/css/style.css">
+        /* 会話本文のスタイル */
+        .c-talk__body {
+            background-color: #EAC7C7; /* 背景色 */
+            padding: 20px;
+        }
 
-<link rel="apple-touch-icon" sizes="180x180"
-	href="./assets/images/favicon/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32"
-	href="./assets/images/favicon/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16"
-	href="./assets/images/favicon/favicon-16x16.png">
-<link rel="manifest" href="./assets/images/favicon/site.webmanifest">
-<link rel="mask-icon"
-	href="./assets/images/favicon/safari-pinned-tab.svg" color="#5bbad5">
-<meta name="msapplication-TileColor" content="#da532c">
-<meta name="theme-color" content="#ffffff">
-<style>
-/* スタイルルールはここで1回だけ定義します */
-.c-talk {
-	border: 5px solid #A0C3D2; /* ボーダーの色 */
-}
+        /* アイコンのスタイル */
+        .c-talk__icon {
+            max-width: 50px;
+            min-width: 50px;
+        }
 
-.c-talk__head {
-	background-color: #EAE0DA; /* タイトル背景色 */
-	padding: 10px;
-}
+        .c-talk__icon img {
+            border-radius: 50%;
+        }
 
-.c-talk__body {
-	background-color: #EAC7C7; /* 背景色 */
-	padding: 20px;
-}
+        /* 吹き出しのスタイル */
+        .c-talk__fukidashi {
+            display: flex;
+        }
 
-.c-talk__icon {
-	max-width: 50px;
-	min-width: 50px;
-}
+        .c-talk__fukidashi+.c-talk__fukidashi {
+            margin-top: 30px;
+        }
 
-.c-talk__icon img {
-	border-radius: 50%;
-}
+        /* 左向きの吹き出しのスタイル */
+        .c-talk__fukidashi--left p {
+            margin-left: 25px;
+        }
 
-.c-talk__fukidashi {
-	display: flex;
-}
+        .c-talk__fukidashi--left p::before {
+            clip-path: polygon(100% 0%, 0% 50%, 100% 100%);
+            left: -15px;
+        }
 
-.c-talk__fukidashi+.c-talk__fukidashi {
-	margin-top: 30px;
-}
+        /* 右向きの吹き出しのスタイル */
+        .c-talk__fukidashi--right {
+            flex-direction: row-reverse;
+        }
 
-.c-talk__fukidashi--left p {
-	margin-left: 25px;
-}
+        .c-talk__fukidashi--right p {
+            margin-right: 25px;
+        }
 
-.c-talk__fukidashi--left p::before {
-	clip-path: polygon(100% 0%, 0% 50%, 100% 100%);
-	left: -15px;
-}
+        .c-talk__fukidashi--right p::before {
+            clip-path: polygon(0% 0%, 0% 100%, 100% 50%);
+            right: -15px;
+        }
 
-.c-talk__fukidashi--right {
-	flex-direction: row-reverse;
-}
+        /* 会話テキストのスタイル */
+        .c-talk__text {
+            max-width: 75%;
+            filter: drop-shadow(3px 3px 5px rgba(0, 0, 0, 0.3));
+            display: flex;
+            align-items: flex-start;
+            flex-direction: column;
+        }
 
-.c-talk__fukidashi--right p {
-	margin-right: 25px;
-}
+        .c-talk__text p {
+            position: relative;
+            display: inline-block;
+            color: #333333; /* 吹き出しの色 */
+            background-color: #EAE0DA; /* 吹き出しの背景色 */
+            padding: 10px;
+            border-radius: 20px;
+        }
 
-.c-talk__fukidashi--right p::before {
-	clip-path: polygon(0% 0%, 0% 100%, 100% 50%);
-	right: -15px;
-}
+        .c-talk__text p+p {
+            margin-top: 15px;
+        }
 
-.c-talk__text {
-	max-width: 75%;
-	filter: drop-shadow(3px 3px 5px rgba(0, 0, 0, 0.3));
-	display: flex;
-	align-items: flex-start;
-	flex-direction: column;
-}
+        .c-talk__text p::before {
+            content: "";
+            display: block;
+            width: 20px;
+            height: 15px;
+            background-color: #EAE0DA; /* 吹き出しの背景色 */
+            position: absolute;
+            top: 10px;
+        }
 
-.c-talk__text p {
-	position: relative;
-	display: inline-block;
-	color: #333333; /* 吹き出しの色 */
-	background-color: #EAE0DA; /* 吹き出しの背景色 */
-	padding: 10px;
-	border-radius: 20px;
-}
+        /* reset & base */
+        *, ::before, ::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Rounded Mplus 1c";
+        }
 
-.c-talk__text p+p {
-	margin-top: 15px;
-}
+        img {
+            width: auto;
+            max-width: 100%;
+            height: auto;
+        }
 
-.c-talk__text p::before {
-	content: "";
-	display: block;
-	width: 20px;
-	height: 15px;
-	background-color: #EAE0DA; /* 吹き出しの背景色 */
-	position: absolute;
-	top: 10px;
-}
+        /* チャット入力フィールドのスタイル */
+        .c-talk__send {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
 
-/* reset & base */
-*, ::before, ::after {
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
-	font-family: "Rounded Mplus 1c";
-}
+        .c-talk__input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+        }
 
-img {
-	width: auto;
-	max-width: 100%;
-	height: auto;
-}
+        .c-talk__send-btn {
+            padding: 10px 20px;
+            background-color: #A0C3D2;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            color: #ffffff;
+            transition: background-color 0.3s;
+        }
 
-.c-talk__send {
-	display: flex;
-	align-items: center;
-	padding: 10px;
-	border-top: 1px solid #ccc;
-}
+        .c-talk__send-btn:hover {
+            background-color: #7599A6;
+        }
 
-.c-talk__input {
-	flex: 1;
-	padding: 10px;
-	border-radius: 20px;
-	border: 1px solid #ccc;
-	margin-right: 10px;
-}
+        /* マイページへのリンクボタンのスタイル */
+        .mypage-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #A0C3D2;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            color: #ffffff;
+            text-decoration: none;
+            margin-bottom: 10px; /* チャットとの間にスペースを追加 */
+            transition: background-color 0.3s;
+        }
 
-.c-talk__send-btn {
-	padding: 10px 20px;
-	background-color: #A0C3D2;
-	border: none;
-	border-radius: 20px;
-	cursor: pointer;
-	color: #ffffff;
-	transition: background-color 0.3s;
-}
+        .mypage-button:hover {
+            background-color: #7599A6;
+        }
 
-.c-talk__send-btn:hover {
-	background-color: #7599A6;
-}
+        /* ヘッダーのスタイル */
+        header {
+            background-color: #f0f0f0;
+            color: rgb(0, 0, 0);
+            padding: 10px 0;
+            text-align: center;
+            display: flex;
+            justify-content: flex-start; /* 要素を左寄せに配置 */
+            align-items: center;
+        }
 
-.mypage-button {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #A0C3D2;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    color: #ffffff;
-    text-decoration: none;
-    margin-bottom: 10px;  /* チャットとの間にスペースを追加 */
-    transition: background-color 0.3s;
-}
+        .button-container {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+        }
 
-.mypage-button:hover {
-    background-color: #7599A6;
-}
+        .action-button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 10px; /* ボタン間の右側のマージン */
+        }
 
-header {
-	background-color: #f0f0f0;
-	color: rgb(0, 0, 0);
-	padding: 10px 0;
-	text-align: center;
-	display: flex;
-	justify-content: flex-start; /* 要素を左寄せに配置 */
-	align-items: center;
+        .action-button:last-child {
+            margin-right: 0; /* 最後のボタンにはマージンを適用しない */
+        }
 
-.button-container {
-	display: flex;
-	align-items: center;
-	margin-left: auto;
-}
+        .action-button:hover {
+            background-color: #2980b9;
+        }
 
-.action-button {
-	background-color: #3498db;
-	color: white;
-	padding: 10px 20px;
-	border: none;
-	border-radius: 3px;
-	cursor: pointer;
-	margin-right: 10px; /* ボタン間の右側のマージン */
-}
-
-.action-button:last-child {
-	margin-right: 0; /* 最後のボタンにはマージンを適用しない */
-}
-
-.action-button:hover {
-	background-color: #2980b9;
-}
-.user-info {
-	padding-left: 10px; /* 左側のパディング */
-	padding-right: 10px; /* 右側のパディング */
-}
-
-</style>
+        .user-info {
+            padding-left: 10px; /* 左側のパディング */
+            padding-right: 10px; /* 右側のパディング */
+        }
+    </style>
 </head>
 
 <body>
-<header>
-		<div class="site-name">
-			 <h1 style="font-size: 32px; cursor: pointer;" onclick="redirectToSellPage()">キャルション！</h1>
-<script>
-            function redirectToSellPage() {
-       window.location.href = '/afterLogin/sell'; 
-}
-</script>
+    <header>
+        <!-- サイト名の表示とクリック時のリダイレクト -->
+        <div class="site-name">
+            <h1 style="font-size: 32px; cursor: pointer;" onclick="redirectToSellPage()">キャルション！</h1>
+            <script>
+                function redirectToSellPage() {
+                    window.location.href = '/afterLogin/sell';
+                }
+            </script>
+        </div>
 
-		</div>
+        <!-- 認証ボタンの表示 -->
+        <div sec:authorize="!isAuthenticated()" class="auth-buttons">
+            <form th:action="@{/sell/login}" method="get">
+                <button class="action-button">ログイン</button>
+            </form>
+        </div>
 
-		<div sec:authorize="!isAuthenticated()" class="auth-buttons">
-			<form th:action="@{/sell/login}" method="get">
-				<button class="action-button">ログイン</button>
-			</form>
-		</div>
+        <!-- 認証情報の表示とログアウトボタン -->
+        <div sec:authorize="isAuthenticated()" class="user-info">
+            こんにちは：<span sec:authentication="name"></span>さん
+            <form th:action="@{/logout}" method="post"></form>
 
-		<!-- sec:authorizeを使って"isAuthenticated()"で認証済みかどうかを判定 -->
-		<!-- trueならば<div>内を表示 -->
-		<div sec:authorize="isAuthenticated()" class="user-info">
-			こんにちは：<span sec:authentication="name"></span>さん
-			<form th:action="@{/logout}" method="post"></form>
+            <!-- ボタンコンテナ -->
+            <div class="button-container" style="margin-top: -5px;">
+                <!-- 商品一覧へのリンクボタン -->
+                <form th:action="@{itemList}" method="get">
+                    <button style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
+                </form>
 
-			<div class="button-container" style="margin-top: -5px;">
-			
-				<form th:action="@{itemList}" method="get">
-					<button
-						style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
+                <!-- マイページへのリンクボタン -->
+                <form th:action="@{showMypage}" method="get">
+                    <button style="background: url('/image/mypageicon.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
+                </form>
 
-				<form th:action="@{showMypage}" method="get">
-					<button
-						style="background: url('/image/mypageicon.png') no-repeat center center; width: 60px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
-				<form th:action="@{create}" method="get">
-					<button
-						style="background: url('/image/upload.png') no-repeat center center; width: 60px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
-				<form th:action="@{/logout}" method="post">
-					<button
-						style="background: url('/image/logoutbutton.png') no-repeat center center; width: 145px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
-			</div>
+                <!-- アップロードページへのリンクボタン -->
+                <form th:action="@{create}" method="get">
+                    <button style="background: url('/image/upload.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
+                </form>
 
-		</div>
-	</header>
-<a th:href="@{/afterLogin/showbitMypage}" class="mypage-button">マイページにもどる</a>
-	<div class="c-talk">
-		<div class="c-talk__head">キャルション！チャット-入札-</div>
-		<div class="c-talk__body">
+                <!-- ログアウトボタン -->
+                <form th:action="@{/logout}" method="post">
+                    <button style="background: url('/image/logoutbutton.png') no-repeat center center; width: 145px; height: 65px; border: none;" type="submit"></button>
+                </form>
+            </div>
+        </div>
+    </header>
 
-			<!-- コメントを表示 -->
-			<div th:each="comment : ${comments}"
-				class="c-talk__fukidashi c-talk__fukidashi--left"
-				th:classappend="${comment.account_id == accountId} ? 'c-talk__fukidashi--right' : ''">
+    <!-- マイページへのリンクボタン -->
+    <a th:href="@{/afterLogin/showbitMypage}" class="mypage-button">マイページにもどる</a>
 
-
-
-				<div class="c-talk__icon">
-					<img
-						th:src="${comment.account_id == accountId} ? 'https://anpanstyle.com/wp-content/uploads/2023/01/icon01.png' : 'https://anpanstyle.com/wp-content/uploads/2023/01/icon02.png'"
-						alt="kuma">
-				</div>
-
-				<div class="c-talk__text">
-					<p th:text="${comment.comment_content}"></p>
-					<p th:text="${comment.comment_time}"></p>
-				</div>
-			</div>
-
-			<form th:action="@{/afterLogin/sendMessage}" method="post"
-				th:object="${commentForm}">
-				<div class="c-talk__send">
-					<!-- Hidden fields for goods_id and account_id -->
-					<input type="hidden" name="goods_id" th:value="${goodsId}" /> <input
-						type="hidden" name="account_id" th:value="${accountId}" />
-					<textarea th:field="*{comment_content}" class="c-talk__input"
-						placeholder="メッセージを入力..."></textarea>
-					<button type="submit" class="c-talk__send-btn">送信</button>
-				</div>
-			</form>
-
-		</div>
-	</div>
+    <!-- 会話コンテナ -->
+    <div class="c-talk">
+        <div class="c-talk__head">キャルション！チャット-入札-</div>
+        <div class="c-talk__body">
+            <!-- コメントを表示 -->
+            <div th:each="comment : ${comments}" class="c-talk__fukidashi c-talk__fukidashi--left" th:classappend="${comment.account_id == accountId} ? 'c-talk__fukidashi--right' : ''">
+                <div class="c-talk__icon">
+                    <img th:src="${comment.account_id == accountId} ? 'https://anpanstyle.com/wp-content/uploads/2023/01/icon01.png' : 'https://anpanstyle.com/wp-content/uploads/2023/01/icon02.png'" alt="kuma">
+                </div>
+                <div class="c-talk__text">
+                    <p th:text="${comment.comment_content}"></p>
+                    <p th:text="${comment.comment_time}"></p>
+                </div>
+            </div>
+            <!-- メッセージ送信フォーム -->
+            <form th:action="@{/afterLogin/sendMessage}" method="post" th:object="${commentForm}">
+                <div class="c-talk__send">
+                    <!-- Hidden fields for goods_id and account_id -->
+                    <input type="hidden" name="goods_id" th:value="${goodsId}" />
+                    <input type="hidden" name="account_id" th:value="${accountId}" />
+                    <textarea th:field="*{comment_content}" class="c-talk__input" placeholder="メッセージを入力..."></textarea>
+                    <button type="submit" class="c-talk__send-btn">送信</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
-
-<style>
-h1 {
-	font-family: "Nico Moji";
-}
-
-.site-name {
-	background: #FFDA45; /*背景色の指定*/
-	color: #000000; /*テキストの色の指定*/
-	padding: 15px;
-	text-align: center;
-	width: 200px;
-}
-.site-name p {
-	margin: 0;
-	padding: 10px;
-}
-
-.search-form {
-	text-align: left;
-}
-
-.button-container {
-	display: flex;
-	align-items: center;
-}
-
-.action-button {
-	/* ボタンのスタイル */
-	
-}
-
-.action-button:hover {
-	/* ボタンのホバースタイル */
-	
-}
-
-
-</style>
 </html>

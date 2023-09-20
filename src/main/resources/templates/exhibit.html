@@ -1,198 +1,217 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
 
-<title>キャルション - 出品</title>
-<style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f0f0f0;
-}
+    <title>キャルション - 出品</title>
+    
+    <style>
+    /* 全体のページスタイル */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f0f0;
+    }
 
-.sell-container {
-    max-width: 600px;
-    margin: 100px auto;
-    background-color: white;
-    border-radius: 5px;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-}
+    /* 出品フォームコンテナのスタイル */
+    .sell-container {
+        max-width: 600px;
+        margin: 100px auto;
+        background-color: white;
+        border-radius: 5px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+        padding: 20px;
+    }
 
-.sell-title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-align: center;
-}
+    /* 出品タイトルのスタイル */
+    .sell-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-align: center;
+    }
 
-.sell-form {
-    text-align: center;
-}
+    /* 出品フォームのスタイル */
+    .sell-form {
+        text-align: center;
+    }
 
-.sell-input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-    box-sizing: border-box; /* パディングとボーダーを含めたボックスサイズ */
-}
+    /* テキスト入力フィールドのスタイル */
+    .sell-input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        box-sizing: border-box; /* パディングとボーダーを含めたボックスサイズ */
+    }
 
-.sell-textarea {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-    resize: vertical;
-    box-sizing: border-box; /* パディングとボーダーを含めたボックスサイズ */
-}
+    /* テキストエリアのスタイル */
+    .sell-textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        resize: vertical;
+        box-sizing: border-box; /* パディングとボーダーを含めたボックスサイズ */
+    }
 
-.sell-select {
-    padding: 5px;
-    width: 100%; /* 幅を100%に設定 */
-}
+    /* セレクトボックスのスタイル */
+    .sell-select {
+        padding: 5px;
+        width: 100%; /* 幅を100%に設定 */
+    }
 
-.sell-button {
-    background-color: #3498db;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-}
+    /* 出品ボタンのスタイル */
+    .sell-button {
+        background-color: #3498db;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
 
-.sell-button:hover {
-    background-color: #2980b9;
-}
+    /* 出品ボタンのホバースタイル */
+    .sell-button:hover {
+        background-color: #2980b9;
+    }
 
-header {
-    background-color: #f0f0f0;
-    color: rgb(0, 0, 0);
-    padding: 10px 0;
-    text-align: center;
-    display: flex;
-    justify-content: flex-start; /* 要素を左寄せに配置 */
-    align-items: center;
-}
+    /* ヘッダーのスタイル */
+    header {
+        background-color: #f0f0f0;
+        color: rgb(0, 0, 0);
+        padding: 10px 0;
+        text-align: center;
+        display: flex;
+        justify-content: flex-start; /* 要素を左寄せに配置 */
+        align-items: center;
+    }
 
-.button-container {
-    display: flex;
-    align-items: center;
-    margin-left: auto;
-}
+    /* ボタンコンテナのスタイル */
+    .button-container {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+    }
 
-.action-button {
-    background-color: #3498db;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    margin-right: 10px; /* ボタン間の右側のマージン */
-}
+    /* アクションボタンのスタイル */
+    .action-button {
+        background-color: #3498db;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        margin-right: 10px; /* ボタン間の右側のマージン */
+    }
 
-.action-button:last-child {
-    margin-right: 0; /* 最後のボタンにはマージンを適用しない */
-}
+    /* 最後のアクションボタンにはマージンを適用しない */
+    .action-button:last-child {
+        margin-right: 0;
+    }
 
-.action-button:hover {
-    background-color: #2980b9;
-}
+    /* アクションボタンのホバースタイル */
+    .action-button:hover {
+        background-color: #2980b9;
+    }
 
-.user-info {
-    padding-left: 10px; /* 左側のパディング */
-    padding-right: 10px; /* 右側のパディング */
-}
-</style>
+    /* ユーザー情報のスタイル */
+    .user-info {
+        padding-left: 10px; /* 左側のパディング */
+        padding-right: 10px; /* 右側のパディング */
+    }
+    </style>
 </head>
 <body>
 <header>
+    <!-- サイト名 -->
     <div class="site-name">
-         <h1 style="font-size: 32px; cursor: pointer;" onclick="redirectToSellPage()">キャルション！</h1>
+        <h1 style="font-size: 32px; cursor: pointer;" onclick="redirectToSellPage()">キャルション！</h1>
         <script>
+            // サイト名がクリックされたときに指定のページにリダイレクトする関数
             function redirectToSellPage() {
                 window.location.href = '/afterLogin/sell'; 
             }
         </script>
     </div>
 
+    <!-- ログインボタン（未認証ユーザー向け） -->
     <div sec:authorize="!isAuthenticated()" class="auth-buttons">
         <form th:action="@{/sell/login}" method="get">
             <button class="action-button">ログイン</button>
         </form>
     </div>
 
-    <!-- sec:authorizeを使って"isAuthenticated()"で認証済みかどうかを判定 -->
-    <!-- trueならば<div>内を表示 -->
+    <!-- ユーザー情報（認証済みユーザー向け） -->
     <div sec:authorize="isAuthenticated()" class="user-info">
         こんにちは：<span sec:authentication="name"></span>さん
         <form th:action="@{/logout}" method="post"></form>
 
+        <!-- ボタンコンテナ -->
         <div class="button-container" style="margin-top: -5px;">
+            <!-- 各ボタンのスタイルとアクション -->
             <form th:action="@{itemList}" method="get">
-                <button
-                    style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;"
-                    type="submit"></button>
+                <button style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
             </form>
 
             <form th:action="@{showMypage}" method="get">
-                <button
-                    style="background: url('/image/mypageicon.png') no-repeat center center; width: 60px; height: 65px; border: none;"
-                    type="submit"></button>
+                <button style="background: url('/image/mypageicon.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
             </form>
             <form th:action="@{create}" method="get">
-                <button
-                    style="background: url('/image/upload.png') no-repeat center center; width: 60px; height: 65px; border: none;"
-                    type="submit"></button>
+                <button style="background: url('/image/upload.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
             </form>
             <form th:action="@{/logout}" method="post">
-                <button
-                    style="background: url('/image/logoutbutton.png') no-repeat center center; width: 145px; height: 65px; border: none;"
-                    type="submit"></button>
+                <button style="background: url('/image/logoutbutton.png') no-repeat center center; width: 145px; height: 65px; border: none;" type="submit"></button>
             </form>
         </div>
     </div>
 </header>
+
+<!-- 出品フォームコンテナ -->
 <div class="sell-container">
+    <!-- 出品タイトル -->
     <div class="sell-title">商品を出品する</div>
     <div class="sell-form">
-        <form method="POST" th:action="@{/afterLogin/create}"
-            th:object="${goodsForm}" enctype="multipart/form-data">
+        <!-- 出品フォーム -->
+        <form method="POST" th:action="@{/afterLogin/create}" th:object="${goodsForm}" enctype="multipart/form-data">
+            <!-- バリデーションエラーメッセージの表示 -->
             <div th:if="${validationError}" th:each="error : ${validationError}">
                 <label class="text-danger" th:text="${error}"></label>
             </div>
-            <input class="sell-input" type="text" th:field="*{name}"
-                placeholder="商品名">
-            <input class="sell-input" type="number"
-                th:field="*{initial_price}" placeholder="開始価格">
+            <!-- 商品名入力フィールド -->
+            <input class="sell-input" type="text" th:field="*{name}" placeholder="商品名">
+            <!-- 開始価格入力フィールド -->
+            <input class="sell-input" type="number" th:field="*{initial_price}" placeholder="開始価格">
+            <!-- 終了時間選択 -->
             <label>終了時間：</label>
-            <input class="sell-input" type="datetime-local"
-                th:field="*{endtime}" id="endTime">
+            <input class="sell-input" type="datetime-local" th:field="*{endtime}" id="endTime">
+            <!-- ジャンル選択 -->
             <label for="genre">ジャンル：</label>
-            <select class="sell-select" id="genre" name="genre"
-                th:field="*{genre_id}">
-                <option th:each="product : ${genreList}"
-                    th:value="${product.genre_id}" th:text="${product.genreName}"></option>
+            <select class="sell-select" id="genre" name="genre" th:field="*{genre_id}">
+                <option th:each="product : ${genreList}" th:value="${product.genre_id}" th:text="${product.genreName}"></option>
             </select>
-            <textarea class="sell-textarea" th:field="*{comment}"
-                placeholder="商品説明"></textarea>
+            <!-- 商品説明テキストエリア -->
+            <textarea class="sell-textarea" th:field="*{comment}" placeholder="商品説明"></textarea>
+            <!-- 商品画像アップロード -->
             <input class="sell-input" type="file" name="file" accept="image/*">
+            <!-- 出品ボタン -->
             <button class="sell-button" type="submit">出品する</button>
         </form>
     </div>
 </div>
 </body>
 <style>
+/* h1要素のスタイル */
 h1 {
     font-family: "Nico Moji";
 }
 
+/* サイト名のスタイル */
 .site-name {
     background: #FFDA45; /*背景色の指定*/
     color: #000000; /*テキストの色の指定*/
@@ -200,6 +219,7 @@ h1 {
     text-align: center;
     width: 200px;
 }
+
 .site-name p {
     margin: 0;
     padding: 10px;
@@ -216,12 +236,10 @@ h1 {
 
 .action-button {
     /* ボタンのスタイル */
-
 }
 
 .action-button:hover {
     /* ボタンのホバースタイル */
-
 }
 </style>
 </html>

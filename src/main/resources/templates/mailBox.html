@@ -1,169 +1,137 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org">
-<link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css"
-	rel="stylesheet">
-
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+    <!-- Google Fontsのスタイルシートを読み込み -->
+    <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header>
+        <div class="site-name">
+            <!-- サイト名とリダイレクトのJavaScript関数 -->
+            <h1 style="font-size: 32px; cursor: pointer;" onclick="redirectToSellPage()">キャルション！</h1>
+            <script>
+                // サイト名クリック時のリダイレクト関数
+                function redirectToSellPage() {
+                    window.location.href = '/afterLogin/sell';
+                }
+            </script>
+        </div>
+
+        <!-- ログイン・ログアウトボタン -->
+        <div sec:authorize="!isAuthenticated()" class="auth-buttons">
+            <form th:action="@{/sell/login}" method="get">
+                <button class="action-button">ログイン</button>
+            </form>
+        </div>
+
+        <!-- sec:authorizeを使って"isAuthenticated()"で認証済みかどうかを判定 -->
+        <!-- trueならば<div>内を表示 -->
+        <div sec:authorize="isAuthenticated()" class="user-info">
+            <!-- ユーザー情報表示 -->
+            こんにちは：<span sec:authentication="name"></span>さん
+            <form th:action="@{/logout}" method="post"></form>
+
+            <!-- ボタンコンテナ -->
+            <div class="button-container" style="margin-top: -5px;">
+                <!-- 各種アクションへのボタン -->
+                <form th:action="@{itemList}" method="get">
+                    <button style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
+                </form>
+
+                <form th:action="@{showMypage}" method="get">
+                    <button style="background: url('/image/mypageicon.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
+                </form>
+                <form th:action="@{create}" method="get">
+                    <button style="background: url('/image/upload.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
+                </form>
+                <form th:action="@{/logout}" method="post">
+                    <button style="background: url('/image/logoutbutton.png') no-repeat center center; width: 145px; height: 65px; border: none;" type="submit"></button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- メール一覧テーブル -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>商品ID</th>
+                <th>送信者</th>
+                <th>チャットページへ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- メールリストの繰り返し処理 -->
+            <tr th:each="mail : ${mailList}">
+                <!-- 各セルにデータを表示 -->
+                <td th:text="${mail.goods_id}"></td>
+                <td th:text="${mail.account_id}"></td>
+                <td>
+                    <!-- チャットページへのリンク -->
+                    <a th:href="@{/afterLogin/mychat2(account_id=${mail.account_id}, goods_id=${mail.goods_id})}" th:text="${mail.is_approved} ? '新着メッセージはありません' : '新着メッセージあり'}"></a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
 <style>
-
-header {
-	background-color: #f0f0f0;
-	color: rgb(0, 0, 0);
-	padding: 10px 0;
-	text-align: center;
-	display: flex;
-	justify-content: flex-start; /* 要素を左寄せに配置 */
-	align-items: center;
-
-.button-container {
-	display: flex;
-	align-items: center;
-	margin-left: auto;
+/* ページ全体のスタイル */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
 }
 
+/* サイト名のスタイル */
+.site-name {
+    background-color: #f0f0f0;
+    color: rgb(0, 0, 0);
+    padding: 10px 0;
+    text-align: center;
+    display: flex;
+    justify-content: flex-start; /* 要素を左寄せに配置 */
+    align-items: center;
+}
+
+.site-name p {
+    margin: 0;
+    padding: 10px;
+}
+
+/* ボタンコンテナのスタイル */
+.button-container {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+/* アクションボタンのスタイル */
 .action-button {
-	background-color: #3498db;
-	color: white;
-	padding: 10px 20px;
-	border: none;
-	border-radius: 3px;
-	cursor: pointer;
-	margin-right: 10px; /* ボタン間の右側のマージン */
+    background-color: #3498db;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-right: 10px; /* ボタン間の右側のマージン */
 }
 
 .action-button:last-child {
-	margin-right: 0; /* 最後のボタンにはマージンを適用しない */
+    margin-right: 0; /* 最後のボタンにはマージンを適用しない */
 }
 
 .action-button:hover {
-	background-color: #2980b9;
+    background-color: #2980b9;
 }
+
+/* ユーザー情報のスタイル */
 .user-info {
-	padding-left: 10px; /* 左側のパディング */
-	padding-right: 10px; /* 右側のパディング */
+    padding-left: 10px; /* 左側のパディング */
+    padding-right: 10px; /* 右側のパディング */
 }
-
-</style>
-<link
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-	rel="stylesheet">
-</head>
-<body>
-
-<header>
-		<div class="site-name">
-			 <h1 style="font-size: 32px; cursor: pointer;" onclick="redirectToSellPage()">キャルション！</h1>
-<script>
-            function redirectToSellPage() {
-       window.location.href = '/afterLogin/sell'; 
-}
-</script>
-
-		</div>
-
-		<div sec:authorize="!isAuthenticated()" class="auth-buttons">
-			<form th:action="@{/sell/login}" method="get">
-				<button class="action-button">ログイン</button>
-			</form>
-		</div>
-
-		<!-- sec:authorizeを使って"isAuthenticated()"で認証済みかどうかを判定 -->
-		<!-- trueならば<div>内を表示 -->
-		<div sec:authorize="isAuthenticated()" class="user-info">
-			こんにちは：<span sec:authentication="name"></span>さん
-			<form th:action="@{/logout}" method="post"></form>
-
-			<div class="button-container" style="margin-top: -5px;">
-			
-				<form th:action="@{itemList}" method="get">
-					<button
-						style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
-
-				<form th:action="@{showMypage}" method="get">
-					<button
-						style="background: url('/image/mypageicon.png') no-repeat center center; width: 60px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
-				<form th:action="@{create}" method="get">
-					<button
-						style="background: url('/image/upload.png') no-repeat center center; width: 60px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
-				<form th:action="@{/logout}" method="post">
-					<button
-						style="background: url('/image/logoutbutton.png') no-repeat center center; width: 145px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
-			</div>
-
-		</div>
-	</header>
-	<table class="table table-striped">
-		<thead>
-			<tr>
-				<th>商品ID</th>
-				<th>送信者</th>
-				<th>チャットページへ</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr th:each="mail : ${mailList}">
-				<td th:text="${mail.goods_id}"></td>
-				<td th:text="${mail.account_id}"></td>
-				<td><a
-					th:href="@{/afterLogin/mychat2(account_id=${mail.account_id}, goods_id=${mail.goods_id})}"
-					th:text="${mail.is_approved} ? '新着メッセージはありません' : '新着メッセージあり'"> </a></td>
-			</tr>
-		</tbody>
-	</table>
-
-</body>
-
-<style>
-
-h1 {
-	font-family: "Nico Moji";
-}
-
-.site-name {
-	background: #FFDA45; /*背景色の指定*/
-	color: #000000; /*テキストの色の指定*/
-	padding: 15px;
-	text-align: center;
-	width: 200px;
-}
-.site-name p {
-	margin: 0;
-	padding: 10px;
-}
-
-.search-form {
-	text-align: left;
-}
-
-.button-container {
-	display: flex;
-	align-items: center;
-}
-
-.action-button {
-	/* ボタンのスタイル */
-	
-}
-
-.action-button:hover {
-	/* ボタンのホバースタイル */
-	
-}
-
-
-
-
-
 </style>
 </html>
-

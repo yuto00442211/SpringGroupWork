@@ -1,193 +1,237 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css"
-	rel="stylesheet">
 <head>
-<meta charset="UTF-8">
-<title>itemList</title>
+    <meta charset="UTF-8">
+    <title>itemList</title>
+    <!-- Google Fontsのスタイルシートを読み込み -->
+    <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
 
-<style>
-header {
-	background-color: #f0f0f0;
-	color: rgb(0, 0, 0);
-	padding: 10px 0;
-	text-align: center;
-	display: flex;
-	justify-content: flex-start; /* 要素を左寄せに配置 */
-	align-items: center;
-}
+    <style>
+    /* ヘッダーのスタイル */
+    header {
+        background-color: #f0f0f0;
+        color: rgb(0, 0, 0);
+        padding: 10px 0;
+        text-align: center;
+        display: flex;
+        justify-content: flex-start; /* 要素を左寄せに配置 */
+        align-items: center;
+    }
 
-.button-container {
-	display: flex;
-	align-items: center;
-	margin-left: auto;
-}
+    /* ボタンコンテナのスタイル */
+    .button-container {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+    }
 
-.action-button {
-	background-color: #3498db;
-	color: white;
-	padding: 10px 20px;
-	border: none;
-	border-radius: 3px;
-	cursor: pointer;
-	margin-right: 10px; /* ボタン間の右側のマージン */
-}
+    /* アクションボタンのスタイル */
+    .action-button {
+        background-color: #3498db;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        margin-right: 10px; /* ボタン間の右側のマージン */
+        transition: background-color 0.3s ease-in-out; /* ホバーアニメーション */
+    }
 
-.action-button:last-child {
-	margin-right: 0; /* 最後のボタンにはマージンを適用しない */
-}
+    /* 最後のアクションボタンにはマージンを適用しない */
+    .action-button:last-child {
+        margin-right: 0;
+    }
 
-.action-button:hover {
-	background-color: #2980b9;
-}
+    /* アクションボタンのホバースタイル */
+    .action-button:hover {
+        background-color: #2980b9;
+    }
 
-.user-info {
-	padding-left: 10px; /* 左側のパディング */
-	padding-right: 10px; /* 右側のパディング */
-}
-</style>
-<link
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-	rel="stylesheet">
+    /* ユーザー情報のスタイル */
+    .user-info {
+        padding-left: 10px; /* 左側のパディング */
+        padding-right: 10px; /* 右側のパディング */
+    }
+
+    /* コンテナ全体の余白設定 */
+    .container {
+        margin-top: 5%;
+    }
+
+    /* セクション見出しのスタイル */
+    h2 {
+        text-align: center;
+    }
+
+    /* 商品テーブルのスタイル */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    /* テーブルヘッダーのスタイル */
+    th {
+        background-color: #3498db;
+        color: white;
+        font-weight: bold;
+    }
+
+    /* テーブルセルのスタイル */
+    td {
+        padding: 8px;
+        text-align: center;
+    }
+
+    /* 商品画像のスタイル */
+    img {
+        max-width: 100px;
+        max-height: 70px;
+    }
+
+    /* ボタンのスタイル */
+    .btn {
+        margin-top: 10px;
+    }
+    </style>
+
+    <!-- Bootstrapのスタイルシートを読み込み -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+    <header>
+        <div class="site-name">
+            <h1 style="font-size: 32px; cursor: pointer;" onclick="redirectToSellPage()">キャルション！</h1>
+            <script>
+                // サイト名クリック時のリダイレクト関数
+                function redirectToSellPage() {
+                    window.location.href = '/afterLogin/sell';
+                }
+            </script>
+        </div>
 
-	<header>
-		<div class="site-name">
-			<h1 style="font-size: 32px; cursor: pointer;"
-				onclick="redirectToSellPage()">キャルション！</h1>
-			<script>
-            function redirectToSellPage() {
-       window.location.href = '/afterLogin/sell'; 
-}
-</script>
+        <div sec:authorize="!isAuthenticated()" class="auth-buttons">
+            <!-- ログインフォーム -->
+            <form th:action="@{/sell/login}" method="get">
+                <button class="action-button">ログイン</button>
+            </form>
+        </div>
 
-		</div>
+        <!-- 認証済みユーザー情報表示 -->
+        <div sec:authorize="isAuthenticated()" class="user-info">
+            こんにちは：<span sec:authentication="name"></span>さん
+            <form th:action="@{/logout}" method="post"></form>
 
-		<div sec:authorize="!isAuthenticated()" class="auth-buttons">
-			<form th:action="@{/sell/login}" method="get">
-				<button class="action-button">ログイン</button>
-			</form>
-		</div>
+            <!-- アクションボタンコンテナ -->
+            <div class="button-container" style="margin-top: -5px;">
+                <!-- 商品一覧へのリンクボタン -->
+                <form th:action="@{itemList}" method="get">
+                    <button style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
+                </form>
 
-		<!-- sec:authorizeを使って"isAuthenticated()"で認証済みかどうかを判定 -->
-		<!-- trueならば<div>内を表示 -->
-		<div sec:authorize="isAuthenticated()" class="user-info">
-			こんにちは：<span sec:authentication="name"></span>さん
-			<form th:action="@{/logout}" method="post"></form>
+                <!-- マイページへのリンクボタン -->
+                <form th:action="@{showMypage}" method="get">
+                    <button style="background: url('/image/mypageicon.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
+                </form>
 
-			<div class="button-container" style="margin-top: -5px;">
+                <!-- 商品出品ページへのリンクボタン -->
+                <form th:action="@{create}" method="get">
+                    <button style="background: url('/image/upload.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
+                </form>
 
-				<form th:action="@{itemList}" method="get">
-					<button
-						style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
+                <!-- ログアウトボタン -->
+                <form th:action="@{/logout}" method="post">
+                    <button style="background: url('/image/logoutbutton.png') no-repeat center center; width: 145px; height: 65px; border: none;" type="submit"></button>
+                </form>
+            </div>
+        </div>
+    </header>
 
-				<form th:action="@{showMypage}" method="get">
-					<button
-						style="background: url('/image/mypageicon.png') no-repeat center center; width: 60px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
-				<form th:action="@{create}" method="get">
-					<button
-						style="background: url('/image/upload.png') no-repeat center center; width: 60px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
-				<form th:action="@{/logout}" method="post">
-					<button
-						style="background: url('/image/logoutbutton.png') no-repeat center center; width: 145px; height: 65px; border: none;"
-						type="submit"></button>
-				</form>
-			</div>
+    <!-- コンテンツコンテナ -->
+    <div class="container mt-5">
+        <!-- セクション見出し -->
+        <h2><a th:href="@{/afterLogin/sell}"></a> <span th:text="${genre}"></span></h2>
 
-		</div>
-	</header>
-	<div class="container mt-5">
-		<h2>
-			<a th:href="@{/afterLogin/sell}"></a> <span th:text="${genre}"></span>
-		</h2>
-		<table class="table table-striped">
-			<thead>
-				<tr>
-					<th>商品ID</th>
-					<th>商品名</th>
-					<th>価格</th>
-					<th>入札数</th>
-					<th>終了時間</th>
-					<th>画像アイコンが作れたら実装</th>
-					<th>商品ページへ</th>
-					<th th:if="${RoleAdmin}">編集</th>
-					<th th:if="${RoleAdmin}">削除</th>
+        <!-- 商品リストテーブル -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>商品ID</th>
+                    <th>商品名</th>
+                    <th>価格</th>
+                    <th>入札数</th>
+                    <th>終了時間</th>
+                    <th>画像アイコンが作れたら実装</th>
+                    <th>商品ページへ</th>
+                    <!-- 管理者権限の場合のみ表示 -->
+                    <th th:if="${RoleAdmin}">編集</th>
+                    <th th:if="${RoleAdmin}">削除</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- データを繰り返し処理 -->
+                <tr th:each="itemList : ${productList}">
+                    <!-- 各セルにデータを表示 -->
+                    <td th:text="${itemList.goods_id}"></td>
+                    <td th:text="${itemList.name}"></td>
+                    <td th:text="${itemList.current_price}"></td>
+                    <td th:text="${itemList.bidcount}"></td>
+                    <td th:text="${itemList.end_time}"></td>
+                    <td><img th:src="@{'/images/' + ${itemList.image_number}}" alt="Product Image" width="100" height="70" /></td>
+                    <!-- 詳細ページへのボタン -->
+                    <td><a th:if="${RoleYes}" th:href="@{/afterLogin/product(productId=${itemList.goods_id})}">商品ページ</a>
+                        <span th:unless="${RoleYes}"><a th:href="@{/sell/login}">欲しい！会員登録する</a></span>
+                    </td>
+                    <!-- 管理者権限の場合のみ表示 -->
+                    <td th:if="${RoleAdmin}"><a th:href="@{/afterLogin/update(goods_id=${itemList.goods_id})}">編集</a></td>
+                    <td th:if="${RoleAdmin}"><a th:href="@{/afterLogin/delete(goods_id=${itemList.goods_id})}">削除</a></td>
+                </tr>
+            </tbody>
+        </table>
 
+        <!-- 戻るボタン -->
+        <a th:href="@{/afterLogin/sell}" class="btn btn-secondary">戻る</a>
+    </div>
 
+    <style>
+    /* h1要素のスタイル */
+    h1 {
+        font-family: "Nico Moji";
+    }
 
-				</tr>
-			</thead>
-			<tbody>
-				<!-- データを繰り返し処理 -->
-				<tr th:each="itemList : ${productList}">
-					<!-- 各セルにデータを表示 -->
-					<td th:text="${itemList.goods_id}"></td>
-					<td th:text="${itemList.name}"></td>
-					<td th:text="${itemList.current_price}"></td>
-					<td th:text="${itemList.bidcount}"></td>
-					<td th:text="${itemList.end_time}"></td>
-					<td><img th:src="@{'/images/' + ${itemList.image_number}}"
-						alt="Product Image" width="100" height="70" /></td>
-					<!-- 詳細ページへのボタン -->
-					<td><a th:if="${RoleYes}"
-						th:href="@{/afterLogin/product(productId=${itemList.goods_id})}">商品ページ</a>
-						<span th:unless="${RoleYes}"><a th:href="@{/sell/login}">欲しい！会員登録する</a></span>
-					</td>
-					<td th:if="${RoleAdmin}"><a
-						th:href="@{/afterLogin/update(goods_id=${itemList.goods_id})}">編集</a></td>
-					<td th:if="${RoleAdmin}"><a
-						th:href="@{/afterLogin/delete(goods_id=${itemList.goods_id})}">削除</a></td>
+    /* サイト名のスタイル */
+    .site-name {
+        background: #FFDA45; /*背景色の指定*/
+        color: #000000; /*テキストの色の指定*/
+        padding: 15px;
+        text-align: center;
+        width: 200px;
+    }
 
-				</tr>
-			</tbody>
-		</table>
-		<!-- ボタン -->
-		<a th:href="@{/afterLogin/sell}" class="btn btn-secondary">戻る</a>
-	</div>
+    .site-name p {
+        margin: 0;
+        padding: 10px;
+    }
+
+    /* 検索フォームのスタイル */
+    .search-form {
+        text-align: left;
+    }
+
+    /* ボタンコンテナのスタイル */
+    .button-container {
+        display: flex;
+        align-items: center;
+    }
+
+    /* アクションボタンのスタイル */
+    .action-button {
+        /* ボタンのスタイル */
+    }
+
+    /* アクションボタンのホバースタイル */
+    .action-button:hover {
+        /* ボタンのホバースタイル */
+    }
+    </style>
 </body>
-
-<style>
-h1 {
-	font-family: "Nico Moji";
-}
-
-.site-name {
-	background: #FFDA45; /*背景色の指定*/
-	color: #000000; /*テキストの色の指定*/
-	padding: 15px;
-	text-align: center;
-	width: 200px;
-}
-
-.site-name p {
-	margin: 0;
-	padding: 10px;
-}
-
-.search-form {
-	text-align: left;
-}
-
-.button-container {
-	display: flex;
-	align-items: center;
-}
-
-.action-button {
-	/* ボタンのスタイル */
-	
-}
-
-.action-button:hover {
-	/* ボタンのホバースタイル */
-	
-}
-</style>
 </html>
