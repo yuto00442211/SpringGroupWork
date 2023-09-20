@@ -86,12 +86,12 @@ public class GoodsService {
 		}
 		
 		//落札出来たかどうか
-		public boolean timeUp(LocalDateTime nowTime,LocalDateTime endTime,int goods_id,Bitinfo mybit) {
+		public boolean timeUp(LocalDateTime nowTime,LocalDateTime endTime,Goods g,Bitinfo mybit) {
 			
 			boolean xxx = nowTime.isAfter(endTime);
 			
 			if(xxx) {
-				if(mybit.getCurrent_price()==bitinfoService.highPrice(goods_id)) {
+				if(mybit.getCurrent_price()==bitinfoService.highPrice(g)) {
 				}else {
 					xxx = false;
 				}

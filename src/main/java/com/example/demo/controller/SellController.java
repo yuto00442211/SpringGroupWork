@@ -63,13 +63,8 @@ public class SellController {
 		//		List<Goods> productList = new ArrayList<>();//最新の金額に変更したGoodsを入れるリスト
 
 		for(Goods g :dataList) {
-			int goodsId=g.getGoods_id();
-			if(bitinfoService.highPrice(goodsId)!=0) {
-				g.setInitial_price(bitinfoService.highPrice(goodsId));
-			}
-			//			productList.add(g);
+			g.setInitial_price(bitinfoService.highPrice(g));
 		}
-
 		List<Genre> genreList = genreService.getAllGenre();
 		model.addAttribute("genreList", genreList);
 
@@ -92,7 +87,7 @@ public class SellController {
 		if (product != null) { // 商品が存在する場合のみ処理を行う
 			String remainingTime = calculateRemainingTime(product.getEnd_time());
 			
-			int current_price = bitinfoService.highPrice(productId);
+			int current_price = bitinfoService.highPrice(product);
 			model.addAttribute("current_price", current_price);
 		
 

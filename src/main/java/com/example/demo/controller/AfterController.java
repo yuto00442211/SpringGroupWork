@@ -597,7 +597,7 @@ public class AfterController {
 				bitinfoDTO.setCurrent_price(bitinfo.getCurrent_price());
 				bitinfoDTO.setGoods_id(bitinfo.getGoods_id());
 				bitinfoDTO.setNotlook(commentService.existsUnapprovedComments(bitinfo.getGoods_id(), goodsaccount_id));
-				bitinfoDTO.setTimeup(goodsservice.timeUp(LocalDateTime.now(),item.getEnd_time(),bitinfo.getGoods_id(),bitinfo));
+				bitinfoDTO.setTimeup(goodsservice.timeUp(LocalDateTime.now(),item.getEnd_time(),item,bitinfo));
 
 				System.out.println(bitinfoDTO.isTimeup());
 
@@ -842,7 +842,7 @@ public class AfterController {
 				bitinfoDTO.setCurrent_price(bitinfo.getCurrent_price());
 				bitinfoDTO.setGoods_id(bitinfo.getGoods_id());
 				bitinfoDTO.setNotlook(commentService.existsUnapprovedComments(bitinfo.getGoods_id(), goodsaccount_id));
-				bitinfoDTO.setTimeup(goodsservice.timeUp(LocalDateTime.now(),item.getEnd_time(),bitinfo.getGoods_id(),bitinfo));
+				bitinfoDTO.setTimeup(goodsservice.timeUp(LocalDateTime.now(),item.getEnd_time(),item,bitinfo));
 				bitinfoDTO.setName(item.getName());
 				System.out.println(bitinfoDTO.isTimeup());
 
