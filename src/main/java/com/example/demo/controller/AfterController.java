@@ -38,17 +38,20 @@ import com.example.demo.Form.GoodsForm;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.Bitinfo;
 import com.example.demo.entity.Comment;
+import com.example.demo.entity.Dropgoods;
 import com.example.demo.entity.Genre;
 import com.example.demo.entity.Goods;
 import com.example.demo.entity.GoodsList;
 import com.example.demo.entity.MyRequestData;
 import com.example.demo.repositry.AccountRepositry;
 import com.example.demo.repositry.BitRepositry;
+import com.example.demo.repositry.DropgoodsRepository;
 import com.example.demo.repositry.GenreRepository;
 import com.example.demo.repositry.GoodsRepositry;
 import com.example.demo.service.AccountService;
 import com.example.demo.service.BitinfoService;
 import com.example.demo.service.CommentService;
+import com.example.demo.service.DropgoodsService;
 import com.example.demo.service.GenreService;
 import com.example.demo.service.GoodsListService;
 import com.example.demo.service.GoodsService;
@@ -72,7 +75,11 @@ public class AfterController {
 	@Autowired
 	private GoodsService goodsservice;
 	@Autowired
-	private BitRepositry bitRepositry;  
+	private BitRepositry bitRepositry; 
+	@Autowired
+	private DropgoodsService dropgoodsService;
+	@Autowired
+	private DropgoodsRepository dropgoodsRepository;
 	@Autowired
 	private GoodsListService goodsListService ;
 	@Autowired
@@ -887,23 +894,28 @@ public class AfterController {
 		return"game";
 	}
 
+
 	@GetMapping("/buy")
-	public String showBuypage(@RequestParam(name = "goods_id") int goodsId,Model model) {
+	public String showBuypage(@RequestParam(name = "goods_id") int goodsId,Model model,@AuthenticationPrincipal UserPrincipal userPrincipal) {
 
 		Goods item = goodsservice.getGoodsById(goodsId);
 		GoodsDTO itemDTO = new GoodsDTO();
-
+		Account account =accountRepositry.findAccountIdByID(accountRepositry.findAccountIdByName(userPrincipal.getUsername()));
+		int itemprice =bitinfoService.highPrice(item);
+		int zandaka =account.getMoney()-itemprice;
+		
 		itemDTO.setGoods_id(item.getGoods_id());
 		itemDTO.setName(item.getName());
 		itemDTO.setGenre_id(item.getGenre_id());
 		itemDTO.setEnd_time(item.getEnd_time());
 		itemDTO.setImage_number(item.getImage_number());
 		itemDTO.setComment(item.getComment());
-		itemDTO.setCurrent_price(bitinfoService.highPrice(item));
+		itemDTO.setCurrent_price(itemprice);
+		
 
 
 		model.addAttribute("itemDTO",itemDTO);
-
+		model.addAttribute("money",zandaka);
 
 		return "buy";
 	}
@@ -918,6 +930,8 @@ public class AfterController {
 		Account buyAccount = accountRepositry.findAccountIdByID(accountId);
 		Account sellAcoount = accountRepositry.findAccountIdByID(goodsAccountId);
 		int goodsprice = bitRepositry.highPrice(goodsId);
+		Goods item=goodsRepositry.allgoodsSelect(goodsId);
+		Dropgoods drop =new Dropgoods();
 
 		System.out.println("Goods Price: " + goodsprice);
 		System.out.println("Account Money: " + buyAccount.getMoney());
@@ -931,6 +945,20 @@ public class AfterController {
 			accountService.updateMoney(accountId, buyprice);
 			accountService.updateMoney(goodsAccountId, sellprice);
 			redirectAttributes.addFlashAttribute("message", "購入が完了しました");
+			
+			drop.setGoods_id(item.getGoods_id());
+			drop.setName(item.getName());
+			drop.setGenre_id(item.getGenre_id());
+			drop.setDrop_time(item.getEnd_time());
+			drop.setImage_number(item.getImage_number());
+			drop.setComment(item.getComment());
+			drop.setInitial_price(goodsprice);
+			drop.setAccount_id(accountId);
+			dropgoodsRepository.save(drop);
+			
+			goodsRepositry.deleteById(goodsId);
+			bitRepositry.deleteById(goodsId);
+			
 			return "redirect:/afterLogin/buybuy";
 		}
 
@@ -938,6 +966,7 @@ public class AfterController {
 		return "redirect:/afterLogin/showbitMypage";
 	}
 
+	
 	@GetMapping("buybuy")
 	public String showBuyBuy() {
 
@@ -945,6 +974,40 @@ public class AfterController {
 		return "buybuy";
 	}
 
+//	@GetMapping("/dropList")
+//	public String showItemList(Model model,@AuthenticationPrincipal UserPrincipal userPrincipal) {
+//		System.out.println(123465);
+//		//入札者と出品者が同じかどうか
+//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//		int accountid = accountService.findAccountIdByName(authentication.getName());
+//		// 商品データをデータベースから取得
+//		List<GoodsList> productList = goodsListService.goodsList1(accountid);
+//		if(master.equals(userPrincipal.getUsername())) {
+//
+//			boolean RoleAdmin = true;
+//			boolean RoleYes = true;
+//			String genre = "全商品";
+//
+//			model.addAttribute("genre",genre);
+//			model.addAttribute("RoleAdmin",RoleAdmin);
+//			model.addAttribute("RoleYes",RoleYes);
+//			model.addAttribute("productList",productList);
+//		}else {
+//			boolean RoleAdmin = false;
+//			boolean RoleYes = true;
+//			String genre = "全商品";
+//
+//			model.addAttribute("genre",genre);
+//			model.addAttribute("RoleAdmin",RoleAdmin);
+//			model.addAttribute("RoleYes",RoleYes);
+//			model.addAttribute("productList",productList);
+//		}
+//
+//		return "dropList";
+//	}
+//
+//	
+	
 
 	@PostMapping("/submitScore")
 	public String submitScore(@RequestParam Integer score,RedirectAttributes redirectAttributes) {

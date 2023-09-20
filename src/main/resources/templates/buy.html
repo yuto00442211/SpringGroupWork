@@ -1,121 +1,127 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>落札承認</title>
-    
-    <!-- CSSスタイルの適用 -->
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
-        }
+<meta charset="UTF-8">
+<title>落札承認</title>
 
-        h2 {
-            text-align: center;
-            margin-top: 20px;
-        }
+<!-- CSSスタイルの適用 -->
+<style>
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	background-color: #f0f0f0;
+}
 
-        form {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
-        }
+h2 {
+	text-align: center;
+	margin-top: 20px;
+}
 
-        label {
-            font-weight: bold;
-        }
+form {
+	max-width: 400px;
+	margin: 0 auto;
+	padding: 20px;
+	background-color: #fff;
+	border-radius: 5px;
+	box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+}
 
-        p {
-            margin-bottom: 10px;
-        }
+label {
+	font-weight: bold;
+}
 
-        img {
-            max-width: 100%;
-            height: auto;
-        }
+p {
+	margin-bottom: 10px;
+}
 
-        button {
-            background-color: #3498db;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
+img {
+	max-width: 100%;
+	height: auto;
+}
 
-        a.btn {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 10px 20px;
-            background-color: #3498db;
-            color: white;
-            text-decoration: none;
-            border-radius: 3px;
-        }
-    </style>
+button {
+	background-color: #3498db;
+	color: white;
+	padding: 10px 20px;
+	border: none;
+	border-radius: 3px;
+	cursor: pointer;
+}
+
+a.btn {
+	display: inline-block;
+	margin-top: 10px;
+	padding: 10px 20px;
+	background-color: #3498db;
+	color: white;
+	text-decoration: none;
+	border-radius: 3px;
+}
+</style>
 </head>
 <body>
 
 
 
-    <h2>落札承認</h2>
-    
-    <!-- 落札承認用フォーム -->
-    <form th:action="@{/afterLogin/buybuy/{goodsId}(goodsId=${itemDTO.goods_id})}" th:method="post">
-        
-        <!-- 隠しフィールド: 商品ID -->
-        <input type="hidden" th:field="*{itemDTO.goods_id}" />
-        
-        <!-- 商品情報表示 -->
-        <p>
-            <label>商品ID：</label>
-            <!-- 商品IDの表示 -->
-            <span th:text="${itemDTO.goods_id}"></span>
-        </p>
-        <p>
-            <label>商品名：</label>
-            <!-- 商品名の表示 -->
-            <span th:text="${itemDTO.name}"></span>
-        </p>
-        <p>
-            <label>ジャンルID：</label>
-            <!-- ジャンルIDの表示 -->
-            <span th:text="${itemDTO.genre_id}"></span>
-        </p>
-        <p>
-            <label>落札価格：</label>
-            <!-- 落札価格の表示 -->
-            <span th:text="${itemDTO.Current_price}"></span>
-        </p>
-        <p>
-            <label>落札時間：</label>
-            <!-- 落札時間の表示 -->
-            <span th:text="${itemDTO.end_time}"></span>
-        </p>
-        <p>
-            <label>商品画像：</label> 
-            <!-- 商品画像の表示 -->
-            <img th:src="@{'/images/' + ${itemDTO.image_number}}" alt="Image" />
-        </p>
-        <p>
-            <label>詳細：</label>
-            <!-- 商品詳細の表示 -->
-            <span th:text="${itemDTO.comment}"></span>
-        </p>
-        
-        <!-- 確定ボタン -->
-        <p>
-            <button type="submit">確定</button>
-        </p>
-    </form>
+	<h2>落札承認</h2>
 
-    <!-- 戻るボタン -->
-    <a th:href="@{sell}" class="btn">戻る</a>
+	<!-- 落札承認用フォーム -->
+	<form
+		th:action="@{/afterLogin/buybuy/{goodsId}(goodsId=${itemDTO.goods_id})}"
+		th:method="post">
+
+		<!-- 隠しフィールド: 商品ID -->
+		<input type="hidden" th:field="*{itemDTO.goods_id}" />
+
+		<!-- 商品情報表示 -->
+		<p>
+			<label>商品ID：</label>
+			<!-- 商品IDの表示 -->
+			<span th:text="${itemDTO.goods_id}"></span>
+		</p>
+		<p>
+			<label>商品名：</label>
+			<!-- 商品名の表示 -->
+			<span th:text="${itemDTO.name}"></span>
+		</p>
+		<p>
+			<label>ジャンルID：</label>
+			<!-- ジャンルIDの表示 -->
+			<span th:text="${itemDTO.genre_id}"></span>
+		</p>
+		<p>
+			<label>落札価格：</label>
+			<!-- 落札価格の表示 -->
+			<span th:text="${itemDTO.Current_price}"></span>
+		</p>
+		<p>
+			<label>落札時間：</label>
+			<!-- 落札時間の表示 -->
+			<span th:text="${itemDTO.end_time}"></span>
+		</p>
+		<p>
+			<label>商品画像：</label>
+			<!-- 商品画像の表示 -->
+			<img th:src="@{'/images/' + ${itemDTO.image_number}}" alt="Image" />
+		</p>
+		<p>
+			<label>詳細：</label>
+			<!-- 商品詳細の表示 -->
+			<span th:text="${itemDTO.comment}"></span>
+		</p>
+
+		<p>
+			購入後の残高：<span th:text="${money}"></span>キャルペイ
+		</p>
+
+		<!-- 確定ボタン -->
+		<p>
+			<button type="submit">確定</button>
+		</p>
+	</form>
+
+	<!-- 戻るボタン -->
+	<a th:href="@{sell}" class="btn">戻る</a>
 </body>
 </html>

@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 public class Dropgoods {
     @Id
     
+    private int dropgoods_id;
+    
     private int goods_id;
 
     private String name;
