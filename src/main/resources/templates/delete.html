@@ -3,62 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <title>問題削除</title>
+    
+    <!-- CSSスタイルの適用 -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        a.btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 3px;
+        }
+    </style>
 </head>
 <body>
     <h2>問題削除</h2>
+    
     <!-- 問題削除用フォーム -->
     <form th:action="@{/afterLogin/deleteGoods/{id}(id=${goods.goods_id})}" th:method="post">
-    	<!-- 隠しフィールド: 問題のID -->
-        <input type="hidden" th:field="*{goods.goods_id}" /> 
+        <!-- 隠しフィールド: 商品ID -->
+        <input type="hidden" th:field="*{goods.goods_id}" />
+        
+        <!-- 商品情報表示 -->
         <p>
             <label>ID：</label>
-            <!-- 問題テキストの表示 -->
+            <!-- 商品IDの表示 -->
             <span th:text="${goods.goods_id}"></span>
         </p>
         <p>
             <label>商品名：</label>
-            <!-- 選択肢1の表示 -->
+            <!-- 商品名の表示 -->
             <span th:text="${goods.name}"></span>
         </p>
         <p>
             <label>ジャンルID：</label>
-            <!-- 選択肢2の表示 -->
+            <!-- ジャンルIDの表示 -->
             <span th:text="${goods.genre_id}"></span>
         </p>
         <p>
             <label>開始価格：</label>
-            <!-- 選択肢3の表示 -->
+            <!-- 開始価格の表示 -->
             <span th:text="${goods.initial_price}"></span>
         </p>
         <p>
             <label>出品時間：</label>
-            <!-- 選択肢3の表示 -->
+            <!-- 出品時間の表示 -->
             <span th:text="${goods.start_time}"></span>
         </p>
         <p>
             <label>終了時間：</label>
-            <!-- 選択肢4の表示 -->
+            <!-- 終了時間の表示 -->
             <span th:text="${goods.end_time}"></span>
         </p>
         <p>
             <label>ファイル名：</label>
-            <!-- 正解の表示 -->
+            <!-- ファイル名の表示 -->
             <span th:text="${goods.image_number}"></span>
         </p>
         <p>
             <label>詳細：</label>
-            <!-- 解説の表示 -->
+            <!-- 詳細の表示 -->
             <span th:text="${goods.comment}"></span>
         </p>
-      <!--   <p><label>アカウントID：</label><!-- 画像idの表示 <span th:text="${goods.account_id}"></span></p> -->
         
+        <!-- 削除ボタン -->
         <p>
-            <!-- 削除ボタン -->
             <button type="submit">削除</button>
         </p>
     </form>
     
-     <!-- ボタン -->
-        <a th:href="@{itemList}" class="btn btn-secondary">戻る</a>
+    <!-- 戻るボタン -->
+    <a th:href="@{itemList}" class="btn btn-secondary">戻る</a>
 </body>
 </html>
