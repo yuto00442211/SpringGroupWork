@@ -6,6 +6,7 @@
     <style>
         body {
             margin: 0;
+            overflow: hidden;
         }
 
         canvas {
@@ -23,25 +24,25 @@
             padding: 20px;
             display: none;
         }
-        
+
         /* ボタンを中央に配置するスタイル */
-    #scoreForm {
-        text-align: center;
-        position: fixed;
-        top: 30%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
-    
-    /* ボタンのスタイル */
-    #scoreForm button {
-        padding: 10px 20px;
-        font-size: 16px;
-        background-color: #007bff; /* ボタンの背景色 */
-        color: #fff; /* ボタンのテキスト色 */
-        border: none;
-        cursor: pointer;
-    }
+        #scoreForm {
+            text-align: center;
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* ボタンのスタイル */
+        #scoreForm button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff; /* ボタンの背景色 */
+            color: #fff; /* ボタンのテキスト色 */
+            border: none;
+            cursor: pointer;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
@@ -51,38 +52,35 @@
         <p>ゲームオーバー ☆ スコア送信ボタンをクリックしてね！<span id="scoreDisplay"></span></p>
     </div>
 
-    <canvas id="gameCanvas" width="800" height="500"></canvas>
+    <canvas id="gameCanvas" width="1200" height="500"></canvas>
     <button id="startGame" style="display: block; margin: 20px auto;">ここをクリックでゲームスタート</button>
     <button id="戻る" style="display: block; margin: 20px auto;">topに戻る</button>
-   
 
-    <form id="scoreForm" th:action="@{/afterLogin/submitScore}" th:object="${myRequestData}" method="post" style="display: none;">
-        <input type="number" id="scoreField" th:field="*{score}" placeholder="スコアを入力してください" th:readonly="true">
+    <form id="scoreForm" th:action="@{/afterLogin/submitScore}" th:object="${myRequestData}" method="post"
+        style="display: none;">
+        <input type="number" id="scoreField" th:field="*{score}" placeholder="スコアを入力してください"
+            th:readonly="true">
         <button type="submit">送信でポイント獲得</button>
     </form>
 
     <script>
-        document.getElementById('戻る').addEventListener('click', function() {
-            window.location.href = '/afterLogin/sell';
-        });
-
         const canvas = document.getElementById('gameCanvas');
         const context = canvas.getContext('2d');
 
-        let playerX = 50;
-        let playerY = canvas.height - 50;
-        let playerSize = 30;
+        let playerX = 50; // プレイヤーの初期X位置
+        let playerY = canvas.height - 250; // プレイヤーの初期Y位置（高く飛ばすために変更）
+        let playerWidth = 171; // プレイヤーの幅
+        let playerHeight = 182; // プレイヤーの高さ
         let playerSpeed = 2;
-        let gravity = 1;
+        let gravity = 0.5;
         let velocityY = 0;
         let isJumping = false;
         let isDucking = false;
         let obstacles = [];
         let keys = {};
-        let obstacleTimer = 0;
-        let obstacleInterval = 100;
         let isGameOver = false;
         let isGameRunning = false;
+        let animationInterval;
 
         let angle = 0;
         const HILL_AMPLITUDE = 50;
@@ -92,18 +90,62 @@
         let backgroundX2 = canvas.width;
 
         let background = new Image();
-        background.src = "/forest.jpg";
+        background.src = "/forest.png";
 
-        background.onload = function() {
+        // プレイヤー画像のパスとフレーム数を定義
+        const playerImagePaths = [
+            "/001.png",
+            "/002.png",
+            "/003.png",
+            "/004.png",
+            "/005.png",
+            "/006.png",
+            "/007.png",
+            "/008.png",
+            "/009.png",
+            "/010.png",
+            "/011.png",
+            "/012.png"
+        ];
+
+        const jumpImagePath = "/jump.png";
+
+        const jumpImage = new Image();
+        jumpImage.src = jumpImagePath;
+
+        const numFrames = playerImagePaths.length;
+        let currentFrame = 0;
+
+        // プレイヤー画像のアニメーション用のImageオブジェクトを作成
+        const playerImages = [];
+
+        playerImagePaths.forEach((path) => {
+            const image = new Image();
+            image.src = path;
+            playerImages.push(image);
+        });
+
+        // 障害物画像の読み込み
+        const obstacleImage = new Image();
+        obstacleImage.src = "/enemy.png";
+
+        background.onload = function () {
             // 背景を描画
             drawBackground();
 
             // スタートボタンがクリックされたときのイベントハンドラ
-            document.getElementById('startGame').addEventListener('click', function() {
+            document.getElementById('startGame').addEventListener('click', function () {
                 if (!isGameRunning && !isGameOver) { // ゲームが実行中でなく、ゲームオーバー状態でない場合にのみ実行
                     startGame();
                     // ボタンを非表示にする
                     document.getElementById('startGame').style.display = 'none';
+                }
+            });
+
+            // リスタートボタンがクリックされたときのイベントハンドラ
+            document.getElementById('restartGame').addEventListener('click', function () {
+                if (isGameOver) {
+                    resetGame();
                 }
             });
         };
@@ -116,7 +158,34 @@
             isGameOver = false;
             isGameRunning = true; // ゲームが開始されたことを設定
 
+            // アニメーション速度を設定 (0.5秒ごとにフレームを切り替える)
+            const animationSpeed = 500; // ミリ秒
+            clearInterval(animationInterval);
+            animationInterval = setInterval(drawPlayer, animationSpeed);
+
             // ゲームループを開始
+            gameLoop();
+        }
+
+        function resetGame() {
+            // ゲームのリセットロジックをここに追加
+            obstacles = [];
+            playerX = 50;
+            playerY = canvas.height - 250;
+            isJumping = false;
+            velocityY = 0;
+            gameTime = 0;
+
+            // ボタンを再び非表示にする
+            document.getElementById('gameOverMessage').style.display = 'none';
+
+            // アニメーション速度を設定 (0.5秒ごとにフレームを切り替える)
+            const animationSpeed = 500; // ミリ秒
+            clearInterval(animationInterval);
+            animationInterval = setInterval(drawPlayer, animationSpeed);
+
+            // ゲームループを再開
+            isGameRunning = true;
             gameLoop();
         }
 
@@ -155,28 +224,28 @@
                 if (playerX < 0) {
                     playerX = 0;
                 }
-                if (playerX + playerSize > canvas.width) {
-                    playerX = canvas.width - playerSize;
+                if (playerX + playerWidth > canvas.width) {
+                    playerX = canvas.width - playerWidth;
                 }
 
                 if (keys['ArrowDown']) {
                     isDucking = true;
-                    playerSize = 15;
+                    playerHeight = 91; // ダック中のプレイヤーの高さ
                 } else {
                     isDucking = false;
-                    playerSize = 30;
+                    playerHeight = 182; // ダックしていないプレイヤーの高さ
                 }
 
                 if (keys['Space'] && !isJumping) {
-                    velocityY = -15;
+                    velocityY = -18; // 高くジャンプするために値を増やす
                     isJumping = true;
                 }
 
                 velocityY += gravity;
                 playerY += velocityY;
 
-                if (playerY >= canvas.height - playerSize) {
-                    playerY = canvas.height - playerSize;
+                if (playerY >= canvas.height - playerHeight) {
+                    playerY = canvas.height - playerHeight;
                     isJumping = false;
                 }
 
@@ -220,9 +289,9 @@
 
                     if (
                         playerX < obstacle.x + obstacle.size &&
-                        playerX + playerSize > obstacle.x &&
+                        playerX + playerWidth > obstacle.x &&
                         playerY < obstacle.y + obstacle.size &&
-                        playerY + playerSize > obstacle.y
+                        playerY + playerHeight > obstacle.y
                     ) {
                         // ゲームオーバーの処理
                         isGameOver = true; // ゲームオーバー状態に設定
@@ -239,7 +308,7 @@
                         document.getElementById('gameOverMessage').style.display = 'block';
 
                         // ゲームループの停止（ゲームオーバー時に動作を止めるため）
-                        cancelAnimationFrame(gameLoop);
+                        clearInterval(animationInterval);
                     }
                 });
             }
@@ -254,16 +323,36 @@
             context.font = '24px Arial';
             context.fillText('スコア: ' + gameTime + 'pt', 20, 30);
 
-            context.fillStyle = '#0F0';
-            context.beginPath();
-            context.arc(playerX + playerSize / 2, playerY + playerSize / 2, playerSize / 2, 0, Math.PI * 2);
-            context.fill();
+            // プレイヤー画像を描画
+            drawPlayer();
 
-            context.fillStyle = '#F00';
-            obstacles.forEach(obstacle => {
-                context.beginPath();
-                context.arc(obstacle.x + obstacle.size / 2, obstacle.y + obstacle.size / 2, obstacle.size / 2, 0, Math.PI * 2);
-                context.fill();
+            // 障害物画像を描画
+            drawObstacles();
+        }
+
+        // プレイヤーのアニメーションを描画する関数
+        function drawPlayer() {
+            // ジャンプ中の場合、jump.png を描画
+            if (isJumping) {
+                context.drawImage(jumpImage, playerX, playerY, playerWidth, playerHeight);
+            } else {
+                context.drawImage(playerImages[currentFrame], playerX, playerY, playerWidth, playerHeight);
+                // 次のフレームに進める
+                currentFrame = (currentFrame + 1) % numFrames;
+            }
+        }
+
+        function drawObstacles() {
+            obstacles.forEach((obstacle, i) => {
+                // 障害物画像のサイズと位置を設定
+                const obstacleWidth = obstacle.size * 4;
+                const obstacleHeight = obstacle.size * 4;
+                const obstacleX = obstacle.x;
+                const obstacleY = obstacle.y - obstacleHeight; // 画像が地面の上に表示されるように調整
+                
+
+                // 障害物画像を描画
+                context.drawImage(obstacleImage, obstacleX, obstacleY, obstacleWidth, obstacleHeight);
             });
         }
 
@@ -278,4 +367,3 @@
     </script>
 </body>
 </html>
-
