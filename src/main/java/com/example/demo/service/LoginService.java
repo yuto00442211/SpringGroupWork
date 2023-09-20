@@ -25,13 +25,6 @@ import com.example.demo.repositry.LoginRepositry;
 			if(account == null) {
 				throw new UsernameNotFoundException("その名前は登録されていません");
 			}
-	           //権限情報を格納するためのリストの作成、権限の付与
-//			Collection<GrantedAuthority> authorityList = new ArrayList<>();
-//			authorityList.add(new SimpleGrantedAuthority("ROLE_USER"));
-//			if(member.isAdmin()) {
-//			authorityList.add(new SimpleGrantedAuthority("ROLE_ADMIN")); // 管理者権限付与
-//		}
-	           //ログインユーザーのコンストラクタを使用してインスタンスを生成する。
 	return new UserPrincipal(account);
 		}
 	}

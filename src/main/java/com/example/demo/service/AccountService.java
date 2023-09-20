@@ -6,39 +6,39 @@ import org.springframework.stereotype.Service;
 import com.example.demo.entity.Account;
 import com.example.demo.repositry.AccountRepositry;
 
-
 @Service
 public class AccountService {
 
+    @Autowired
+    private AccountRepositry accountRepositry;
 
-	@Autowired
-	private AccountRepositry accountRepositry;
+    // 名前を指定してアカウントIDを取得するメソッド
+    public int findAccountIdByName(String name) {
+        return accountRepositry.findAccountIdByName(name);
+    }
 
-	public int findAccountIdByName(String name) {
-		return accountRepositry.findAccountIdByName(name);
-	}
-	public boolean isNameAlreadyExists(String name) {
-		return accountRepositry.countByName(name) > 0;
-	}
+    // 指定した名前のアカウントがすでに存在するかどうかを確認するメソッド
+    public boolean isNameAlreadyExists(String name) {
+        return accountRepositry.countByName(name) > 0;
+    }
 
-	public String findNameById(int accountId) {
-		return accountRepositry.findNameById(accountId);
-	}
+    // アカウントIDを指定して名前を取得するメソッド
+    public String findNameById(int accountId) {
+        return accountRepositry.findNameById(accountId);
+    }
 
-	public int lookMoney(int accountId) {
-		return accountRepositry.lookMoney(accountId);
-	}
+    // アカウントの残高を取得するメソッド
+    public int lookMoney(int accountId) {
+        return accountRepositry.lookMoney(accountId);
+    }
 
-	//IDを使用して全てを取得するカスタムクエリメソッド
-	public Account findAccountIdByID(int acoountId) {
-		return accountRepositry.findAccountIdByID(acoountId);
-	}
+    // アカウントIDを使用してアカウント情報を取得するカスタムクエリメソッド
+    public Account findAccountIdByID(int accountId) {
+        return accountRepositry.findAccountIdByID(accountId);
+    }
 
-	//account_idのmoneyをアップデートするメソッド
-	public void updateMoney(int accountId,int money){
-
-		accountRepositry.updateMoney(accountId, money);
-	}
-
-
+    // アカウントの残高をアップデートするメソッド
+    public void updateMoney(int accountId, int money) {
+        accountRepositry.updateMoney(accountId, money);
+    }
 }

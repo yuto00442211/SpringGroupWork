@@ -389,7 +389,7 @@ public class AfterController {
 		int currentPrice = BitForm.getBidAmount();
 
 		// 新しい入札情報を保存し、その結果を表示 (デバッグ用)
-		int o = bitinfoService.insertbid(goodsId, accountId, bidTime, currentPrice);
+		int o = bitinfoService.insertBid(goodsId, accountId, bidTime, currentPrice);
 		System.out.println(o);
 
 		// 入札成功のメッセージをリダイレクト先に渡す
@@ -572,7 +572,7 @@ public class AfterController {
 		System.out.println(authentication.getName());
 		System.out.println(accountId);
 		//入札情報
-		List<Bitinfo> mypageList = bitinfoService.bidListmypage(accountId);
+		List<Bitinfo> mypageList = bitinfoService.bidListMypage(accountId);
 		// 常にtrueに設定されているが、これはテストやデバッグのためかもしれない
 		boolean RoleAdmin = true;
 		boolean RoleYes = true;
@@ -816,7 +816,7 @@ public class AfterController {
 		System.out.println(accountId);
 
 		// 入札情報を取得
-		List<Bitinfo> mypageList = bitinfoService.bidListmypage(accountId);
+		List<Bitinfo> mypageList = bitinfoService.bidListMypage(accountId);
 
 		// 常にtrueに設定されているが、これはテストやデバッグのためかもしれない
 		boolean RoleAdmin = true;

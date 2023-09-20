@@ -68,11 +68,6 @@ public class UserPrincipal implements UserDetails {
     }
 
 	
-
-	public static Account getAccount() {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
-	}
 }
 
 

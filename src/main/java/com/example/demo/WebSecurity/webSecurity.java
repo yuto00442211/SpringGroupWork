@@ -10,130 +10,60 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-
 @Configuration
 @EnableWebSecurity
 public class webSecurity {
-	
 
-	@Bean//パスワード暗号化用のクラス
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    // パスワードの暗号化に使用するエンコーダーを設定
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
+    // セキュリティフィルターチェインを設定
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            // CSRF保護を有効化し、トークンリポジトリを設定
+            .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+            
+            .authorizeHttpRequests(authorizeRequests ->
+                authorizeRequests
+                    // 指定のURLパターンへのアクセスをすべて許可
+                    .requestMatchers(
+                        "/sell",
+                        "/sell/login",
+                        "/sell/sub",
+                        "/sell/product",
+                        "/sell/genreItemList",
+                        "/sell/itemList",
+                        "/sell/success"
+                    ).permitAll()
+                    
+                    // その他のリクエストは認証が必要
+                    .anyRequest().authenticated()
+            )
+            
+            .formLogin(formLogin ->
+                formLogin
+                    // ログインページを指定し、認証が必要でないように設定
+                    .loginPage("/sell/login").permitAll()
+                    // ログイン成功後のデフォルトのリダイレクト先を指定
+                    .defaultSuccessUrl("/afterLogin/sell", true)
+            )
+            
+            .logout(logout ->
+                logout
+                    // ログアウトのリクエストをマッチさせるパスを指定
+                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                    // ログアウト成功後のリダイレクト先を指定
+                    .logoutSuccessUrl("/sell")
+                    // クッキーを削除し、HTTPセッションを無効にする
+                    .deleteCookies("JSESSIONID")
+                    .invalidateHttpSession(true)
+            );
 
-	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception  {
-		http
-		.csrf(csrf->csrf
-				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-		.authorizeHttpRequests(authorizeRequests ->
-		authorizeRequests
-		
-		.requestMatchers("/sell","/sell/login","/sell/sub","/sell/product","/sell/genreItemList","/sell/itemList","/sell/success").permitAll()
-		
-		
-		
-//		.requestMatchers(HttpMethod. POST,"/sell/product/**").permitAll()
-//		.requestMatchers(HttpMethod. GET,"/sell/product/**").permitAll()
-		.anyRequest().authenticated()
-				)
-		.formLogin(formLogin ->
-
-		formLogin
-		.loginPage("/sell/login").permitAll() 
-		//.failureUrl("/error")
-		.defaultSuccessUrl("/afterLogin/sell", true)                  
-				)
-
-		.logout(logout ->
-		logout
-		.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-		.logoutSuccessUrl("/sell")
-		.deleteCookies("JSESSIONID")
-		.invalidateHttpSession(true)
-				);
-		 // 特定のURLを許可
- 
-		return http.build();
-	}
-
-
-	//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-	//    	System.out.println("bbbbbbbbbbbbbbbbbb");
-	//        auth.userDetailsService(memberDetailsService)
-	//            .passwordEncoder(passwordEncoder());
-	//    }
+        // セキュリティフィルターチェインを構築して返す
+        return http.build();
+    }
 }
-//@Configuration //設定用のクラスであることをSpringに伝える
-//@EnableWebSecurity //Spring Securityを使うための設定
-//public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-//	
-//	@Autowired
-//	private UserDetailsService memberDetailsService;
-//
-//	//   (1)主に全体に対するセキュリティ設定を行う
-//	//  このメソッドをオーバーライドすることで、
-//	//  特定のリクエストに対して「セキュリティ設定」を無視する
-//	//  設定など全体に関わる設定ができる。
-//	//  具体的には静的ファイルに対してセキュリティの設定を無効にする（静的ファイルのリクエストまで弾かない。）。
-//	@Override
-//	public void configure(WebSecurity web)throws Exception{
-//          web.ignoring().antMatchers("/css/**","/js/**","/images/**");
-//	}
-//	
-//    　　　　//  (2)主にURLごとに異なるセキュリティ設定を行う
-//	//  このメソッドをオーバーライドすることで認可に設定や
-//	//  ログイン、ログアウトに関する設定ができる。
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-//       //(2-1)認可に関する設定
-//    	http.authorizeHttpRequests() 
-//    	.antMatchers("/","/register","/register/decision").permitAll() //ここに記載したパスは全てのユーザーに許可
-//    	 // /admin/から始まるパスはADMIN権限でログインしている場合のみアクセス可(権限設定時の「ROLE_」を除いた文字列を指定)
-//　　　　　　//.antMatchers("/admin/**").hasRole("ADMIN")
-//　　　　　　// /user/から始まるパスはUSER権限でログインしている場合のみアクセス可(権限設定時の「ROLE_」を除いた文字列を指定)
-//	//.antMatchers("/user/**").hasRole("USER")
-//　　　　　//それ以外のパスは認証が必要
-//    	.anyRequest().authenticated(); 
-//    	
-//      //(2-2)ログインに関する設定
-//    	http.formLogin()
-//      //ログイン画面に遷移させるパス(ログイン認証が必要なパスを指定してかつログインされていないとこのパスに遷移される。)
-//    	.loginPage("/") 
-//    	.loginProcessingUrl("/login") //ログインボタンを押したときに遷移させるパス（ここに遷移させれば自動的にログインが行われる。）
-//    	.failureUrl("/?error=true") //ログイン失敗時に遷移させるパス
-//    	.defaultSuccessUrl("/afterLogin/top",true) // 第1引数:デフォルトでログイン成功時に遷移させるパス
-//								                  // 第2引数: true :認証後常に第1引数のパスに遷移
-//	// false:認証されてなくて一度ログイン画面に飛ばされてもログインしたら指定したURLに遷移
-//    	.usernameParameter("email")     //認証時に使用するユーザー名のリクエストパラメータ名（今回はメールアドレスを使用）
-//    	.passwordParameter("password"); //認証時に使用するパスワードのリクエストパラメーター名
-//   
-//    	http.logout() //(2-3)ログアウトに関する設定
-//    	.logoutRequestMatcher(new AntPathRequestMatcher("/logout")) //ログアウトさせる際に遷移させるパス
-//    	.logoutSuccessUrl("/") //ログアウト後に遷移させるパス
-//    	.deleteCookies("JSESSIONID") //ログアウト後、Cookieに保存されているセッションIDを削除
-//    	.invalidateHttpSession(true); //ログアウト後、セッションを無効にする false:セッションを無効にしない
-//    }
-//    
-//    //  (3) 主に認証方法の実装の設定を行う
-//    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//    	auth.userDetailsService(memberDetailsService)
-//    	.passwordEncoder(new BCryptPasswordEncoder())
-//    	;
-//    }
-//    
-//    /**
-//     * 
-//     * (4)bcryptアルゴリズムでハッシュ化する実装を返します.
-//     * これを指定することでパスワードハッシュ化やマッチ確認する際に
-//     * @Autowired
-//	 * private PasswordEncoder passwordEncoder;
-//	 * と記載するとDIされるようになります。
-//     * @return bcryptアルゴリズムでハッシュ化する実装オブジェクト
-//     */
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//    		return new BCryptPasswordEncoder();
-//    }
