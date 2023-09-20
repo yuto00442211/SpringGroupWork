@@ -1027,6 +1027,33 @@ public class AfterController {
 		// レスポンスを返す
 		return "redirect:/afterLogin/sell";
 	}
+	
+	    //入金処理
+		@GetMapping("/calpay")
+		public String calpay(Model model,@ModelAttribute("errorMessage") String errorMessage) {
+			model.addAttribute("errorMessage", errorMessage);
+
+			return "calpay";
+		}
+		
+		@PostMapping("/calcal")
+		public String processForm(@RequestParam("amount") int amount, Model model, RedirectAttributes redirectAttributes) {
+
+			if(amount<=0) {
+				redirectAttributes.addFlashAttribute("errorMessage", "0円以下は無理だよ働こ");
+				return "redirect:/afterLogin/calpay"; 
+			}
+
+
+			//入金出金処理
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			int accountId = accountService.findAccountIdByName(authentication.getName());
+			Account buyAccount = accountRepositry.findAccountIdByID(accountId);
+			int money = buyAccount.getMoney()+amount;
+			accountService.updateMoney(accountId, money);
+
+			return "redirect:/afterLogin/showMypage"; // リダイレクト
+		}
 
 }
 

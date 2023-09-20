@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>金額データベースフォーム</title>
+</head>
+<body>
+    <h1>金額データベースフォーム</h1>
+    <form th:action="@{/afterLogin/calcal}" method="post">
+        <label for="amount">金額：</label>
+        <input type="number" th:name="amount" id="amount" required>
+        <br>
+        <input type="submit" value="送信">
+    </form>
+    
+     <!-- 戻るボタン -->
+    <a th:href="@{/afterLogin/showMypage}" class="btn btn-secondary">戻る</a>
+    
+    <!-- エラーメッセージ表示 -->
+    <div th:if="${errorMessage}" th:text="${errorMessage}" style="color: red;"></div>
+</body>
+</html>
