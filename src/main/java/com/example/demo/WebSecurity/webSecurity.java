@@ -38,7 +38,9 @@ public class webSecurity {
                         "/sell/genreItemList",
                         "/sell/itemList",
                         "/sell/success",
-                        "/sell/readme"
+                        "/sell/readme",
+                        "/static/image",// この行を追加
+                        "/images/*"
                     ).permitAll()
                     
                     // その他のリクエストは認証が必要
