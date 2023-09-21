@@ -79,8 +79,10 @@
     <!-- 問題更新用フォーム -->
     <form th:action="@{/afterLogin/updateGood}" th:object="${updateGoods}" th:method="post" enctype="multipart/form-data" class="update-form">
 
-        <!-- 隠しフィールド: 問題のID -->
+        <!-- 隠しフィールド: goodsID -->
         <input type="hidden" th:field="*{goods_id}" />
+         <!-- 隠しフィールド: goodsaccountID -->
+        <input type="hidden" th:field="*{account_id}" />
 
         <!-- 商品名 -->
         <p>
