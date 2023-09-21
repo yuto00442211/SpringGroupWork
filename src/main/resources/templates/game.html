@@ -5,10 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body {
-	margin: 0;
-	overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* This ensures full viewport height */
+    margin: 0;
 }
-
 canvas {
 	background: #001f3f;
 	display: block;
@@ -43,6 +46,30 @@ canvas {
 	border: none;
 	cursor: pointer;
 }
+
+#gameTitle {
+    font-size: 24px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    position: absolute; /* 絶対位置指定 */
+    top: 150px; /* 画像の上に50pxの位置に配置 */
+    left: 50%; /* 横方向中央に配置 */
+    transform: translateX(-50%); /* 中央揃え */
+    white-space: nowrap; /* タイトルの改行を無効にする */
+}
+
+#gameInstructions {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    position: absolute; /* 絶対位置指定 */
+    top: 350px; /* 画像の上に50pxの位置に配置 */
+    left: 50%; /* 横方向中央に配置 */
+    transform: translateX(-50%); /* 中央揃え */
+    white-space: nowrap; /* タイトルの改行を無効にする */
+}
+
 </style>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
@@ -53,23 +80,28 @@ canvas {
 			ゲームオーバー ☆ スコア送信ボタンをクリックしてね！<span id="scoreDisplay"></span>
 		</p>
 	</div>
+    <div id="gameTitle">
+        <h1>~CalRun~ビルゲイツには負けない</h1>
+    </div>
+    <div id="gameInstructions">
+        <p>操作説明: ジャンプ - スペースキー, 左移動 - ←キー, 右移動 - →キー, しゃがむ - ↓キー</p>
+    </div>
 
-	<canvas id="gameCanvas" width="1200" height="500"></canvas>
-	<button id="startGame" style="display: block; margin: 20px auto;">ここをクリックでゲームスタート</button>
-	<button id="戻る" style="display: block; margin: 20px auto;">
-    <a th:href="@{/afterLogin/sell}">topに戻る</a>
-</button>
+    <canvas id="gameCanvas" width="1200" height="500"></canvas>
+    <button id="startGame" style="display: block; margin: 20px auto;">ここをクリックでゲームスタート</button>
+    <button id="restartGame" style="display: none; margin: 20px auto;">もう一度プレイ</button>
+    <button id="戻る" style="display: block; margin: 20px auto;">
+        <a th:href="@{/afterLogin/sell}">topに戻る</a>
+    </button>
 
-	<form id="scoreForm" th:action="@{/afterLogin/submitScore}"
-		th:object="${myRequestData}" method="post" style="display: none;">
-		<input type="number" id="scoreField" th:field="*{score}"
-			placeholder="スコアを入力してください" th:readonly="true">
-		<button type="submit">送信でポイント獲得</button>
-	</form>
+    <form id="scoreForm" th:action="@{/afterLogin/submitScore}"
+        th:object="${myRequestData}" method="post" style="display: none;">
+        <input type="number" id="scoreField" th:field="*{score}"
+            placeholder="スコアを入力してください" th:readonly="true">
+        <button type="submit">送信でポイント獲得</button>
+    </form>
 
-	<script>
-	
-	
+    <script>
         // キャンバスの描画コンテキストを取得
         const canvas = document.getElementById('gameCanvas');
         const context = canvas.getContext('2d');
@@ -83,12 +115,13 @@ canvas {
         let gravity = 0.5;
         let velocityY = 0;
         let isJumping = false;
-        let isDucking = false;
+        let isDucking = false; // しゃがんでいるかどうかを追跡する変数を追加
         let obstacles = [];
         let keys = {};
         let isGameOver = false;
         let isGameRunning = false;
         let animationInterval;
+        let isDownKeyPressed = false;
 
         // 丘の設定
         let angle = 0;
@@ -123,7 +156,14 @@ canvas {
         const jumpImage = new Image();
         jumpImage.src = jumpImagePath;
 
-        // プレイヤー画像のアニメーション関連
+        // しゃがんでいる画像のパス
+        const duckingImagePaths = "/syagami.png";
+        const duckingImage = new Image();
+        duckingImage.src = duckingImagePaths;
+                   
+
+        
+        // 画像のアニメーション関連
         const numFrames = playerImagePaths.length;
         let currentFrame = 0;
         const playerImages = [];
@@ -160,6 +200,18 @@ canvas {
                 }
             });
         };
+        
+         document.getElementById('startGame').addEventListener('click', function () {
+            if (!isGameRunning && !isGameOver) {
+                startGame();
+                // Hide the title when the game starts
+                document.getElementById('gameTitle').style.display = 'none';
+                // Hide the start button
+                document.getElementById('startGame').style.display = 'none';
+                 // Hide the start button
+                document.getElementById('gameInstructions').style.display = 'none';
+            }
+        });
 
         // ゲームの経過時間
         let gameTime = 0;
@@ -223,9 +275,34 @@ canvas {
             return HILL_AMPLITUDE * Math.sin((x + angle) * HILL_SPEED);
         }
 
-        // キーボードイベントリスナーを追加
-        document.addEventListener('keydown', (e) => { keys[e.code] = true; });
-        document.addEventListener('keyup', (e) => { keys[e.code] = false; });
+     // キーボードイベントリスナーを追加
+        document.addEventListener('keydown', (e) => { 
+            keys[e.code] = true;
+            if (e.code === 'ArrowDown') {
+                isDucking = true; // ↓キーが押されたらしゃがんでいる状態にする
+            }
+        });
+        document.addEventListener('keyup', (e) => { 
+            keys[e.code] = false; 
+            if (e.code === 'ArrowDown') {
+                isDucking = false; // ↓キーが離されたらしゃがんでいない状態にする
+            }
+        });
+        
+     // キーボードイベントリスナーを追加
+        document.addEventListener('keydown', (e) => {
+            keys[e.code] = true;
+
+            // 上矢印キーが押された場合
+            if (e.code === 'ArrowUp') {
+                // 攻撃を発射する処理をここに追加
+                // 例：attack();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            keys[e.code] = false;
+        });
 
         // ゲームのアップデートロジック
         function update() {
@@ -249,10 +326,8 @@ canvas {
 
                 // ↓キーによるしゃがみ状態の切り替え
                 if (keys['ArrowDown']) {
-                    isDucking = true;
                     playerHeight = 91;
                 } else {
-                    isDucking = false;
                     playerHeight = 182;
                 }
 
@@ -312,14 +387,14 @@ canvas {
                     }
 
                  // プレイヤーの当たり判定エリア
-                    const playerCollisionX = playerX + 20; // プレイヤーの左端から20ピクセル右にずらす
-                    const playerCollisionY = playerY + 20; // プレイヤーの上端から20ピクセル下にずらす
+                    const playerCollisionX = playerX ; // プレイヤーの左端から20ピクセル右にずらす
+                    const playerCollisionY = playerY ; // プレイヤーの上端から20ピクセル下にずらす
                     const playerCollisionWidth = playerWidth - 40; // プレイヤーの幅から40ピクセル引く
                     const playerCollisionHeight = playerHeight - 40; // プレイヤーの高さから40ピクセル引く
 
                     // 障害物の当たり判定エリア
-                    const obstacleCollisionX = obstacle.x + 10; // 障害物の左端から10ピクセル右にずらす
-                    const obstacleCollisionY = obstacle.y + 10; // 障害物の上端から10ピクセル下にずらす
+                    const obstacleCollisionX = obstacle.x ; // 障害物の左端から10ピクセル右にずらす
+                    const obstacleCollisionY = obstacle.y -90; // 障害物の上端から10ピクセル下にずらす
                     const obstacleCollisionWidth = obstacle.size * 4 - 20; // 障害物の幅から20ピクセル引く
                     const obstacleCollisionHeight = obstacle.size * 4 - 20; // 障害物の高さから20ピクセル引く
 
@@ -371,15 +446,24 @@ canvas {
             drawObstacles();
         }
 
-        // プレイヤーの描画
+     // プレイヤーの描画
         function drawPlayer() {
-            if (isJumping) {
+        	if (isJumping && isDucking) {
+                // Display the ducking image when jumping and down key is pressed
+                context.drawImage(duckingImage, playerX, playerY, playerWidth, playerHeight);
+            } else if (isJumping) {
+                // ジャンプ中の画像を表示
                 context.drawImage(jumpImage, playerX, playerY, playerWidth, playerHeight);
+            } else if (isDucking) {
+                // しゃがんでいるときの画像を表示
+                context.drawImage(duckingImage, playerX, playerY, playerWidth, playerHeight);
             } else {
+                // 通常の画像を表示
                 context.drawImage(playerImages[currentFrame], playerX, playerY, playerWidth, playerHeight);
                 currentFrame = (currentFrame + 1) % numFrames;
             }
         }
+
 
         // 障害物の描画
         function drawObstacles() {
