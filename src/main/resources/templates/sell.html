@@ -264,9 +264,11 @@ document.addEventListener("DOMContentLoaded", function () {
 		</div>
 		
 		 <!-- ボタン -->
-        <a th:if="${ok}" th:href="@{game}" class="btn btn-secondary">スタート</a>
+       <a th:if="${ok}" th:href="@{game}" style="display: inline-block; background: url('/image/gamebutton.png') no-repeat center center; width: 145px; height: 65px; border: none; margin-top: 21px; margin-left: -25px;"></a>
+
         <span th:if="${ok}">&nbsp;</span> <!-- スペースを追加 -->
-        <a th:if="${ok}" th:href="@{game2}" class="btn btn-secondary">スタート2</a>
+       <a th:if="${ok}" th:href="@{game2}" style="display: inline-block; background: url('/image/cardgame.png') no-repeat center center; width: 145px; height: 65px; border: none; margin-top: 21px; margin-left: -40px;"></a>
+
           
 		 <!-- ボタン -->
         <a th:if="${!ok}" th:href="@{/sell/readme}" class="btn btn-secondary">初めに読んでください</a>
