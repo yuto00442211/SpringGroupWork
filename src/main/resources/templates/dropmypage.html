@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+<!-- グーグルフォントのスタイルを読み込む -->
+<link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css"
+      rel="stylesheet">
+
+<head>
+    <meta charset="UTF-8">
+    <title>落札リスト</title>
+
+    <!-- Bootstrapのスタイルシートを読み込む -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+</head>
+<style>
+/* 全体のページスタイル */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+}
+
+/* ヘッダー部分のスタイル */
+header {
+    background-color: #f0f0f0;
+    color: rgb(0, 0, 0);
+    padding: 10px 0;
+    text-align: center;
+    display: flex;
+    justify-content: flex-start; /* 要素を左寄せに配置 */
+    align-items: center;
+}
+
+/* 認証ボタンとユーザー情報のスタイル */
+.auth-buttons {
+    display: flex;
+    align-items: center;
+}
+
+/* ボタンコンテナのスタイル */
+.button-container {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+/* アクションボタンのスタイル */
+.action-button {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-right: 10px; /* ボタン間の右側のマージン */
+}
+
+/* 最後のアクションボタンのスタイル */
+.action-button:last-child {
+    margin-right: 0; /* 最後のボタンにはマージンを適用しない */
+}
+
+/* アクションボタンのホバースタイル */
+.action-button:hover {
+    background-color: #2980b9;
+}
+
+/* ユーザー情報のスタイル */
+.user-info {
+    padding-left: 10px; /* 左側のパディング */
+    padding-right: 10px; /* 右側のパディング */
+}
+
+/* エラーメッセージのスタイル */
+.alert.alert-danger {
+    /* エラーメッセージ全体のスタイル */
+}
+
+/* 落札成功メッセージのスタイル */
+.alert.alert-success {
+    /* 落札成功メッセージ全体のスタイル */
+}
+
+/* 未読メッセージのテキストスタイル */
+.text-danger {
+    color: red;
+}
+</style>
+
+<body>
+    <!-- ヘッダーセクション -->
+    <header>
+        <div class="site-name">
+            <!-- サイト名 -->
+            <h1 style="font-size: 32px;">キャルション！</h1>
+        </div>
+
+        <!-- 未認証ユーザーの認証ボタン -->
+        <div sec:authorize="!isAuthenticated()" class="auth-buttons">
+            <form th:action="@{/sell/login}" method="get">
+                <button class="action-button">ログイン</button>
+            </form>
+        </div>
+
+        <!-- 認証済みユーザーの情報とアクションボタン -->
+        <div sec:authorize="isAuthenticated()" class="user-info">
+            こんにちは：<span sec:authentication="name"></span>さん
+            <form th:action="@{/logout}" method="post"></form>
+
+            <!-- ボタンコンテナ -->
+            <div class="button-container">
+                <!-- 商品一覧へのリンクボタン -->
+                <form th:action="@{itemList}" method="get">
+                    <button style="background: url('/image/itembutton.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
+                </form>
+                <!-- マイページへのリンクボタン -->
+                <form th:action="@{showMypage}" method="get">
+                    <button style="background: url('/image/mypageicon.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
+                </form>
+                <!-- 商品の出品ページへのリンクボタン -->
+                <form th:action="@{create}" method="get">
+                    <button style="background: url('/image/upload.png') no-repeat center center; width: 60px; height: 65px; border: none;" type="submit"></button>
+                </form>
+                <!-- ログアウトボタン -->
+                <form th:action="@{/logout}" method="post">
+                    <button style="background: url('/image/logoutbutton.png') no-repeat center center; width: 145px; height: 65px; border: none;" type="submit"></button>
+                </form>
+            </div>
+        </div>
+        
+    </header>
+
+    <!-- エラーメッセージの表示 -->
+    <div th:if="${error}" class="alert alert-danger">
+        <p th:text="${error}"></p>
+        <!-- エラーメッセージが存在する場合のみリンクを表示 -->
+        <a th:href="@{/afterLogin/itemList}" class="btn btn-primary">商品を落札しよう！</a>
+    </div>
+
+    <!-- マイページの商品一覧テーブル -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>商品ID</th>
+                <th>商品名</th>
+                <th>ジャンル</th>
+                <th>落札価格</th>
+                <th>落札日時</th>
+                <th>商品詳細</th>
+                <th>落札者ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- データを繰り返し処理 -->
+            <tr th:each="dropgoods : ${dropList}">
+                <!-- 各セルにデータを表示 -->
+                <td th:text="${dropgoods.goods_id}"></td>
+                <td th:text="${dropgoods.name}"></td>
+                <td th:text="${dropgoods.genre_id}"></td>
+                <td th:text="${dropgoods.initial_price}+円"></td>
+                <td th:text="${#temporals.format(dropgoods.drop_time, 'yyyy年MM月dd日HH時mm分ss秒')}"></td>
+                <td th:text="${dropgoods.comment}"></td>
+                <td th:text="${dropgoods.account_id}"></td>
+                <!-- チャットページへのリンクボタン -->
+                <td><a th:href="@{/afterLogin/mychat(goods_id=${dropgoods.goods_id})}">チャット</a></td>
+ 
+            </tr>
+        </tbody>
+    </table>
+</body>
+<style>
+/* カスタムフォントのスタイル */
+h1 {
+    font-family: "Nico Moji";
+}
+
+/* サイト名のスタイル */
+.site-name {
+    background: #FFDA45; /*背景色の指定*/
+    color: #000000; /*テキストの色の指定*/
+    padding: 10px;
+    text-align: center;
+    width: 200px;
+}
+
+/* サイト名内のテキストスタイル */
+.site-name p {
+    margin: 0;
+    padding: 10px;
+}
+
+/* 検索フォームのスタイル */
+.search-form {
+    text-align: left;
+}
+
+/* ボタンコンテナ */
+.button-container {
+    display: flex;
+    align-items: center;
+}
+
+/* アクションボタンのスタイル */
+.action-button {
+    /* ボタンのスタイル */
+}
+
+/* アクションボタンのホバースタイル */
+.action-button:hover {
+    /* ボタンのホバースタイル */
+}
+
+/* 未読メッセージのテキストスタイル */
+.text-danger {
+    color: red;
+}
+</style>
+</html>

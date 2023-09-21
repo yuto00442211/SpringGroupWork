@@ -33,6 +33,7 @@ import com.example.demo.Domain.UserPrincipal;
 import com.example.demo.Form.AccountForm;
 import com.example.demo.Form.BitForm;
 import com.example.demo.Form.BitinfoDTO;
+import com.example.demo.Form.DropgoodsDTO;
 import com.example.demo.Form.GoodsDTO;
 import com.example.demo.Form.GoodsForm;
 import com.example.demo.entity.Account;
@@ -886,6 +887,55 @@ public class AfterController {
 		return "bitmypage";
 	}
 
+	//入札ページ表示
+	@GetMapping("/showdropMypage")
+	public String showDropMypage(Model model,@RequestParam(name = "error", required = false) Boolean error1) {
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		int accountId = accountService.findAccountIdByName(authentication.getName());
+		System.out.println(authentication.getName());
+		System.out.println(accountId);
+
+		// 入札情報を取得
+		List<Dropgoods> myDropList = dropgoodsService.getMyDropItem(accountId);
+
+		// 常にtrueに設定されているが、これはテストやデバッグのためかもしれない
+		boolean RoleAdmin = true;
+		boolean RoleYes = true;
+
+		// モデルにロール情報を追加
+		model.addAttribute("RoleAdmin", RoleAdmin);
+		model.addAttribute("RoleYes", RoleYes);
+
+		// 入札情報が存在する場合の処理
+		if (myDropList != null && !myDropList.isEmpty()) {
+			List<DropgoodsDTO> dropgoodsDTOs = new ArrayList<>(); // DTOのリストを初期化
+
+			for (Dropgoods dgoods : myDropList) {
+				DropgoodsDTO dropgoodsDTO = new DropgoodsDTO();
+
+				// DTOに情報をコピー
+				dropgoodsDTO.setGoods_id(dgoods.getGoods_id());
+				dropgoodsDTO.setName(dgoods.getName());
+				dropgoodsDTO.setGenre_id(dgoods.getGenre_id());
+				dropgoodsDTO.setInitial_price(dgoods.getInitial_price());
+				dropgoodsDTO.setDrop_time(dgoods.getDrop_time());
+				dropgoodsDTO.setComment(dgoods.getComment());
+				dropgoodsDTO.setAccount_id(dgoods.getAccount_id());
+
+
+				dropgoodsDTOs.add(dropgoodsDTO); // DTOリストに追加
+
+			}
+
+			model.addAttribute("dropList", dropgoodsDTOs); // モデルにDTOリストを追加
+		} else {
+			model.addAttribute("error", "落札している商品はありません。");
+		}
+
+		return "dropmypage";
+	}
 	//商品別mailBox表示
 	@GetMapping("/game")
 	public String showGame(Model model) {
@@ -975,7 +1025,7 @@ public class AfterController {
 	}
 
 //	@GetMapping("/dropList")
-//	public String showItemList(Model model,@AuthenticationPrincipal UserPrincipal userPrincipal) {
+//	public String showDropItemList(Model model,@AuthenticationPrincipal UserPrincipal userPrincipal) {
 //		System.out.println(123465);
 //		//入札者と出品者が同じかどうか
 //		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -1005,8 +1055,8 @@ public class AfterController {
 //
 //		return "dropList";
 //	}
-//
-//	
+
+	
 	
 
 	@PostMapping("/submitScore")
