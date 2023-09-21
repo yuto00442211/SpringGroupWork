@@ -67,29 +67,31 @@ public class SellController {
 		}
 		List<Genre> genreList = genreService.getAllGenre();
 		model.addAttribute("genreList", genreList);
-
-
+		if(dataList!=null) {
+			model.addAttribute("pickUp","～ピックアップ商品～");
+			dataList=goodsservice.getRandomElements(dataList, 3);
+		}
 		model.addAttribute("productList", dataList);
-		
+
 		boolean issellMapping =true;
 		model.addAttribute("issellMapping",issellMapping);
 		model.addAttribute("ok",false);
-		
+
 		return "sell"; // 出品ページのテンプレート名
 	}
 
 	@GetMapping("/product")
 	public String getProductDetail(@RequestParam int productId, Model model) {
 		Goods product = goodsservice.getGoodsById(productId);
-		
-		
+
+
 
 		if (product != null) { // 商品が存在する場合のみ処理を行う
 			String remainingTime = calculateRemainingTime(product.getEnd_time());
-			
+
 			int current_price = bitinfoService.highPrice(product);
 			model.addAttribute("current_price", current_price);
-		
+
 
 			model.addAttribute("product", product);
 			model.addAttribute("remainingTime", remainingTime);
@@ -101,60 +103,60 @@ public class SellController {
 		}
 	}
 	// AfterControllerクラス内にcalculateRemainingTimeメソッドを追加
-		private String calculateRemainingTime(LocalDateTime endTime) {
-			LocalDateTime now = LocalDateTime.now();
+	private String calculateRemainingTime(LocalDateTime endTime) {
+		LocalDateTime now = LocalDateTime.now();
 
-			if (now.isAfter(endTime)) {
-				return "オークション終了";
-			}
-
-			Duration duration = Duration.between(now, endTime);
-
-			long days = duration.toDays();
-			long hours = duration.toHoursPart();
-			long minutes = duration.toMinutesPart();
-
-			return String.format("残り時間: %d日 %d時間 %d分", days, hours, minutes);
+		if (now.isAfter(endTime)) {
+			return "オークション終了";
 		}
-	
 
-		@GetMapping("/sub")
-		public String aaa(Model model) {
-			
-			model.addAttribute("accountForm",new AccountForm());
+		Duration duration = Duration.between(now, endTime);
+
+		long days = duration.toDays();
+		long hours = duration.toHoursPart();
+		long minutes = duration.toMinutesPart();
+
+		return String.format("残り時間: %d日 %d時間 %d分", days, hours, minutes);
+	}
+
+
+	@GetMapping("/sub")
+	public String aaa(Model model) {
+
+		model.addAttribute("accountForm",new AccountForm());
+		return "menber";
+	}
+
+	@PostMapping("/sub")
+	public String menber(@Valid @ModelAttribute AccountForm accountForm, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+
+		if (bindingResult.hasErrors()) {
+			return "menber"; // 入力エラーがある場合は同じページに戻る
+		}
+
+		String name = accountForm.getName();
+
+		if (accountService.isNameAlreadyExists(name)) {
+			bindingResult.rejectValue("name", "error.accountForm", "この名前はすでに使用されています");
 			return "menber";
 		}
 
-		@PostMapping("/sub")
-		public String menber(@Valid @ModelAttribute AccountForm accountForm, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
-
-		    if (bindingResult.hasErrors()) {
-		        return "menber"; // 入力エラーがある場合は同じページに戻る
-		    }
-
-		    String name = accountForm.getName();
-
-		    if (accountService.isNameAlreadyExists(name)) {
-		        bindingResult.rejectValue("name", "error.accountForm", "この名前はすでに使用されています");
-		        return "menber";
-		    }
 
 
+		Account account = new Account();
 
-			Account account = new Account();
-
-			account.setName(accountForm.getName());
-			account.setAddress(accountForm.getAddress());
-			account.setTel(accountForm.getTel());
-			account.setMail(accountForm.getMail());
-			account.setPassword(passwordEncoder.encode(accountForm.getPassword()));
-			accountRepositry.save(account);
-			redirectAttributes.addFlashAttribute("message", "登録が完了しました");
-			return "redirect:/sell/success"; // 登録完了後にトップーページにリダイレクト
+		account.setName(accountForm.getName());
+		account.setAddress(accountForm.getAddress());
+		account.setTel(accountForm.getTel());
+		account.setMail(accountForm.getMail());
+		account.setPassword(passwordEncoder.encode(accountForm.getPassword()));
+		accountRepositry.save(account);
+		redirectAttributes.addFlashAttribute("message", "登録が完了しました");
+		return "redirect:/sell/success"; // 登録完了後にトップーページにリダイレクト
 
 
 
-		}
+	}
 
 	//	@GetMapping("/") // ルートURL ("/") に対するGETリクエストを処理します
 	//    public String redirectToIndex() {
@@ -186,7 +188,7 @@ public class SellController {
 		for(int i =0; i<productList.size(); i++) {
 			if(productList.get(i).getCurrent_price()==0) {
 				Goods goods =goodsservice.findAllAllbygoodsID (productList.get(i).getGoods_id());
-				
+
 				productList.get(i).setCurrent_price(goods.getInitial_price());
 			}
 		}
@@ -207,31 +209,31 @@ public class SellController {
 		List<GoodsList> productList;
 		boolean ID=true;
 		model.addAttribute("ID",ID);
-		
+
 		System.out.println(genre_id+"***");
 
 		System.out.println(keyword+8);
 		if (keyword != null && !keyword.isEmpty() && genre_id > 0) {
-		    // キーワードとジャンルIDを使用して検索クエリを実行する
+			// キーワードとジャンルIDを使用して検索クエリを実行する
 			System.out.println(456);
-		    productList = goodsListService.searchGoodsByKeywordAndGenre(keyword, genre_id);
+			productList = goodsListService.searchGoodsByKeywordAndGenre(keyword, genre_id);
 		} else if (keyword != null && !keyword.isEmpty()&&genre_id==0) {
-		    // キーワードのみを使用して検索クエリを実行する
+			// キーワードのみを使用して検索クエリを実行する
 			System.out.println(456456);
-		    productList = goodsListService.searchGoodsByKeyword(keyword);
+			productList = goodsListService.searchGoodsByKeyword(keyword);
 		} else if (genre_id > 0) {
-		    // ジャンルIDのみを使用して検索クエリを実行する
+			// ジャンルIDのみを使用して検索クエリを実行する
 			System.out.println(456456456);
-		    productList = goodsListService.goodsList2(genre_id);
+			productList = goodsListService.goodsList2(genre_id);
 		} else {
-		    // どちらも提供されない場合、デフォルトの検索処理を行うか、エラーハンドリングを行う
+			// どちらも提供されない場合、デフォルトの検索処理を行うか、エラーハンドリングを行う
 			System.out.println(654654654);
-		    productList = goodsListService.goodsList(); // デフォルトの検索処理の例
+			productList = goodsListService.goodsList(); // デフォルトの検索処理の例
 		}
 		for(int i =0; i<productList.size(); i++) {
 			if(productList.get(i).getCurrent_price()==0) {
 				Goods goods =goodsservice.findAllAllbygoodsID (productList.get(i).getGoods_id());
-				
+
 				productList.get(i).setCurrent_price(goods.getInitial_price());
 			}
 		}
