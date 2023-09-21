@@ -1054,6 +1054,13 @@ public class AfterController {
 
 			return "redirect:/afterLogin/showMypage"; // リダイレクト
 		}
+		
+		@GetMapping("/game2")
+		public String showGame2(Model model) {
+
+			model.addAttribute("myRequestData", new MyRequestData());
+			return"game2";
+		}
 
 }
 
