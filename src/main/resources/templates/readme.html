@@ -25,33 +25,6 @@ CREATE TABLE account (
     money INT DEFAULT 0
 );
 
--- 商品マスタ
-CREATE TABLE goods (
-    goods_id SERIAL PRIMARY KEY,
-    name VARCHAR(255),
-    genre_id INT,
-    initial_price INT,
-    start_time TIMESTAMP,
-    end_time TIMESTAMP,
-    image_number VARCHAR(255),
-    comment TEXT,
-    account_id INT
-);
-
--- ジャンルマスタ
-CREATE TABLE genre (
-    genre_id SERIAL PRIMARY KEY,
-    genre_name VARCHAR(100)
-);
-
--- 入札情報
-CREATE TABLE bitinfo (
-    goods_id INT,
-    account_id INT,
-    bid_time TIMESTAMP,
-    current_price INT,
-    PRIMARY KEY (goods_id, account_id, bid_time)
-);
 
 -- コメントテーブル
 CREATE TABLE comment (
