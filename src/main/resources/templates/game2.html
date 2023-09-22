@@ -172,7 +172,7 @@ body {
                     div.index = i;
                     div.number = arr[i];
                     div.innerHTML = '';
-                    div.onclick = function(e) { panelClick(e); };
+                    div.addEventListener('click', function(e) { panelClick(e); });
                     panel.appendChild(div);
                     cards.push(div);
                 }
@@ -237,6 +237,12 @@ body {
 
                 // 2枚目の処理
             } else {
+                // 同じカードをダブルクリックした場合
+                if (cardFirst === div) {
+                    // クリックを有効にする
+                    clickEnabled = true;
+                    return;
+                }
 
                 // 数字が1枚目と一致する場合
                 if (cardFirst.number == div.number) {
