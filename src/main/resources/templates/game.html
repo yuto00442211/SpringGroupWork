@@ -75,6 +75,18 @@ canvas {
 </head>
 
 <body>
+
+	<audio id="bgmAudio" loop>
+    <source src="/bgm.mp3" type="audio/mpeg">
+	</audio>
+	<audio id="jumpSound">
+    <source src="/jump.mp3" type="audio/mpeg">
+	</audio>
+	<audio id="gameOverSound">
+    <source src="/gameOver.mp3" type="audio/mpeg">
+	</audio>
+	
+
 	<div id="gameOverMessage" style="display: none;">
 		<p>
 			ゲームオーバー ☆ スコア送信ボタンをクリックしてね！<span id="scoreDisplay"></span>
@@ -221,6 +233,10 @@ canvas {
             gameTime = 0;
             isGameOver = false;
             isGameRunning = true; // ゲームが開始されたことを設定
+            
+         	// BGMを再生
+            var bgmAudio = document.getElementById('bgmAudio');
+            bgmAudio.play();
 
             // アニメーション速度を設定 (0.5秒ごとにフレームを切り替える)
             const animationSpeed = 500; // ミリ秒
@@ -331,11 +347,14 @@ canvas {
                     playerHeight = 182;
                 }
 
-                // スペースキーでジャンプ
+             	// スペースキーでジャンプ
                 if (keys['Space'] && !isJumping) {
                     velocityY = -18; // 上方向への速度を設定してジャンプ
                     isJumping = true;
+                    // ジャンプ効果音を再生
+                    playJumpSound();
                 }
+
 
                 // 重力による落下
                 velocityY += gravity;
@@ -408,6 +427,8 @@ canvas {
                         // 衝突した場合の処理
                         isGameOver = true;
                         isGameRunning = false;
+                        
+                        playgameOverSound();
 
                         // スコアをフォームに設定
                         document.getElementById('scoreField').value = gameTime;
@@ -421,11 +442,26 @@ canvas {
 
                         // アニメーションを停止
                         clearInterval(animationInterval);
+                        
+                        var bgmAudio = document.getElementById('bgmAudio');
+                        bgmAudio.pause();
                     }
 
                 });
             }
         }
+        
+	    // ジャンプ効果音を再生する関数
+        function playJumpSound() {
+            var jumpSound = document.getElementById('jumpSound');
+            jumpSound.play();
+        }
+     	// ジャンプ効果音を再生する関数
+        function playgameOverSound() {
+            var gameOverSound = document.getElementById('gameOverSound');
+            gameOverSound.play();
+        }
+
 
         // ゲームの描画
         function draw() {
