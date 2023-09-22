@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>データベースセットアップと操作ガイド</title>
 </head>
+
 <body>
     <h1>データベースセットアップと操作ガイド</h1>
     <p>このガイドでは、データベースのセットアップと基本的な操作手順を説明します。データベースは PostgreSQL を使用しています。</p>
@@ -66,9 +67,10 @@ CREATE TABLE comment (
 
 -- 落札商品マスタ
 CREATE TABLE dropgoods (
-    goods_id SERIAL PRIMARY KEY,
+    dropgoods_id SERIAL PRIMARY KEY,
+    goods_id INT,
     name VARCHAR(255),
-    genre_id INT,
+    genre_id INT ,
     initial_price INT,
     drop_time TIMESTAMP,
     image_number VARCHAR(255),

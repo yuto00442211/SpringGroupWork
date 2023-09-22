@@ -988,6 +988,7 @@ public class AfterController {
 
 		if(goodsprice<=buyAccount.getMoney()) {
 
+			
 			int sellprice = sellAcoount.getMoney()+goodsprice;
 			int buyprice = buyAccount.getMoney()-goodsprice;
 			buyAccount.setMoney(buyprice);
@@ -995,7 +996,6 @@ public class AfterController {
 			accountService.updateMoney(accountId, buyprice);
 			accountService.updateMoney(goodsAccountId, sellprice);
 			redirectAttributes.addFlashAttribute("message", "購入が完了しました");
-			
 			drop.setGoods_id(item.getGoods_id());
 			drop.setName(item.getName());
 			drop.setGenre_id(item.getGenre_id());
