@@ -13,18 +13,18 @@ html {
 }
 
 body {
-	margin: 0;
-	height: 100vh;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 #panel {
-	width: 310px;
-	height: 340px;
-	overflow: hidden;
-	margin-top: 100px;
+    width: 310px;
+    height: 340px;
+    overflow: hidden;
+    margin-top: 100px;
 }
 
 .card {
@@ -38,29 +38,28 @@ body {
     background-repeat: no-repeat;
 }
 
-
 /* 裏の状態 */
 .back {
-	background-image: url('/wagan2.jpg');
+    background-image: url('/wagan2.jpg');
 }
 
 /* 終了時 */
 .finish {
-	opacity: 0;
-	cursor: default;
+    opacity: 0;
+    cursor: default;
 }
 
 /* 経過秒数 */
 #result {
-	font-size: 1.2em;
-	font-weight: bold;
-	margin-top: 20px;
-	color: black;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 20px;
+    color: black;
 }
 
 #startGame {
-	display: block;
-	margin: 20px auto;
+    display: block;
+    margin: 20px auto;
 }
 
 #gameClearMessage {
@@ -73,233 +72,260 @@ body {
 </style>
 </head>
 <body>
-	
-	<div id="result">経過秒数:</div>
-	
-	<div id="gameClearMessage" style="display: none;">
+
+    <div id="result">経過秒数:</div>
+
+    <div id="gameClearMessage" style="display: none;">
         <p>ゲームクリア！ ☆ スコア送信ボタンをクリックしてね！<span id="scoreDisplay"></span></p>
     </div>
     <form id="scoreForm" th:action="@{/afterLogin/submitScore}"
-		th:object="${myRequestData}" method="post" style="display: none;">
-		<input type="number" id="scoreField" th:field="*{score}"
-			placeholder="スコアを入力してください" th:readonly="true">
-		<button type="submit">送信でポイント獲得</button>
-	</form>
-	
-	
-	<!-- パネルを包む新しいdivを追加 -->
-	<div style="display: flex;">
-    <!-- 画像を表示するdiv -->
-    <div id="imagePanel" style="width: 60px; height: 60px;">
-        <img src="/001.png" alt="Image" style="width: 100%; height: 100%;">
+        th:object="${myRequestData}" method="post" style="display: none;">
+        <input type="number" id="scoreField" th:field="*{score}"
+            placeholder="スコアを入力してください" th:readonly="true">
+        <button type="submit">送信でポイント獲得</button>
+    </form>
+
+    <!-- パネルを包む新しいdivを追加 -->
+    <div style="display: flex;">
+        <!-- 画像を表示するdiv -->
+        <div id="imagePanel" style="width: 60px; height: 60px;">
+            <img src="/001.png" alt="Image" style="width: 100%; height: 100%;">
+        </div>
+        <!-- カードを表示するdiv -->
+        <div id="panel" style="width: 350px; height: 350px; overflow: hidden; margin-top: 100px;">
+            <!-- カード要素はそのまま -->
+        </div>
     </div>
-    <!-- カードを表示するdiv -->
-    <div id="panel" style="width: 350px; height: 350px; overflow: hidden; margin-top: 100px;">
-        <!-- カード要素はそのまま -->
-    </div>
-	</div>
-	
-	<button id="startGame" onclick="startGame()">ここをクリックでゲームスタート</button>
-	<button id="戻る" style="display: block; margin: 20px auto;">topに戻る</button>
 
-	<script>
-		document.getElementById('戻る').addEventListener('click', function() {
-			window.location.href = '/afterLogin/sell';
-		});
+    <button id="startGame" onclick="startGame()">ここをクリックでゲームスタート</button>
+    <button id="戻る" style="display: block; margin: 20px auto;">topに戻る</button>
 
-		// グローバル
-		// div要素を格納
-		var cards = [];
-		// 開始時間
-		var startTime;
-		// 経過秒数用 タイマーID
-		var timer;
-		// カードめくり用 タイマーID
-		var backTimer;
-		// 1枚目かどうかのフラグ   1枚目: true   2枚目: false
-		var flgFirst = true;
-		// 1枚目のカードを格納
-		var cardFirst;
-		// そろえた枚数
-		var countUnit = 0;
+    <script>
+        document.getElementById('戻る').addEventListener('click', function() {
+            window.location.href = '/afterLogin/sell';
+        });
 
-		// ゲームが開始されたかどうかのフラグ
-		var gameStarted = false;
-		
-		var elapsedTime = 0;
-		
-		var scorePt = 0;
+        // グローバル
+        // div要素を格納
+        var cards = [];
+        // 開始時間
+        var startTime;
+        // 経過秒数用 タイマーID
+        var timer;
+        // カードめくり用 タイマーID
+        var backTimer;
+        // 1枚目かどうかのフラグ   1枚目: true   2枚目: false
+        var flgFirst = true;
+        // 1枚目のカードを格納
+        var cardFirst;
+        // そろえた枚数
+        var countUnit = 0;
 
-		// カードの数字と画像の対応関係を定義
-		var cardImages = {
-		    0: '/cardImage/card00.jpeg',
-		    1: '/cardImage/card11.jpeg',
-		    2: '/cardImage/card22.jpeg',
-		    3: '/cardImage/card33.jpeg',
-		    4: '/cardImage/card44.jpeg',
-		    5: '/cardImage/card55.jpeg',
-		    6: '/cardImage/card66.jpeg',
-		    7: '/cardImage/card77.jpeg',
-		    8: '/cardImage/card88.jpeg',
-		    9: '/cardImage/card99.jpeg',
-		};
+        // ゲームが開始されたかどうかのフラグ
+        var gameStarted = false;
 
-		function startGame() {
-			if (!gameStarted) {
-				// ゲームが開始されていない場合
-				gameStarted = true;
+        var elapsedTime = 0;
 
-				// ボタンを非表示に
-				var startButton = document.getElementById('startGame');
-				startButton.style.display = 'none';
+        var scorePt = 0;
 
-				// 数字格納 一時配列
-				var arr = [];
+        // カードの数字と画像の対応関係を定義
+        var cardImages = {
+            0: '/cardImage/card00.jpeg',
+            1: '/cardImage/card11.jpeg',
+            2: '/cardImage/card22.jpeg',
+            3: '/cardImage/card33.jpeg',
+            4: '/cardImage/card44.jpeg',
+            5: '/cardImage/card55.jpeg',
+            6: '/cardImage/card66.jpeg',
+            7: '/cardImage/card77.jpeg',
+            8: '/cardImage/card88.jpeg',
+            9: '/cardImage/card99.jpeg',
+        };
 
-				for (var i = 0; i < 10; i++) {
-					// ペアの数字を10組
-					arr.push(i);
-					arr.push(i);
-				}
+        function startGame() {
+            if (!gameStarted) {
+                // ゲームが開始されていない場合
+                gameStarted = true;
 
-				// シャッフル
-				shuffle(arr);
+                // ボタンを非表示に
+                var startButton = document.getElementById('startGame');
+                startButton.style.display = 'none';
 
-				var panel = document.getElementById('panel');
+                // 数字格納 一時配列
+                var arr = [];
 
-				// div要素作成
-				for (i = 0; i < 20; i++) {
-					var div = document.createElement('div');
-					div.className = 'card back';
-					div.index = i;
-					div.number = arr[i];
-					div.innerHTML = '';
-					div.onclick = turn;
-					panel.appendChild(div);
-					cards.push(div);
-				}
-				// 開始時刻を取得
-				startTime = new Date();
-				// タイマー開始
-				startTimer();
-			}
-		}
+                for (var i = 0; i < 10; i++) {
+                    // ペアの数字を10組
+                    arr.push(i);
+                    arr.push(i);
+                }
 
-		// シャッフル用関数
-		function shuffle(arr) {
-			var n = arr.length;
-			var temp, i;
+                // シャッフル
+                shuffle(arr);
 
-			while (n) {
-				i = Math.floor(Math.random() * n--);
-				temp = arr[n];
-				arr[n] = arr[i];
-				arr[i] = temp;
-			}
-			return arr;
-		}
+                var panel = document.getElementById('panel');
 
-		// クリック時の処理
-		function turn(e) {
+                // div要素作成
+                for (i = 0; i < 20; i++) {
+                    var div = document.createElement('div');
+                    div.className = 'card back';
+                    div.index = i;
+                    div.number = arr[i];
+                    div.innerHTML = '';
+                    div.onclick = function(e) { panelClick(e); };
+                    panel.appendChild(div);
+                    cards.push(div);
+                }
+                // 開始時刻を取得
+                startTime = new Date();
+                // タイマー開始
+                startTimer();
+            }
+        }
 
-			var div = e.target;
+        // シャッフル用関数
+        function shuffle(arr) {
+            var n = arr.length;
+            var temp, i;
 
-			// カードのタイマー処理が動作中は return
-			if (backTimer || !gameStarted)
-				return;
+            while (n) {
+                i = Math.floor(Math.random() * n--);
+                temp = arr[n];
+                arr[n] = arr[i];
+                arr[i] = temp;
+            }
+            return arr;
+        }
 
-			// 裏向きのカードをクリックした場合は画像を表示する
-			if (div.innerHTML == '') {
-				div.className = 'card';
-				div.style.backgroundImage = 'url(' + cardImages[div.number] + ')';
-				div.innerHTML = '';
-			} else {
-				// 画像が表示されているカードは return
-				return;
-			}
+        // クリック時の処理
+        function turn(e) {
+            if (!clickEnabled) {
+                return; // クリックが無効の場合は何もしない
+            }
 
-			// 1枚目の処理
-			if (flgFirst) {
-				// cardFirst は2枚目の処理のときに使う
-				cardFirst = div;
-				// フラグ変更
-				flgFirst = false;
+            var div = e.target;
 
-				// 2枚目の処理
-			} else {
+            // カードのタイマー処理が動作中またはカードが finish 状態の場合は return
+            if (backTimer || !gameStarted || div.className === 'card finish') {
+                return;
+            }
 
-				// 数字が1枚目と一致する場合
-				if (cardFirst.number == div.number) {
-					countUnit++;
-					// 見えない状態にする
-					backTimer = setTimeout(function() {
-						div.className = 'card finish';
-						cardFirst.className = 'card finish';
-						backTimer = NaN;
+            // クリックを無効にする
+            clickEnabled = false;
 
-						if (countUnit == 10) {
-							clearInterval(timer); // timer終了
-							
-							if(elapsedTime<20){
-								scorePt = 1000;
-							}else if(elapsedTime<30){
-								scorePt = 800;
-							}else if(elapsedTime<40){
-								scorePt = 600;
-							}else if(elapsedTime<50){
-								scorePt = 400;
-							}else if(elapsedTime<60){
-								scorePt = 200;
-							}
-							 // スコアをフォームに設定
-	                        document.getElementById('scoreField').value = scorePt;
+            // 裏向きのカードをクリックした場合は画像を表示する
+            if (div.innerHTML == '') {
+                div.className = 'card';
+                div.style.backgroundImage = 'url(' + cardImages[div.number] + ')';
+                div.innerHTML = '';
+            } else {
+                // クリックを有効にする
+                clickEnabled = true;
+                // 画像が表示されているカードは return
+                return;
+            }
 
-	                        // フォームを表示してデータを送信
-	                        document.getElementById('scoreForm').style.display = 'block';
+            // 1枚目の処理
+            if (flgFirst) {
+                // cardFirst は2枚目の処理のときに使う
+                cardFirst = div;
+                // フラグ変更
+                flgFirst = false;
 
-	                        // ゲームクリアメッセージを表示
-	                        document.getElementById('scoreDisplay').textContent = scorePt + 'pt';
-	                        document.getElementById('gameClearMessage').style.display = 'block';
-							
-						}
-					}, 500)
+                // クリックを有効にする
+                clickEnabled = true;
 
-					// 一致しない場合
-				} else {
-				    // カードを裏側に戻す
-				    backTimer = setTimeout(function() {
-				        div.className = 'card back'; // カードを 'card back' に戻す
-				        div.style.backgroundImage = 'url(/wagan2.jpg)'; // 背景画像を設定
-				        div.innerHTML = '';
-				        cardFirst.className = 'card back'; // カードを 'card back' に戻す
-				        cardFirst.style.backgroundImage = 'url(/wagan2.jpg)'; // 背景画像を設定
-				        cardFirst.innerHTML = '';
-				        cardFirst = null;
-				        backTimer = NaN;
-				    }, 500);
-				}
+                // 2枚目の処理
+            } else {
 
+                // 数字が1枚目と一致する場合
+                if (cardFirst.number == div.number) {
+                    countUnit++;
+                    // 見えない状態にする
+                    backTimer = setTimeout(function() {
+                        div.className = 'card finish';
+                        cardFirst.className = 'card finish';
+                        backTimer = NaN;
 
-				flgFirst = true;
-			}
-		}
+                        if (countUnit == 10) {
+                            clearInterval(timer); // timer終了
 
-		// タイマー開始
-		function startTimer() {
-			timer = setInterval(showSecond, 1000);
-		}
+                            if (elapsedTime < 20) {
+                                scorePt = 1000;
+                            } else if (elapsedTime < 30) {
+                                scorePt = 800;
+                            } else if (elapsedTime < 40) {
+                                scorePt = 600;
+                            } else if (elapsedTime < 50) {
+                                scorePt = 400;
+                            } else if (elapsedTime < 60) {
+                                scorePt = 200;
+                            }
+                            // スコアをフォームに設定
+                            document.getElementById('scoreField').value = scorePt;
 
-		// 秒数表示
-		function showSecond() {
+                            // フォームを表示してデータを送信
+                            document.getElementById('scoreForm').style.display = 'block';
 
-			var nowTime = new Date();
-			elapsedTime = Math.floor((nowTime - startTime) / 1000);
-			var str = '経過秒数: ' + elapsedTime + '秒';
+                            // ゲームクリアメッセージを表示
+                            document.getElementById('scoreDisplay').textContent = scorePt + 'pt';
+                            document.getElementById('gameClearMessage').style.display = 'block';
 
-			var re = document.getElementById('result');
-			re.innerHTML = str;
-		}
-	</script>
+                        }
+                        // クリックを有効にする
+                        clickEnabled = true;
+                    }, 500)
+
+                    // 一致しない場合
+                } else {
+                    // カードを裏側に戻す
+                    backTimer = setTimeout(function() {
+                        div.className = 'card back'; // カードを 'card back' に戻す
+                        div.style.backgroundImage = 'url(/wagan2.jpg)'; // 背景画像を設定
+                        div.innerHTML = '';
+                        cardFirst.className = 'card back'; // カードを 'card back' に戻す
+                        cardFirst.style.backgroundImage = 'url(/wagan2.jpg)'; // 背景画像を設定
+                        cardFirst.innerHTML = '';
+                        cardFirst = null;
+                        backTimer = NaN;
+                        // クリックを有効にする
+                        clickEnabled = true;
+                    }, 500);
+                }
+
+                flgFirst = true;
+            }
+        }
+
+        // パネルのクリックイベント
+        function panelClick(e) {
+            // クリックした要素がパネル内のカードでなければ return
+            if (!e.target.classList.contains('card')) {
+                return;
+            }
+
+            turn(e);
+        }
+
+        // タイマー開始
+        function startTimer() {
+            timer = setInterval(showSecond, 1000);
+        }
+
+        // 秒数表示
+        function showSecond() {
+
+            var nowTime = new Date();
+            elapsedTime = Math.floor((nowTime - startTime) / 1000);
+            var str = '経過秒数: ' + elapsedTime + '秒';
+
+            var re = document.getElementById('result');
+            re.innerHTML = str;
+        }
+
+        // グローバル変数にクリックを受け付けるフラグを追加
+        var clickEnabled = true;
+    </script>
 
 </body>
 </html>
